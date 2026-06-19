@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Camera (for face detection) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="true" />
+
     <!-- Audio & Internet -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -74,6 +79,12 @@
         <service
             android:name=".service.CallMonitorService"
             android:foregroundServiceType="phoneCall"
+            android:exported="false" />
+
+        <!-- Maya Core Service (Always-on background) -->
+        <service
+            android:name=".service.MayaCoreService"
+            android:foregroundServiceType="microphone|camera"
             android:exported="false" />
 
         <!-- Accessibility Service -->

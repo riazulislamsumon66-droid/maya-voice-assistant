@@ -227,6 +227,18 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, "Settings saved! Restart app to apply changes.", Toast.LENGTH_LONG).show()
+
+        // Start MayaCoreService after saving settings
+        try {
+            val coreIntent = Intent(this, com.maya.assistant.service.MayaCoreService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(coreIntent)
+            } else {
+                startService(coreIntent)
+            }
+        } catch (e: Exception) {
+            // Service may already be running
+        }
     }
 
     private fun updateAccessibilityStatus() {
