@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Maya" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/maya_red</item>
+        <item name="colorPrimaryVariant">@color/maya_idle_dark</item>
+        <item name="colorSecondary">@color/maya_purple</item>
+        <item name="colorSecondaryVariant">@color/maya_purple</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/maya_dark</item>
+        <item name="android:windowBackground">@color/maya_dark</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

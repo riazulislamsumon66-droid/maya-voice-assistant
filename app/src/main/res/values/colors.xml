@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="maya_red">#FF1744</color>
+    <color name="maya_purple">#D500F9</color>
+    <color name="maya_dark">#050505</color>
+    <color name="maya_card">#111111</color>
+    <color name="maya_prime_card">#1A0000</color>
+    <color name="maya_text_primary">#EEEEEE</color>
+    <color name="maya_text_hint">#555555</color>
+    <color name="maya_success">#00E676</color>
+    <color name="maya_cyan">#40C4FF</color>
+    <color name="maya_idle_dark">#B71C1C</color>
+    <color name="maya_idle_deep">#880E4F</color>
+</resources>

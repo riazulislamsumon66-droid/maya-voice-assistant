@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="8dp">
+
+    <View
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/ic_maya_notif"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/chatMayaText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chat_maya"
+        android:padding="12dp"
+        android:textColor="@color/maya_text_primary"
+        android:textSize="13sp"
+        android:maxWidth="280dp" />
+</LinearLayout>
