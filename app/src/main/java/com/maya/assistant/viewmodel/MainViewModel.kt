@@ -15,6 +15,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.maya.assistant.service.AccessibilityHelperService
+import com.maya.assistant.service.ScreenInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -354,9 +356,111 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return prefs.getString("prime_contacts_json", "[]") ?: "[]"
     }
 
+    fun getPrimeContactsJson(): String {
+        val context = getApplication<Application>()
+        val prefs = context.getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
+        return prefs.getString("prime_contacts_json", "[]") ?: "[]"
+    }
+
     fun savePrimeContacts(json: String) {
         val context = getApplication<Application>()
         val prefs = context.getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
         prefs.edit().putString("prime_contacts_json", json).apply()
+    }
+
+    // ===== SCREEN READING METHODS =====
+
+    /**
+     * Get current screen content as text
+     */
+    fun getScreenContent(): String {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.getScreenContent()
+        } else {
+            ""
+        }
+    }
+
+    /**
+     * Get structured screen info (app name, text, clickable items)
+     */
+    fun getScreenInfo(): ScreenInfo {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.getScreenInfo()
+        } else {
+            ScreenInfo("Unknown", "", emptyList())
+        }
+    }
+
+    /**
+     * Click on text on screen
+     */
+    fun clickOnScreenText(text: String): Boolean {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.clickOnText(text)
+        } else false
+    }
+
+    /**
+     * Type text into focused input
+     */
+    fun typeOnScreen(text: String) {
+        val service = AccessibilityHelperService.instance
+        if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.typeText(text)
+        }
+    }
+
+    /**
+     * Smart type — finds EditText and types
+     */
+    fun smartTypeOnScreen(text: String, hint: String = ""): Boolean {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.typeTextSmart(text, hint)
+        } else false
+    }
+
+    /**
+     * Get clickable elements from screen
+     */
+    fun getClickableElements(): List<String> {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.getClickableElements()
+        } else emptyList()
+    }
+
+    /**
+     * Click at coordinates
+     */
+    fun clickAt(x: Int, y: Int) {
+        val service = AccessibilityHelperService.instance
+        if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.clickAt(x, y)
+        }
+    }
+
+    /**
+     * Scroll screen
+     */
+    fun scrollScreen(direction: String) {
+        val service = AccessibilityHelperService.instance
+        if (service != null && AccessibilityHelperService.isEnabled()) {
+            if (direction == "down") service.scrollDown() else service.scrollUp()
+        }
+    }
+
+    /**
+     * Wait for text and click
+     */
+    fun waitAndClick(text: String, timeoutMs: Long = 5000): Boolean {
+        val service = AccessibilityHelperService.instance
+        return if (service != null && AccessibilityHelperService.isEnabled()) {
+            service.waitAndClick(text, timeoutMs)
+        } else false
     }
 }

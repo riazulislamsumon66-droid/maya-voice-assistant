@@ -367,4 +367,143 @@ class CommandParser {
             else -> 0
         }
     }
+
+    // ===== SCREEN-AWARE COMMANDS =====
+    // These return commands that use screen reading for context
+
+    /**
+     * Parse screen-aware voice commands
+     * Called when regular parse returns null but user wants to interact with screen
+     */
+    fun parseScreenCommand(text: String): AppCommand? {
+        val lower = text.lowercase().trim()
+
+        // Facebook / Social Media Post
+        // English: "post on facebook", "write a post", "share on facebook"
+        // Bangla: "facebook e post karo", "fb te post kor", "post dao facebook e"
+        // Hindi: "facebook mein post karo", "fb mein likh do"
+        if (lower.contains("post") && (lower.contains("facebook") || lower.contains("fb") || lower.contains("facebook e"))) {
+            val content = extractPostContent(lower)
+            return AppCommand(
+                type = "SCREEN_FACEBOOK_POST",
+                params = mapOf("content" to content, "raw" to text)
+            )
+        }
+
+        // Click/tap on screen elements
+        // English: "click on X", "tap on X", "press X"
+        // Bangla: "X e click karo", "X e tap koro", "X চাপ দাও"
+        // Hindi: "X pe click karo", "X dabao"
+        val clickPatterns = listOf(
+            Regex("""^click\s+on\s+(.+)$"""),
+            Regex("""^tap\s+on\s+(.+)$"""),
+            Regex("""^press\s+(.+)$"""),
+            Regex("""^(.+)\s+e\s+click\s+karo$"""),
+            Regex("""^(.+)\s+pe\s+click\s+karo$"""),
+            Regex("""^(.+)\s+e\s+tap\s+koro$"""),
+            Regex("""^(.+)\s+pe\s+tap\s+karo$"""),
+            Regex("""^click\s+karo\s+(.+)$"""),
+            Regex("""^tap\s+koro\s+(.+)$""")
+        )
+        for (pattern in clickPatterns) {
+            val match = pattern.find(lower)
+            if (match != null) {
+                val target = match.groupValues[1].trim()
+                return AppCommand(
+                    type = "SCREEN_CLICK_TEXT",
+                    params = mapOf("target" to target)
+                )
+            }
+        }
+
+        // Type/Write on screen
+        // English: "type X", "write X", "enter X"
+        // Bangla: "X type karo", "X likho", "X lekho"
+        // Hindi: "X type karo", "X likh do"
+        val typePatterns = listOf(
+            Regex("""^type\s+(.+)$"""),
+            Regex("""^write\s+(.+)$"""),
+            Regex("""^enter\s+(.+)$"""),
+            Regex("""^likho\s+(.+)$"""),
+            Regex("""^lekho\s+(.+)$"""),
+            Regex("""^(.+)\s+type\s+karo$"""),
+            Regex("""^(.+)\s+likho$"""),
+            Regex("""^(.+)\s+lekho$"""),
+            Regex("""^type\s+karo\s+(.+)$""")
+        )
+        for (pattern in typePatterns) {
+            val match = pattern.find(lower)
+            if (match != null) {
+                val content = match.groupValues[1].trim()
+                return AppCommand(
+                    type = "SCREEN_TYPE_TEXT",
+                    params = mapOf("content" to content)
+                )
+            }
+        }
+
+        // Scroll screen
+        // English: "scroll down", "scroll up", "page down"
+        // Bangla: "scroll koro", "niche scroll koro", "upore scroll koro"
+        // Hindi: "scroll karo", "neeche scroll karo"
+        if (lower.contains("scroll down") || lower.contains("niche scroll") ||
+            lower.contains("neeche scroll") || lower.contains("scroll niche")) {
+            return AppCommand(type = "SCREEN_SCROLL", params = mapOf("direction" to "down"))
+        }
+        if (lower.contains("scroll up") || lower.contains("upore scroll") ||
+            lower.contains("oopar scroll") || lower.contains("scroll upore")) {
+            return AppCommand(type = "SCREEN_SCROLL", params = mapOf("direction" to "up"))
+        }
+
+        // Read screen
+        // English: "read screen", "what's on screen", "screen ta kemon"
+        // Bangla: "screen ta bolo", "screen e ki ache", "screen poro"
+        // Hindi: "screen kya hai", "screen batao"
+        if (lower.contains("read screen") || lower.contains("screen") &&
+            (lower.contains("bolo") || lower.contains("batao") || lower.contains("kemon") ||
+             lower.contains("ki ache") || lower.contains("kya hai") || lower.contains("poro"))) {
+            return AppCommand(type = "SCREEN_READ", params = emptyMap())
+        }
+
+        // Search on current app
+        // English: "search for X", "search X"
+        // Bangla: "X search karo", "X khujo"
+        // Hindi: "X search karo"
+        val searchPatterns = listOf(
+            Regex("""^search\s+for\s+(.+)$"""),
+            Regex("""^search\s+(.+)$"""),
+            Regex("""^(.+)\s+search\s+karo$"""),
+            Regex("""^(.+)\s+khujo$""")
+        )
+        for (pattern in searchPatterns) {
+            val match = pattern.find(lower)
+            if (match != null) {
+                val query = match.groupValues[1].trim()
+                return AppCommand(
+                    type = "SCREEN_SEARCH",
+                    params = mapOf("query" to query)
+                )
+            }
+        }
+
+        return null
+    }
+
+    private fun extractPostContent(text: String): String {
+        // Try to extract actual post content from the voice command
+        val patterns = listOf(
+            Regex("""post\s+(?:on\s+)?(?:facebook|fb)\s*(?:that\s+)?["']?(.+?)["']?$"""),
+            Regex("""(?:facebook|fb)\s*(?:te|e|mein)\s*post\s*(?:karo|kor|do)\s*["']?(.+?)["']?$"""),
+            Regex("""post\s+(?:karo|kor|do)\s*(?:facebook|fb)\s*(?:te|e|mein)?\s*["']?(.+?)["']?$"""),
+            Regex("""post\s+(?:content|text)?\s*[:=]?\s*["']?(.+?)["']?$""")
+        )
+        for (pattern in patterns) {
+            val match = pattern.find(text)
+            if (match != null) {
+                val content = match.groupValues[1].trim()
+                if (content.isNotBlank() && content.length > 3) return content
+            }
+        }
+        return ""
+    }
 }

@@ -248,6 +248,14 @@ class MainActivity : AppCompatActivity() {
                         val command = commandParser.parse(input)
                         if (command != null) {
                             viewModel.executeCommand(command)
+                        } else {
+                            // Try screen-aware commands
+                            val screenCommand = commandParser.parseScreenCommand(input)
+                            if (screenCommand != null) {
+                                executeScreenCommand(screenCommand)
+                            } else {
+                                // Let MAYA handle as conversation — already sent via WebSocket
+                            }
                         }
                     }
                 }
@@ -375,6 +383,103 @@ class MainActivity : AppCompatActivity() {
         // Time
         val timeFormat = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
         timeText.text = timeFormat.format(java.util.Date())
+    }
+
+    // ===== SCREEN COMMAND EXECUTION =====
+
+    private fun executeScreenCommand(command: com.maya.assistant.model.AppCommand) {
+        when (command.type) {
+            "SCREEN_FACEBOOK_POST" -> {
+                val content = command.params["content"] ?: ""
+                val raw = command.params["raw"] ?: ""
+                statusText.text = "Facebook এ post করছে..."
+                orbView.setState(OrbState.THINKING)
+
+                // Step 1: Open Facebook
+                viewModel.executeCommand(
+                    com.maya.assistant.model.AppCommand(
+                        type = "OPEN_APP",
+                        params = mapOf("app_name" to "facebook", "package_name" to "com.facebook.katana")
+                    )
+                )
+
+                // Step 2: After delay, guide user through posting
+                orbView.postDelayed({
+                // Tell MAYA to help with the post via Gemini
+                val postInstruction = if (content.isNotBlank()) {
+                    "Facebook এ একটা post করো: $content"
+                } else {
+                    raw
+                }
+                geminiLive.sendText("User wants to $postInstruction. Please guide them step by step on what to do on the Facebook screen. Tell them to use screen commands like 'click on X' or 'type X'. Keep it short.")
+                statusText.text = "MAYA বলছে কীভাবে post করবেন..."
+            }, 3000)
+        }
+
+            "SCREEN_CLICK_TEXT" -> {
+                val target = command.params["target"] ?: ""
+                statusText.text = "'$target' click করছে..."
+                val success = viewModel.clickOnScreenText(target)
+                val msg = if (success) "'$target' click হয়ে গেল!" else "'$target' পাওয়া যায়নি"
+                geminiLive.sendText(msg)
+            }
+
+            "SCREEN_TYPE_TEXT" -> {
+                val content = command.params["content"] ?: ""
+                statusText.text = "টাইপ করছে: $content"
+                viewModel.smartTypeOnScreen(content)
+                orbView.postDelayed({
+                    geminiLive.sendText("Typed '$content' on screen. What next?")
+                }, 1500)
+            }
+
+            "SCREEN_SCROLL" -> {
+                val direction = command.params["direction"] ?: "down"
+                viewModel.scrollScreen(direction)
+                statusText.text = "Scroll করছে $direction..."
+            }
+
+            "SCREEN_READ" -> {
+                statusText.text = "Screen পড়ছে..."
+                orbView.setState(OrbState.THINKING)
+
+                // Get screen content via accessibility service
+                val screenInfo = viewModel.getScreenInfo()
+                val screenText = screenInfo.fullText
+
+                if (screenText.isNotBlank()) {
+                    // Send to Gemini for interpretation
+                    val prompt = """
+                        Here is the current screen content from ${screenInfo.appName}:
+                        $screenText
+
+                        Clickable items: ${screenInfo.clickableItems.joinToString(", ") { it.text }}
+
+                        User asked: "স্ক্রিনটা বলো / read screen"
+                        Summarize what's on the screen in Bangla/English/Hindi. Keep it short.
+                    """.trimIndent()
+                    geminiLive.sendText(prompt)
+                } else {
+                    geminiLive.sendText("Accessibility service is not enabled. Please enable it in Settings to read screen content.")
+                    statusText.text = "Accessibility চালু নেই — Settings এ যান"
+                }
+            }
+
+            "SCREEN_SEARCH" -> {
+                val query = command.params["query"] ?: ""
+                statusText.text = "সার্চ করছে: $query"
+                viewModel.smartTypeOnScreen(query)
+                orbView.postDelayed({
+                    // Press Enter / Search key
+                    viewModel.clickOnScreenText("Search")
+                    viewModel.clickOnScreenText("সার্চ")
+                }, 2000)
+            }
+
+            else -> {
+                statusText.text = "Unknown screen command: ${command.type}"
+            }
+        }
     }
 
     override fun onPause() {
