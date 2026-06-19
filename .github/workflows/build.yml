@@ -47,24 +47,10 @@ jobs:
     - name: Build debug APK
       run: ./gradlew assembleDebug --no-daemon 2>&1 | tail -50
 
-    - name: Upload APK
+    - name: Upload APK artifact
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: maya-debug-apk
         path: app/build/outputs/apk/**/*.apk
         retention-days: 30
-
-    - name: Create Release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v${{ github.run_number }}
-        name: MAYA v${{ github.run_number }}
-        body: |
-          MAYA Voice Assistant - Debug APK
-          Built from commit: ${{ github.sha }}
-        files: app/build/outputs/apk/**/*.apk
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
