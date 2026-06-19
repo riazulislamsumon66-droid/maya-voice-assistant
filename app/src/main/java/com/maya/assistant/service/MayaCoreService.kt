@@ -56,7 +56,7 @@ class MayaCoreService : Service() {
     // Sub-services
     private var hotwordDetector: HotwordDetector? = null
     private var faceDetector: FaceDetector? = null
-    private var voiceAuthenticator: VoiceAuthenticator? = null
+    private var voiceAuthManager: VoiceAuthManager? = null
     
     // State
     private var isHotwordActive = false
@@ -154,7 +154,7 @@ class MayaCoreService : Service() {
     }
 
     private fun initVoiceAuthenticator() {
-        voiceAuthenticator = VoiceAuthenticator(this)
+        voiceAuthManager = VoiceAuthManager(this)
     }
 
     // ===== AUTHENTICATION LOGIC =====
@@ -184,28 +184,35 @@ class MayaCoreService : Service() {
     private fun handleVoiceDetected() {
         lastVoiceDetected = System.currentTimeMillis()
         
-        // Check if face is also detected recently (within 10 seconds)
-        val faceRecent = System.currentTimeMillis() - lastFaceDetected < 10000
-        
-        authState = if (faceRecent) {
-            AUTH_BOTH
-        } else {
-            AUTH_VOICE
-        }
-        
-        isAuthenticated = true
-        updateNotification()
-        onAuthenticated?.invoke(authState)
-        
-        // Start listening for command after hotword
-        startCommandListening()
-        
-        // Set auth timeout (30 seconds)
-        authTimeoutJob?.cancel()
-        authTimeoutJob = serviceScope.launch {
-            delay(30000)
-            if (authState != AUTH_BOTH) {
-                // If only voice, require face within 30s
+        // Verify voice against enrolled profile
+        serviceScope.launch {
+            val verified = voiceAuthManager?.verifyVoice() ?: true
+            
+            if (verified) {
+                // Voice matched — full access
+                val faceRecent = System.currentTimeMillis() - lastFaceDetected < 10000
+                authState = if (faceRecent) AUTH_BOTH else AUTH_VOICE
+                isAuthenticated = true
+                
+                Log.d(TAG, "Voice verified! Auth state: $authState")
+                updateNotification()
+                onAuthenticated?.invoke(authState)
+                startCommandListening()
+            } else {
+                // Voice NOT matched — conversation only
+                authState = AUTH_NONE
+                isAuthenticated = false
+                
+                Log.d(TAG, "Voice NOT verified — conversation only")
+                updateNotification()
+                // Still start listening but commands won't work
+                startCommandListening()
+            }
+            
+            // Set auth timeout (30 seconds)
+            authTimeoutJob?.cancel()
+            authTimeoutJob = serviceScope.launch {
+                delay(30000)
                 resetAuth()
             }
         }
@@ -267,7 +274,9 @@ class MayaCoreService : Service() {
     fun getAuthStateInt(): Int = authState
 
     fun setVoiceEnrolled() {
-        voiceAuthenticator?.enrollVoice()
+        serviceScope.launch {
+            voiceAuthManager?.enrollVoice()
+        }
     }
 
     fun setFaceEnrolled() {
@@ -283,6 +292,14 @@ class MayaCoreService : Service() {
 
     fun logout() {
         resetAuth()
+    }
+
+    fun getVoiceAuthStatus(): String {
+        return voiceAuthManager?.getStatusText() ?: "⚠️ Voice auth not initialized"
+    }
+
+    fun canExecuteCommands(): Boolean {
+        return voiceAuthManager?.canExecuteCommands() ?: true
     }
 
     override fun onBind(intent: Intent?): IBinder = binder

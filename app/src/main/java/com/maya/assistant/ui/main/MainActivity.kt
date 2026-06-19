@@ -245,17 +245,26 @@ class MainActivity : AppCompatActivity() {
                     addChatMessage(input, true)
                     // Check for commands if not in call mode
                     if (!isInCallMode) {
-                        val command = commandParser.parse(input)
-                        if (command != null) {
-                            viewModel.executeCommand(command)
-                        } else {
-                            // Try screen-aware commands
-                            val screenCommand = commandParser.parseScreenCommand(input)
-                            if (screenCommand != null) {
-                                executeScreenCommand(screenCommand)
+                        // Check voice authentication
+                        val canExecute = com.maya.assistant.service.MayaCoreService.canExecuteCommands()
+                        
+                        if (canExecute) {
+                            // Voice verified or not enrolled — allow commands
+                            val command = commandParser.parse(input)
+                            if (command != null) {
+                                viewModel.executeCommand(command)
                             } else {
-                                // Let MAYA handle as conversation — already sent via WebSocket
+                                // Try screen-aware commands
+                                val screenCommand = commandParser.parseScreenCommand(input)
+                                if (screenCommand != null) {
+                                    executeScreenCommand(screenCommand)
+                                }
+                                // else: conversation already sent via WebSocket
                             }
+                        } else {
+                            // Voice NOT verified — conversation only, no commands
+                            Log.d("MainActivity", "Voice not verified — commands blocked, conversation only")
+                            geminiLive.sendText("আমি তোমার voice চিনতে পারছি না। শুধু কথা বলতে পারবে, কোনো কাজ করবে না।")
                         }
                     }
                 }

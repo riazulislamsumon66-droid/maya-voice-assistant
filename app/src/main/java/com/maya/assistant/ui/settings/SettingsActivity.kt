@@ -30,6 +30,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var personalityPro: RadioButton
     private lateinit var personalityAssistant: RadioButton
     private lateinit var accessibilityStatus: TextView
+    private lateinit var voiceAuthStatus: TextView
+    private lateinit var enrollVoiceBtn: Button
     private lateinit var primeContactsRecycler: RecyclerView
     private lateinit var addPrimeContactBtn: Button
     private lateinit var saveButton: Button
@@ -57,6 +59,8 @@ class SettingsActivity : AppCompatActivity() {
         personalityPro = findViewById(R.id.personalityPro)
         personalityAssistant = findViewById(R.id.personalityAssistant)
         accessibilityStatus = findViewById(R.id.accessibilityStatus)
+        voiceAuthStatus = findViewById(R.id.voiceAuthStatus)
+        enrollVoiceBtn = findViewById(R.id.enrollVoiceBtn)
         primeContactsRecycler = findViewById(R.id.primeContactsRecycler)
         addPrimeContactBtn = findViewById(R.id.addPrimeContactBtn)
         saveButton = findViewById(R.id.saveButton)
@@ -157,11 +161,39 @@ class SettingsActivity : AppCompatActivity() {
             showAddPrimeContactDialog()
         }
 
+        // Voice enrollment
+        enrollVoiceBtn.setOnClickListener {
+            enrollVoice()
+        }
+
         // Save
         saveButton.setOnClickListener {
             saveSettings()
         }
     }
+
+    private fun enrollVoice() {
+        enrollVoiceBtn.isEnabled = false
+        enrollVoiceBtn.text = "🎙️ Recording... Speak now!"
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val coreService = com.maya.assistant.service.MayaCoreService.instance
+                if (coreService != null) {
+                    coreService.setVoiceEnrolled()
+                }
+                withContext(Dispatchers.Main) {
+                    enrollVoiceBtn.text = "✅ Voice enrolled!"
+                    voiceAuthStatus.text = "✅ Voice enrolled — only your voice will work for commands"
+                    voiceAuthStatus.setTextColor(getColor(R.color.maya_success))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    enrollVoiceBtn.text = "❌ Failed — try again"
+                    enrollVoiceBtn.isEnabled = true
+                }
+            }
+        }
 
     private fun showAddPrimeContactDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_prime_contact, null)
