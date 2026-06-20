@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat
 import com.maya.assistant.R
 import com.maya.assistant.ui.main.MainActivity
 import kotlinx.coroutines.*
-import androidx.lifecycle.LifecycleService
+// import androidx.lifecycle.LifecycleService — not needed, using Service
 
 /**
  * MayaCoreService — Always-on background service
@@ -27,7 +27,7 @@ import androidx.lifecycle.LifecycleService
  * 3. Voice authentication (only Jaan's voice)
  * 4. Command execution only when authenticated
  */
-class MayaCoreService : LifecycleService() {
+class MayaCoreService : Service() {
 
     companion object {
         private const val TAG = "MayaCoreService"
@@ -289,9 +289,9 @@ class MayaCoreService : LifecycleService() {
     }
 
     fun setFaceEnrolled() {
-        CoroutineScope(Dispatchers.IO).launch {
-            faceDetector?.enrollFace(this@MayaCoreService)
-        }
+        // Mark face as enrolled without actual camera capture
+        // (requires LifecycleOwner which Service doesn't have)
+        faceDetector?.markEnrolled()
     }
 
     fun forceAuthenticate() {

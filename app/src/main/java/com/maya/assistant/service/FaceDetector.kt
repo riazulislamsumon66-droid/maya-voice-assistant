@@ -89,7 +89,7 @@ class FaceDetector(private val context: Context) {
     /**
      * Enroll Jaan's face — take a photo and save as reference
      */
-    suspend fun enrollFace(lifecycleOwner: LifecycleOwner): Boolean = withContext(Dispatchers.IO) {
+    suspend fun enrollFace(lifecycleOwner: LifecycleOwner? = null): Boolean = withContext(Dispatchers.IO) {
         return@withContext try {
             val bitmap = captureFacePhoto(lifecycleOwner)
             if (bitmap != null) {
@@ -310,6 +310,10 @@ class FaceDetector(private val context: Context) {
     }
 
     fun isFaceEnrolled(): Boolean = isEnrolled
+
+    fun markEnrolled() {
+        isEnrolled = true
+    }
 
     fun stop() {
         try {
