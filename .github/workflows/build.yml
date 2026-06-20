@@ -44,8 +44,11 @@ jobs:
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.2/gradle/wrapper/gradle-wrapper.jar
         fi
 
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+
     - name: Build debug APK
-      run: ./gradlew assembleDebug --no-daemon 2>&1 | tail -50
+      run: ./gradlew assembleDebug --no-daemon 2>&1 | tail -100
 
     - name: Upload APK artifact
       if: success()
