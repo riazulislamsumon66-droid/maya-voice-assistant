@@ -49,7 +49,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var isDecisionMade = false
     private var isListening… = false
     private var announcementPlayed = false
-    private var isSpeaking = false
+    private var isSpeaking… = false
     private var isCallAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
@@ -183,7 +183,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // WebSocket audio duration estimate
         val estimatedDuration = (msg.length * 80L).coerceIn(3000L, 8000L)
         handler.postDelayed({
-            if (!isDecisionMade && !isSpeaking) startListening…()
+            if (!isDecisionMade && !isSpeaking…) startListening…()
         }, estimatedDuration)
     }
 
@@ -257,9 +257,9 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         liveClient = GeminiLiveClient(apiKey, prompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) {
-                isSpeaking = true
+                isSpeaking… = true
                 liveAudioManager.playChunk(data)
-                runOnUiThread {
+                runEnabledUiThread {
                     statusText.text = "Speaking…... 💬"
                     waveformView?.startAnimation()
                 }
@@ -269,16 +269,16 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 Log.d(TAG, "Gemini Text: $text")
             }
 
-            override fun onConnected() {
+            override fun onConnected ✅() {
                 isLiveConnected ✅ = true
-                Log.d(TAG, "Gemini Live Connected")
+                Log.d(TAG, "Gemini Live Connected ✅ ✅")
                 // Start কRow announcement once connected
                 handler.postDelayed({ startAnnouncement() }, 500)
             }
 
             override fun onTurnComplete() {
-                isSpeaking = false
-                runOnUiThread {
+                isSpeaking… = false
+                runEnabledUiThread {
                     waveformView?.stopAnimation()
                     if (!isDecisionMade) startListening…()
                 }
@@ -301,7 +301,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      */
     private fun speakViaWebSocket(text: String) {
         if (isLiveConnected ✅) {
-            isSpeaking = true
+            isSpeaking… = true
             liveClient.sendTextMessage(text)
             Log.d(TAG, "Speaking… via WebSocket: $text")
             return
@@ -319,7 +319,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun startListening…() {
-        if (isDecisionMade || isListening… || isSpeaking) return
+        if (isDecisionMade || isListening… || isSpeaking…) return
         isListening… = true
 
         statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
@@ -482,8 +482,8 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 // ✅ ENHANCED: If not answer/reject, let Gemini handle the query naturally
                 if (isLiveConnected ✅) {
                     Log.d(TAG, "Passing unrecognized command to Gemini: $spoken")
-                    isSpeaking = true
-                    runOnUiThread { statusText.text = "Thinking…... 🤔" }
+                    isSpeaking… = true
+                    runEnabledUiThread { statusText.text = "Thinking…... 🤔" }
                     liveClient.sendTextMessage(spoken)
                 } else {
                     val confusion = when (personality) {
@@ -607,7 +607,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     /**
-     * ✅ FIXED: কল REJECT — proper endকল(), no confusion
+     * ✅ FIXED: কল REJECT — proper endCall(), no confusion
      */
     private fun performReject() {
         if (isDecisionMade) return
@@ -647,20 +647,20 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun rejectNormalCall(): Boolean {
         var success = false
 
-        // Method 1: TelecomManager endকল
+        // Method 1: TelecomManager endCall
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
                     val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
                     @Suppress("DEPRECATION")
-                    telecom.endকল()
-                    Log.d(TAG, "✅ কল rejected via TelecomManager.endকল()")
+                    telecom.endCall()
+                    Log.d(TAG, "✅ কল rejected via TelecomManager.endCall()")
                     success = true
                 } else {
                     Log.w(TAG, "Permission ANSWER_PHONE_CALLS missing")
                 }
             } else {
-                Log.w(TAG, "TelecomManager.endকল() requires API 28")
+                Log.w(TAG, "TelecomManager.endCall() requires API 28")
             }
         } catch (e: Exception) {
             Log.e(TAG, "TelecomManager reject failed: ${e.message}")
@@ -753,7 +753,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             isDecisionMade = false
             isListening… = false
             announcementPlayed = false
-            isSpeaking = false
+            isSpeaking… = false
 
             finish()
         }
@@ -767,7 +767,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             .getString(key, default) ?: default
     }
 
-    override fun onপিছনেPressed() {
+    override fun onBackPressed() {
         speakViaWebSocket("Pehle decision lo!")
         // super.onপিছনেPressed() // সরাওd to block back button during call decision
     }
@@ -785,7 +785,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         isDecisionMade = false
         isListening… = false
         announcementPlayed = false
-        isSpeaking = false
+        isSpeaking… = false
         isCallAnswered = false
 
         Log.d(TAG, "কলAsিস্ট্যান্টActivity destroyed")
