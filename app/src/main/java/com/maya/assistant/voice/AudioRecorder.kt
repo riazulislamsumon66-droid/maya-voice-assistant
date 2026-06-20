@@ -16,7 +16,7 @@ class AudioRecorder(
 ) {
     private val TAG = "RECORDER"
     private val SAMPLE_RATE = 16000
-    private val CHUNK_SIZE = 1024  // ~64ms at 16kHz
+    private val CHUNK_SIZE = 1024
 
     private var audioRecord: AudioRecord? = null
     private var recordThread: Thread? = null
@@ -49,7 +49,7 @@ class AudioRecorder(
                 val buffer = ByteArray(CHUNK_SIZE)
                 while (isRecording && !Thread.interrupted()) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: -1
-                    if (read > 0 && !VoiceStateManager.isAiSpeaking…()) {
+                    if (read > 0 && !VoiceStateManager.isAiSpeaking()) {
                         onChunk(buffer.copyOf(read))
                     }
                 }
@@ -76,7 +76,7 @@ class AudioRecorder(
             audioRecord = null
             EchoCancellationManager.release()
         } catch (e: Exception) {
-            Logger.e(TAG, "Off কRow error: ${e.message}")
+            Logger.e(TAG, "Stop error: ${e.message}")
         }
         Logger.d(TAG, "Recording stopped")
     }

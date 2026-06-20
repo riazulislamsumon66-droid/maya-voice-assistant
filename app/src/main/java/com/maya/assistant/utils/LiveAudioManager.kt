@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class LiveAudioManager(private val context: Context) {
     private val TAG = "MAYA_AUDIO"
 
-    // Gemini Live API sends 24kHz, 16-bit PCM mono audio
     private val SAMPLE_RATE = 24000
     private val CHANNEL_CONFIG = AudioFormat.CHANNEL_OUT_MONO
     private val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
@@ -24,7 +23,6 @@ class LiveAudioManager(private val context: Context) {
     private var isPlaying = false
     private var playbackThread: Thread? = null
 
-    // Buffer for accumulating audio chunks
     private val audioBuffer = mutableListOf<ByteArray>()
 
     init {
@@ -90,13 +88,9 @@ class LiveAudioManager(private val context: Context) {
         }
     }
 
-    /**
-     * Play audio chunk - for PCM data from Gemini Live API
-     */
     fun playChunk(data: ByteArray) {
         if (data.isEmpty()) return
 
-        // If data is base64 encoded (which shouldn't be but just in case)
         val pcmData = try {
             if (isBase64(data)) {
                 android.util.Base64.decode(data, android.util.Base64.DEFAULT)
@@ -111,14 +105,11 @@ class LiveAudioManager(private val context: Context) {
         Log.d(TAG, "Queued audio chunk: ${pcmData.size} bytes")
     }
 
-    /**
-     * Play MP3 audio from URL or file path
-     */
     fun playAudioFromPath(path: String) {
         try {
             MediaPlayer().apply {
                 setDataSource(path)
-                setEnabledCompletionListener { release() }
+                setOnCompletionListener { release() }
                 prepare()
                 start()
             }
@@ -127,18 +118,14 @@ class LiveAudioManager(private val context: Context) {
         }
     }
 
-    /**
-     * Play MP3 from byte array
-     */
     fun playMp3Data(mp3Data: ByteArray) {
         try {
-            // Write to temp file and play
             val tempFile = File.createTempFile("maya_audio", ".mp3", context.cacheDir)
             FileOutputStream(tempFile).use { it.write(mp3Data) }
 
             MediaPlayer().apply {
                 setDataSource(tempFile.absolutePath)
-                setEnabledCompletionListener {
+                setOnCompletionListener {
                     release()
                     tempFile.delete()
                 }
@@ -164,7 +151,7 @@ class LiveAudioManager(private val context: Context) {
 
             Log.d(TAG, "Audio stopped")
         } catch (e: Exception) {
-            Log.e(TAG, "Off কRow error: ${e.message}")
+            Log.e(TAG, "Stop error: ${e.message}")
         }
     }
 
@@ -181,8 +168,7 @@ class LiveAudioManager(private val context: Context) {
     }
 
     private fun isBase64(data: ByteArray): Boolean {
-        if (data.size < 100) return false // PCM audio will be at least a few hundred bytes
-        // Check if all bytes are valid base64 characters
+        if (data.size < 100) return false
         val base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toSet()
         return data.all { base64Chars.contains(it.toInt().toChar()) }
     }

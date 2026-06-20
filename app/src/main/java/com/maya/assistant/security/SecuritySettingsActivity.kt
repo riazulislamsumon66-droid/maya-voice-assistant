@@ -25,7 +25,7 @@ import java.util.Locale
 /**
  * SecuritySettingsActivity — MAYA নিরাপত্তা Configuration
  */
-class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
+class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var appLockSwitch: Switch
     private lateinit var appLockStatusText: TextView
@@ -51,7 +51,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
     private var firstPattern: List<Int>? = null
     private var geminiClient: GeminiLiveClient? = null
     private var liveAudioManager: LiveAudioManager? = null
-    private var isGeminiConnected ✅ = false
+    private var isGeminiConnected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -263,9 +263,9 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
                 liveAudioManager?.playChunk(data)
             }
             override fun onTextReceived(text: String) {}
-            override fun onConnected() { isGeminiConnected ✅ = true }
+            override fun onConnected() { isGeminiConnected = true }
             override fun onTurnComplete() {}
-            override fun onError(msg: String) { isGeminiConnected ✅ = false }
+            override fun onError(msg: String) { isGeminiConnected = false }
         })
         geminiClient?.start()
     }
@@ -292,7 +292,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
     }
 
     private fun speak(text: String, hindi: Boolean) {
-        if (isGeminiConnected ✅) {
+        if (isGeminiConnected) {
             geminiClient?.sendTextMessage(text)
         } else if (isTtsReady) {
             tts?.language = if (hindi) Locale("bn", "BD") else Locale.ENGLISH

@@ -101,7 +101,7 @@ class AudioPlayer {
 
     fun clearAndFlush() {
         queue.clear()
-        VoiceStateManager.setListening…()
+        VoiceStateManager.setListening()
     }
 
     fun release() {
