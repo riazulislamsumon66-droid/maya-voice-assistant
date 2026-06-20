@@ -278,7 +278,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        geminiLive.onSpeakingStarted = {
+        geminiLive.onOutputTranscript = { text ->
             runOnUiThread {
                 orbView.setState(OrbState.SPEAKING)
             }

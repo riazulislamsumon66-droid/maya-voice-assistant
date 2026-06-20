@@ -47,6 +47,13 @@ class MayaCoreService : Service() {
         
         var onAuthenticated: ((Int) -> Unit)? = null
         var onCommandReceived: ((String) -> Unit)? = null
+
+        var instance: MayaCoreService? = null
+            private set
+
+        fun canExecuteCommandsInstance(): Boolean {
+            return instance?.canExecuteCommandsInstance() ?: true
+        }
     }
 
     private val binder = LocalBinder()
@@ -75,6 +82,7 @@ class MayaCoreService : Service() {
         Log.d(TAG, "MayaCoreService created")
         prefs = getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
         isRunning = true
+        instance = this
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -280,7 +288,9 @@ class MayaCoreService : Service() {
     }
 
     fun setFaceEnrolled() {
-        faceDetector?.enrollFace()
+        CoroutineScope(Dispatchers.IO).launch {
+            faceDetector?.enrollFace(this@MayaCoreService)
+        }
     }
 
     fun forceAuthenticate() {
@@ -298,7 +308,7 @@ class MayaCoreService : Service() {
         return voiceAuthManager?.getStatusText() ?: "⚠️ Voice auth not initialized"
     }
 
-    fun canExecuteCommands(): Boolean {
+    fun canExecuteCommandsInstance(): Boolean {
         return voiceAuthManager?.canExecuteCommands() ?: true
     }
 
@@ -307,9 +317,10 @@ class MayaCoreService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isRunning = false
+        instance = null
         hotwordDetector?.stop()
         faceDetector?.stop()
-        voiceAuthenticator?.stop()
+        voiceAuthManager?.stop()
         serviceScope.cancel()
         Log.d(TAG, "MayaCoreService destroyed")
     }

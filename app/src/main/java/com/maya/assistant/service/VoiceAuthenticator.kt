@@ -99,7 +99,7 @@ class VoiceAuthenticator(private val context: Context) {
                     }
                 }
                 for (j in avgProfile.indices) {
-                    avgProfile[j] /= allFeatures.size
+                    avgProfile[j] = avgProfile[j] / allFeatures.size.toFloat()
                 }
                 
                 // Save profile

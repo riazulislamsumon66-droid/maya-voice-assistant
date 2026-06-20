@@ -94,7 +94,7 @@ class AudioEngine(private val context: Context) {
 
         try {
             audioTrack = AudioTrack(
-                AudioManager.USAGE_ASSISTANT,
+                AudioManager.USAGE_MEDIA,
                 SPEAKER_SAMPLE_RATE,
                 CHANNEL_CONFIG_OUT,
                 AUDIO_FORMAT,

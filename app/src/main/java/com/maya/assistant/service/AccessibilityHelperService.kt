@@ -82,7 +82,7 @@ class AccessibilityHelperService : AccessibilityService() {
      * Get structured screen info — what app, what text, what buttons
      */
     fun getScreenInfo(): ScreenInfo {
-        val rootNode = rootInActiveWindow ?: return ScreenInfo("", "", emptyList())
+        val rootNode = rootInActiveWindow ?: return ScreenInfo("", "", "", emptyList())
         val sb = StringBuilder()
         val clickableItems = mutableListOf<ClickableItem>()
         try {
@@ -356,7 +356,7 @@ class AccessibilityHelperService : AccessibilityService() {
             showAccessibilityError()
             return
         }
-        performGlobalAction(ACTION_SCROLL_FORWARD)
+        performGlobalAction(AccessibilityService.ACTION_SCROLL_FORWARD)
     }
 
     fun scrollUp() {
@@ -364,7 +364,7 @@ class AccessibilityHelperService : AccessibilityService() {
             showAccessibilityError()
             return
         }
-        performGlobalAction(ACTION_SCROLL_BACKWARD)
+        performGlobalAction(AccessibilityService.ACTION_SCROLL_BACKWARD)
     }
 
     /**
