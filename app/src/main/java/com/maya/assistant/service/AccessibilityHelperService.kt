@@ -1,34 +1,34 @@
 package com.maya.assistant.service
 
-import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
-import android.accessibilityservice.অ্যাক্সেসিবিলিটিServiceতথ্য
-import android.content.Componentনাম
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.ComponentName
 import android.content.Context
-import android.provider.সেটিংস
+import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
-import android.view.accessibility.অ্যাক্সেসিবিলিটিইভেন্ট
-import android.view.accessibility.অ্যাক্সেসিবিলিটিনাdeতথ্য
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 
-class অ্যাক্সেসিবিলিটিসাহায্যerService : অ্যাক্সেসিবিলিটিService() {
+class AccessibilityHelperService : AccessibilityService() {
 
     companion object {
         private const val TAG = "MAYA_ACCESS"
 
-        var instance: অ্যাক্সেসিবিলিটিসাহায্যerService? = null
-        var currentRoot: অ্যাক্সেসিবিলিটিনাdeতথ্য? = null
+        var instance: AccessibilityHelperService? = null
+        var currentRoot: AccessibilityNodeInfo? = null
 
-        fun isচালু(context: Context): Boolean {
-            val expectedComponentনাম =
-                Componentনাম(
+        fun isEnabled(context: Context): Boolean {
+            val expectedComponentName =
+                ComponentName(
                     context,
-                    অ্যাক্সেসিবিলিটিসাহায্যerService::class.java
+                    AccessibilityHelperService::class.java
                 )
 
             val enabledServicesSetting =
-                সেটিংস.Secure.getString(
+                Settings.Secure.getString(
                     context.contentResolver,
-                    সেটিংস.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
                 ) ?: return false
 
             val colonSplitter =
@@ -36,15 +36,15 @@ class অ্যাক্সেসিবিলিটিসাহায্যerSer
 
             colonSplitter.setString(enabledServicesSetting)
 
-            while (colonSplitter.hasপরবর্তী()) {
-                val componentনামString = colonSplitter.next()
+            while (colonSplitter.hasNext()) {
+                val componentNameString = colonSplitter.next()
 
                 val enabledService =
-                    Componentনাম.unflattenFromString(
-                        componentনামString
+                    ComponentName.unflattenFromString(
+                        componentNameString
                     )
 
-                if (enabledService == expectedComponentনাম) {
+                if (enabledService == expectedComponentName) {
                     return true
                 }
             }
@@ -52,50 +52,50 @@ class অ্যাক্সেসিবিলিটিসাহায্যerSer
             return false
         }
 
-        fun getFreshRoot(): অ্যাক্সেসিবিলিটিনাdeতথ্য? {
-            return instance?.rootInসক্রিয়Window ?: currentRoot
+        fun getFreshRoot(): AccessibilityNodeInfo? {
+            return instance?.rootInActiveWindow ?: currentRoot
         }
     }
 
-    override fun onServiceসংযুক্ত ✅() {
-        super.onServiceসংযুক্ত ✅()
+    override fun onServiceConnected() {
+        super.onServiceConnected()
 
         instance = this
-        Smartঅ্যাক্সেসিবিলিটিEngine.service = this
+        SmartAccessibilityEngine.service = this
 
-        serviceতথ্য = অ্যাক্সেসিবিলিটিServiceতথ্য().apply {
+        serviceInfo = AccessibilityServiceInfo().apply {
 
             eventTypes =
-                অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_WINDOW_STATE_CHANGED or
-                        অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_WINDOW_CONTENT_CHANGED or
-                        অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_VIEW_CLICKED or
-                        অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_VIEW_FOCUSED or
-                        অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_VIEW_TEXT_CHANGED or
-                        অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_VIEW_SCROLLED
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
+                        AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
+                        AccessibilityEvent.TYPE_VIEW_CLICKED or
+                        AccessibilityEvent.TYPE_VIEW_FOCUSED or
+                        AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED or
+                        AccessibilityEvent.TYPE_VIEW_SCROLLED
 
             feedbackType =
-                অ্যাক্সেসিবিলিটিServiceতথ্য.FEEDBACK_GENERIC
+                AccessibilityServiceInfo.FEEDBACK_GENERIC
 
             flags =
-                অ্যাক্সেসিবিলিটিServiceতথ্য.FLAG_REPORT_VIEW_IDS or
-                        অ্যাক্সেসিবিলিটিServiceতথ্য.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
-                        অ্যাক্সেসিবিলিটিServiceতথ্য.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+                AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
+                        AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
+                        AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
 
-            notificationটাইমআউট = 50
+            notificationTimeout = 50
         }
 
-        currentRoot = rootInসক্রিয়Window
+        currentRoot = rootInActiveWindow
 
         Log.d(TAG, "==============================")
         Log.d(TAG, "MAYA ACCESSIBILITY CONNECTED")
         Log.d(TAG, "==============================")
     }
 
-    override fun onঅ্যাক্সেসিবিলিটিইভেন্ট(event: অ্যাক্সেসিবিলিটিইভেন্ট?) {
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
-        currentRoot = rootInসক্রিয়Window
-        com.maya.assistant.accessibility.অ্যাক্সেসিবিলিটিইভেন্টManager.onইভেন্ট(event)
-        Log.d(TAG, "EVENT -> ${event.packageনাম} | ${event.classনাম}")
+        currentRoot = rootInActiveWindow
+        AccessibilityEventManager.onEvent(event)
+        Log.d(TAG, "EVENT -> ${event.packageName} | ${event.className}")
     }
 
     override fun onInterrupt() {
@@ -107,7 +107,7 @@ class অ্যাক্সেসিবিলিটিসাহায্যerSer
 
         instance = null
         currentRoot = null
-        Smartঅ্যাক্সেসিবিলিটিEngine.service = null
+        SmartAccessibilityEngine.service = null
 
         Log.d(TAG, "SERVICE DESTROYED")
     }

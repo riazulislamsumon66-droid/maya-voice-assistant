@@ -8,7 +8,7 @@ object VisionDecisionEngine {
     private val TAG = "VISION_DECISION"
 
     fun executeVisualAction(action: String): Boolean {
-        val nodes = স্ক্রিনহাইerarchyParser.getCurrentনাdes()
+        val nodes = স্ক্রিনহাইerarchyParser.getCurrentNodes()
         val target = VisualUIAnalyzer.findBestActionTarget(nodes, action)
         if (target != null) {
             Logger.d(TAG, "Visual target found: ${target.text ?: target.contentDesc}")

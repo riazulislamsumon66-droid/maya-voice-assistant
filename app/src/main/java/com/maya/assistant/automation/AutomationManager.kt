@@ -1,60 +1,60 @@
 package com.maya.assistant.automation
 
-import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
+import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object অটোmationManager {
+object AutomationManager {
 
     private const val TAG = "MAYA_AUTOMATION_MGR"
 
     private var scope: CoroutineScope? = null
-    private var service: অ্যাক্সেসিবিলিটিService? = null
-    private var isঅটোmatic = true
+    private var service: AccessibilityService? = null
+    private var isAutomatic = true
 
     /**
      * Initialize automation manager
      */
     fun initialize(
-        accessibilityService: অ্যাক্সেসিবিলিটিService,
+        accessibilityService: AccessibilityService,
         coroutineScope: CoroutineScope
     ) {
         service = accessibilityService
         scope = coroutineScope
 
-        // শুরু করো screen monitoring
-        স্ক্রিনMonitor.startMonitoring(accessibilityService, coroutineScope)
+        // Start screen monitoring
+        ScreenMonitor.startMonitoring(accessibilityService, coroutineScope)
 
-        Log.d(TAG, "অটোmation manager initialized")
+        Log.d(TAG, "Automation manager initialized")
     }
 
     /**
-     * চালু করো/disable automatic task execution
+     * Enable/disable automatic task execution
      */
-    fun setঅটোmaticMode(enabled: Boolean) {
-        isঅটোmatic = enabled
-        Log.d(TAG, "অটোmatic mode: $enabled")
+    fun setAutomaticMode(enabled: Boolean) {
+        isAutomatic = enabled
+        Log.d(TAG, "Automatic mode: $enabled")
     }
 
     /**
      * Execute automation task from command
      */
-    fun executeটাস্ক(command: String): Boolean {
+    fun executeTask(command: String): Boolean {
         val svc = service ?: return false
 
         Log.d(TAG, "Execute task: $command")
 
-        if (!isঅটোmatic) {
-            Log.d(TAG, "অটোmatic mode disabled")
+        if (!isAutomatic) {
+            Log.d(TAG, "Automatic mode disabled")
             return false
         }
 
         return when {
             // Handle app opening
             command.startsWith("OPEN_APP", ignoreCase = true) -> {
-                handleখোলোApp(svc, command)
+                handleOpenApp(svc, command)
             }
 
             // Handle clicks
@@ -64,12 +64,12 @@ object অটোmationManager {
 
             // Handle searches
             command.startsWith("SEARCH", ignoreCase = true) -> {
-                handleখুঁজো(svc, command)
+                handleSearch(svc, command)
             }
 
             // Smart automation
             else -> {
-                SmartঅটোmationAgent.run(svc, command)
+                SmartAutomationAgent.run(svc, command)
             }
         }
     }
@@ -77,37 +77,37 @@ object অটোmationManager {
     /**
      * Handle OPEN_APP command with dynamic app detection
      */
-    private fun handleখোলোApp(
-        service: অ্যাক্সেসিবিলিটিService,
+    private fun handleOpenApp(
+        service: AccessibilityService,
         command: String
     ): Boolean {
 
-        val appনাম = command
+        val appName = command
             .removePrefix("OPEN_APP")
             .removePrefix(":")
             .trim()
 
-        Log.d(TAG, "খোলোing app: $appনাম")
+        Log.d(TAG, "Opening app: $appName")
 
-        val app = AppDetector.findAppByনাম(service, appনাম)
+        val app = AppDetector.findAppByName(service, appName)
 
         if (app == null) {
-            Log.e(TAG, "App not found: $appনাম")
+            Log.e(TAG, "App not found: $appName")
             return false
         }
 
         return try {
-            val intent = service.packageManager.getLaunchIntentForPackage(app.packageনাম)
+            val intent = service.packageManager.getLaunchIntentForPackage(app.packageName)
             if (intent != null) {
                 intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                 service.startActivity(intent)
-                Log.d(TAG, "খোলোed: ${app.label}")
+                Log.d(TAG, "Opened: ${app.label}")
                 true
             } else {
                 false
             }
         } catch (e: Exception) {
-            Log.e(TAG, "ব্যর্থ to open app: ${e.message}")
+            Log.e(TAG, "Failed to open app: ${e.message}")
             false
         }
     }
@@ -116,7 +116,7 @@ object অটোmationManager {
      * Handle CLICK command
      */
     private fun handleClick(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         command: String
     ): Boolean {
 
@@ -132,8 +132,8 @@ object অটোmationManager {
     /**
      * Handle SEARCH command
      */
-    private fun handleখুঁজো(
-        service: অ্যাক্সেসিবিলিটিService,
+    private fun handleSearch(
+        service: AccessibilityService,
         command: String
     ): Boolean {
 
@@ -141,7 +141,7 @@ object অটোmationManager {
             .removePrefix("SEARCH")
             .trim()
 
-        Log.d(TAG, "খুঁজোing: $query")
+        Log.d(TAG, "Searching: $query")
 
         // Implementation depends on the app
         // This is a placeholder
@@ -151,25 +151,25 @@ object অটোmationManager {
     /**
      * Get current screen state
      */
-    fun getCurrentস্ক্রিনState(): স্ক্রিনMonitor.স্ক্রিনState? {
+    fun getCurrentScreenState(): ScreenMonitor.ScreenState? {
         val svc = service ?: return null
-        return স্ক্রিনMonitor.captureস্ক্রিনState(svc)
+        return ScreenMonitor.captureScreenState(svc)
     }
 
     /**
      * Get all installed apps
      */
-    fun getইনস্টল করোedApps(): List<AppDetector.ইনস্টল করোedApp> {
+    fun getInstalledApps(): List<AppDetector.InstalledApp> {
         val svc = service ?: return emptyList()
-        return AppDetector.getইনস্টল করোedApps(svc)
+        return AppDetector.getInstalledApps(svc)
     }
 
     /**
      * Find app by name
      */
-    fun findApp(appনাম: String): AppDetector.ইনস্টল করোedApp? {
+    fun findApp(appName: String): AppDetector.InstalledApp? {
         val svc = service ?: return null
-        return AppDetector.findAppByনাম(svc, appনাম)
+        return AppDetector.findAppByName(svc, appName)
     }
 
     /**
@@ -177,7 +177,7 @@ object অটোmationManager {
      */
     fun executeAsync(command: String) {
         scope?.launch(Dispatchers.Main) {
-            executeটাস্ক(command)
+            executeTask(command)
         }
     }
 
@@ -185,10 +185,10 @@ object অটোmationManager {
      * Shutdown automation
      */
     fun shutdown() {
-        স্ক্রিনMonitor.stopMonitoring()
+        ScreenMonitor.stopMonitoring()
         service = null
         scope = null
 
-        Log.d(TAG, "অটোmation manager shutdown")
+        Log.d(TAG, "Automation manager shutdown")
     }
 }

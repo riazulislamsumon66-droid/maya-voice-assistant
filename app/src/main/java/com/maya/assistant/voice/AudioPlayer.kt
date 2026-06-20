@@ -17,7 +17,7 @@ class AudioPlayer {
     @Volatile private var isPlaying = false
     private var playThread: Thread? = null
 
-    var onPlaybackশুরু করোed: (() -> Unit)? = null
+    var onPlaybackStart কRowed: (() -> Unit)? = null
     var onPlaybackFinished: (() -> Unit)? = null
 
     init {
@@ -72,8 +72,8 @@ class AudioPlayer {
                 if (chunk != null) {
                     if (!wasPlaying) {
                         wasPlaying = true
-                        ভয়েসStateManager.setবলছে…()
-                        onPlaybackশুরু করোed?.invoke()
+                        VoiceStateManager.setSpeaking…()
+                        onPlaybackStart কRowed?.invoke()
                     }
                     try {
                         audioTrack?.write(chunk, 0, chunk.size)
@@ -99,9 +99,9 @@ class AudioPlayer {
         if (data.isনাtEmpty()) queue.offer(data)
     }
 
-    fun clearAndবন্ধ করো() {
+    fun clearAndOff কRow() {
         queue.clear()
-        ভয়েসStateManager.setশুনছে…()
+        VoiceStateManager.setListening…()
     }
 
     fun release() {

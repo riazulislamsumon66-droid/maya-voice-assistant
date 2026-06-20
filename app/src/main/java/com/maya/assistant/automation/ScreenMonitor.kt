@@ -1,13 +1,13 @@
 package com.maya.assistant.automation
 
-import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
+import android.accessibilityservice.AccessibilityService
 import android.util.Log
-import android.view.accessibility.অ্যাক্সেসিবিলিটিইভেন্ট
+import android.view.accessibility.AccessibilityEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object স্ক্রিনMonitor {
+object ScreenMonitor {
 
     private const val TAG = "MAYA_SCREEN_MONITOR"
 
@@ -15,9 +15,9 @@ object স্ক্রিনMonitor {
     private var lastPackage: String = ""
     private var monitoringScope: CoroutineScope? = null
 
-    data class স্ক্রিনState(
+    data class ScreenState(
         val uiTree: String,
-        val packageনাম: String,
+        val packageName: String,
         val timestamp: Long,
         val elements: List<UiElement>
     )
@@ -25,50 +25,50 @@ object স্ক্রিনMonitor {
     data class UiElement(
         val text: String,
         val contentDesc: String,
-        val classনাম: String,
+        val className: String,
         val isClickable: Boolean,
         val bounds: String,
-        val isদৃশ্যমান: Boolean
+        val isVisible: Boolean
     )
 
     /**
-     * শুরু করো continuous screen monitoring
+     * Start continuous screen monitoring
      */
     fun startMonitoring(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         scope: CoroutineScope
     ) {
         monitoringScope = scope
 
-        Log.d(TAG, "স্ক্রিন monitoring started")
+        Log.d(TAG, "Screen monitoring started")
     }
 
     /**
      * Capture current screen state
      */
-    fun captureস্ক্রিনState(
-        service: অ্যাক্সেসিবিলিটিService
-    ): স্ক্রিনState? {
+    fun captureScreenState(
+        service: AccessibilityService
+    ): ScreenState? {
 
         return try {
-            val root = service.rootInসক্রিয়Window 
+            val root = service.rootInActiveWindow
                 ?: return null
 
-            val packageনাম = root.packageনাম?.toString() 
+            val packageName = root.packageName?.toString()
                 ?: "unknown"
 
             val uiTree = UiTreeSerializer.serialize(root)
             val elements = extractElements(root)
 
-            স্ক্রিনState(
+            ScreenState(
                 uiTree = uiTree,
-                packageনাম = packageনাম,
-                timestamp = সিস্টেম.currentসময়Millis(),
+                packageName = packageName,
+                timestamp = System.currentTimeMillis(),
                 elements = elements
             )
 
         } catch (e: Exception) {
-            Log.e(TAG, "সমস্যা capturing screen: ${e.message}")
+            Log.e(TAG, "Error capturing screen: ${e.message}")
             null
         }
     }
@@ -77,41 +77,41 @@ object স্ক্রিনMonitor {
      * Extract all clickable and text elements from the screen
      */
     private fun extractElements(
-        node: android.view.accessibility.অ্যাক্সেসিবিলিটিনাdeতথ্য,
+        node: android.view.accessibility.AccessibilityNodeInfo,
         elements: MutableList<UiElement> = mutableListOf()
     ): List<UiElement> {
 
         try {
             val rect = android.graphics.Rect()
-            node.getBoundsInস্ক্রিন(rect)
+            node.getBoundsInScreen(rect)
 
             // Extract element only if it has text or content description
             val text = node.text?.toString() ?: ""
             val desc = node.contentDescription?.toString() ?: ""
 
-            if (text.isনাtEmpty() || desc.isনাtEmpty() || node.isClickable) {
+            if (text.isNotEmpty() || desc.isNotEmpty() || node.isClickable) {
                 elements.add(
                     UiElement(
                         text = text,
                         contentDesc = desc,
-                        classনাম = node.classনাম?.toString() ?: "",
+                        className = node.className?.toString() ?: "",
                         isClickable = node.isClickable,
                         bounds = "${rect.left},${rect.top}," +
                                 "${rect.right},${rect.bottom}",
-                        isদৃশ্যমান = node.isদৃশ্যমানToব্যবহারকারী
+                        isVisible = node.isVisibleToUser
                     )
                 )
             }
 
             // Recurse through children
-            for (i in 0 until node.childগণনা) {
+            for (i in 0 until node.childCount) {
                 node.getChild(i)?.let {
                     extractElements(it, elements)
                 }
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "সমস্যা extracting elements: ${e.message}")
+            Log.e(TAG, "Error extracting elements: ${e.message}")
         }
 
         return elements
@@ -121,11 +121,11 @@ object স্ক্রিনMonitor {
      * Find interactive elements related to a command
      */
     fun findRelevantElements(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         command: String
     ): List<UiElement> {
 
-        val state = captureস্ক্রিনState(service) 
+        val state = captureScreenState(service)
             ?: return emptyList()
 
         val query = command.lowercase()
@@ -134,8 +134,8 @@ object স্ক্রিনMonitor {
             val text = element.text.lowercase()
             val desc = element.contentDesc.lowercase()
 
-            (element.isClickable || text.isনাtEmpty()) &&
-            (text.contains(query) || 
+            (element.isClickable || text.isNotEmpty()) &&
+            (text.contains(query) ||
              desc.contains(query) ||
              query.contains(text) ||
              query.contains(desc))
@@ -146,32 +146,32 @@ object স্ক্রিনMonitor {
      * Get all clickable elements on screen
      */
     fun getClickableElements(
-        service: অ্যাক্সেসিবিলিটিService
+        service: AccessibilityService
     ): List<UiElement> {
 
-        val state = captureস্ক্রিনState(service) 
+        val state = captureScreenState(service)
             ?: return emptyList()
 
         return state.elements.filter { it.isClickable }
     }
 
     /**
-     * আপডেট UI tree after event (called from accessibility service)
+     * Update UI tree after event (called from accessibility service)
      */
-    fun onঅ্যাক্সেসিবিলিটিইভেন্ট(
-        event: অ্যাক্সেসিবিলিটিইভেন্ট,
-        service: অ্যাক্সেসিবিলিটিService
+    fun onAccessibilityEvent(
+        event: AccessibilityEvent,
+        service: AccessibilityService
     ) {
         when (event.eventType) {
-            অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_WINDOW_STATE_CHANGED,
-            অ্যাক্সেসিবিলিটিইভেন্ট.TYPE_WINDOW_CONTENT_CHANGED -> {
-                monitoringScope?.launch(Dispatchers.ডিফল্ট) {
-                    val state = captureস্ক্রিনState(service)
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                monitoringScope?.launch(Dispatchers.Default) {
+                    val state = captureScreenState(service)
                     if (state != null) {
                         lastUiTree = state.uiTree
-                        lastPackage = state.packageনাম
+                        lastPackage = state.packageName
 
-                        Log.d(TAG, "স্ক্রিন updated: ${state.packageনাম}")
+                        Log.d(TAG, "Screen updated: ${state.packageName}")
                     }
                 }
             }
@@ -181,11 +181,11 @@ object স্ক্রিনMonitor {
     /**
      * Get last captured screen state
      */
-    fun getLastস্ক্রিনState(): Pair<String, String> {
+    fun getLastScreenState(): Pair<String, String> {
         return Pair(lastUiTree, lastPackage)
     }
 
     fun stopMonitoring() {
-        Log.d(TAG, "স্ক্রিন monitoring stopped")
+        Log.d(TAG, "Screen monitoring stopped")
     }
 }

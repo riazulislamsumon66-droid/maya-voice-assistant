@@ -1,11 +1,11 @@
 package com.maya.assistant.accessibility
 
-import android.view.accessibility.অ্যাক্সেসিবিলিটিইভেন্ট
+import android.view.accessibility.AccessibilityEvent
 
-object অ্যাক্সেসিবিলিটিইভেন্টManager {
+object AccessibilityEventManager {
     private var lastPackage = ""
-    private var lastইভেন্টType = -1
-    fun onইভেন্ট(e: অ্যাক্সেসিবিলিটিইভেন্ট) { lastইভেন্টType = e.eventType; e.packageনাম?.let { lastPackage = it.toString() } }
+    private var lastEventType = -1
+    fun onEvent(e: AccessibilityEvent) { lastEventType = e.eventType; e.packageName?.let { lastPackage = it.toString() } }
     fun getCurrentPackage() = lastPackage
-    fun getLastইভেন্টType() = lastইভেন্টType
+    fun getLastEventType() = lastEventType
 }

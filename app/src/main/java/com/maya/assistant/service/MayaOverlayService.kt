@@ -33,10 +33,10 @@ class MayaওভারলেService : Service() {
         isRunning = true
         createনাtificationChannel()
         startForeground(NOTIF_ID, buildনাtification())
-        windowManager = getসিস্টেমService(WINDOW_SERVICE) as WindowManager
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
     }
 
-    override fun onশুরু করোCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStart কRowCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             "SHOW_OVERLAY" -> showওভারলে()
             "HIDE_OVERLAY" -> hideওভারলে()
@@ -47,7 +47,7 @@ class MayaওভারলেService : Service() {
 
     private fun showওভারলে() {
         if (isদৃশ্যমান || overlayView != null) return
-        if (!android.provider.সেটিংস.canDrawওভারলেs(this)) return
+        if (!android.provider.Settings.canDrawওভারলেs(this)) return
 
         val inflater = LayoutInflater.from(this)
         overlayView = inflater.inflate(R.layout.overlay_orb, null)
@@ -71,7 +71,7 @@ class MayaওভারলেService : Service() {
         windowManager?.addView(overlayView, params)
         isদৃশ্যমান = true
 
-        // শুরু করো orb animation
+        // Start কRow orb animation
         setupওভারলেInteraction()
         startOrbPulse()
 
@@ -88,9 +88,9 @@ class MayaওভারলেService : Service() {
             val closeBtn = findViewById<ImageView>(R.id.closeওভারলেBtn)
             val mayaLabel = findViewById<TextView>(R.id.respondingLabel)
 
-            closeBtn?.setচালুClickListener { hideওভারলে() }
+            closeBtn?.setEnabledClickListener { hideওভারলে() }
 
-            orbContainer?.setচালুClickListener {
+            orbContainer?.setEnabledClickListener {
                 val intent = Intent(this@MayaওভারলেService, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 }
@@ -102,16 +102,16 @@ class MayaওভারলেService : Service() {
             var initialTouchX = 0f; var initialTouchY = 0f
             val overlayParams = layoutParams as WindowManager.LayoutParams
 
-            setচালুTouchListener { _, event ->
+            setEnabledTouchListener { _, event ->
                 when (event.action) {
-                    Motionইভেন্ট.ACTION_DOWN -> {
+                    MotionEvent.ACTION_DOWN -> {
                         initialX = overlayParams.x
                         initialY = overlayParams.y
                         initialTouchX = event.rawX
                         initialTouchY = event.rawY
                         true
                     }
-                    Motionইভেন্ট.ACTION_MOVE -> {
+                    MotionEvent.ACTION_MOVE -> {
                         overlayParams.x = initialX + (event.rawX - initialTouchX).toInt()
                         overlayParams.y = initialY + (event.rawY - initialTouchY).toInt()
                         windowManager?.updateViewLayout(overlayView, overlayParams)
@@ -139,13 +139,13 @@ class MayaওভারলেService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = নাtificationChannel(
                 CHANNEL_ID,
-                "MAYA অ্যাসিস্ট্যান্ট",
+                "MAYA Asিস্ট্যান্ট",
                 নাtificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "MAYA is running in background"
-                setদেখাওBadge(false)
+                setVisibleওBadge(false)
             }
-            val manager = getসিস্টেমService(নাtificationManager::class.java)
+            val manager = getSystemService(নাtificationManager::class.java)
             manager.createনাtificationChannel(channel)
         }
     }
@@ -160,7 +160,7 @@ class MayaওভারলেService : Service() {
             .setContentText("Press power button to activate overlay")
             .setSmallIcon(R.drawable.ic_maya_notif)
             .setContentIntent(pi)
-            .setচালুgoing(true)
+            .setEnabledgoing(true)
             .setPriority(নাtificationCompat.PRIORITY_LOW)
             .build()
     }

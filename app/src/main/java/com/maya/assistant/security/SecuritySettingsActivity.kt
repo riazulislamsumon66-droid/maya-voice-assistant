@@ -7,7 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.সেটিংস
+import android.provider.Settings
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -16,16 +16,16 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.বায়োমেট্রিকManager
+import androidx.biometric.BiometricManager
 import com.maya.assistant.R
 import com.maya.assistant.ai.GeminiLiveClient
 import com.maya.assistant.utils.LiveAudioManager
 import java.util.Locale
 
 /**
- * নিরাপত্তাসেটিংসActivity — MAYA নিরাপত্তা Configuration
+ * নিরাপত্তাSettingsActivity — MAYA নিরাপত্তা Configuration
  */
-class নিরাপত্তাসেটিংসActivity : AppCompatActivity(), TextToSpeech.চালুInitListener {
+class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private lateinit var appLockSwitch: Switch
     private lateinit var appLockStatusText: TextView
@@ -33,7 +33,7 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
     private lateinit var pinStatusText: TextView
     private lateinit var setPatternBtn: Button
     private lateinit var patternStatusText: TextView
-    private lateinit var setভয়েসBtn: Button
+    private lateinit var setVoiceBtn: Button
     private lateinit var voiceStatusText: TextView
     private lateinit var selectAppsBtn: Button
     private lateinit var usageStatsBtn: Button
@@ -51,7 +51,7 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
     private var firstPattern: List<Int>? = null
     private var geminiClient: GeminiLiveClient? = null
     private var liveAudioManager: LiveAudioManager? = null
-    private var isGeminiসংযুক্ত ✅ = false
+    private var isGeminiConnected ✅ = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +83,7 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
         pinStatusText      = findViewById(R.id.pinStatusText)
         setPatternBtn      = findViewById(R.id.setPatternBtn)
         patternStatusText  = findViewById(R.id.patternStatusText)
-        setভয়েসBtn        = findViewById(R.id.setভয়েসBtn)
+        setVoiceBtn        = findViewById(R.id.setVoiceBtn)
         voiceStatusText    = findViewById(R.id.voiceStatusText)
         privateModeSwitch  = findViewById(R.id.privateModeSwitch)
         privateModeStatusText = findViewById(R.id.privateModeStatusText)
@@ -91,34 +91,34 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
     }
 
     private fun loadCurrentStatus() {
-        val lockচালু = নিরাপত্তাManager.isAppLockচালু(this) || PatternManager.isPatternLockচালু(this)
-        appLockSwitch.isChecked = lockচালু
-        appLockStatusText.text = if (lockচালু) "🔒 App Lock চালু" else "🔓 App Lock বন্ধ"
-        appLockStatusText.setTextরঙ(if (lockচালু) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        val lockEnabled = নিরাপত্তাManager.isAppLockEnabled(this) || PatternManager.isPatternLockEnabled(this)
+        appLockSwitch.isChecked = lockEnabled
+        appLockStatusText.text = if (lockEnabled) "🔒 App Lock Enabled" else "🔓 App Lock Off"
+        appLockStatusText.setTextরঙ(if (lockEnabled) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         checkPermissions()
         
-        pinStatusText.text = if (নিরাপত্তাManager.hasPin(this)) "✅ PIN সেট আছে" else "❌ PIN সেট নেই"
+        pinStatusText.text = if (নিরাপত্তাManager.hasPin(this)) "✅ PIN Set আছে" else "❌ PIN Set নেই"
         pinStatusText.setTextরঙ(if (নিরাপত্তাManager.hasPin(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
-        patternStatusText.text = if (PatternManager.isPatternSet(this)) "✅ Pattern সেট আছে" else "❌ Pattern সেট নেই"
+        patternStatusText.text = if (PatternManager.isPatternSet(this)) "✅ Pattern Set আছে" else "❌ Pattern Set নেই"
         patternStatusText.setTextরঙ(if (PatternManager.isPatternSet(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
-        voiceStatusText.text = if (নিরাপত্তাManager.hasভয়েসPassphrase(this)) "✅ ভয়েস passphrase set" else "❌ নাt set"
-        voiceStatusText.setTextরঙ(if (নিরাপত্তাManager.hasভয়েসPassphrase(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        voiceStatusText.text = if (নিরাপত্তাManager.hasVoicePassphrase(this)) "✅ Voice passphrase set" else "❌ নাt set"
+        voiceStatusText.setTextরঙ(if (নিরাপত্তাManager.hasVoicePassphrase(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         // Check বায়োমেট্রিক hardware
-        val biometricManager = বায়োমেট্রিকManager.from(this)
-        val canভেরিফাই করো = biometricManager.canভেরিফাই করো(বায়োমেট্রিকManager.Authenticators.BIOMETRIC_STRONG)
-        if (canভেরিফাই করো == বায়োমেট্রিকManager.BIOMETRIC_SUCCESS) {
+        val biometricManager = BiometricManager.from(this)
+        val canভেরিফাই কRow = biometricManager.canভেরিফাই কRow(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+        if (canভেরিফাই কRow == BiometricManager.BIOMETRIC_SUCCESS) {
             fingerprintSwitch.visibility = View.VISIBLE
-            fingerprintSwitch.isChecked = নিরাপত্তাManager.isবায়োমেট্রিকচালু(this)
+            fingerprintSwitch.isChecked = নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)
         } else {
             fingerprintSwitch.visibility = View.GONE
-            নিরাপত্তাManager.setবায়োমেট্রিকচালু(this, false)
+            নিরাপত্তাManager.setবায়োমেট্রিকEnabled(this, false)
         }
 
-        deviceLockSwitch.isChecked = নিরাপত্তাManager.isDeviceLockচালু(this)
+        deviceLockSwitch.isChecked = নিরাপত্তাManager.isDeviceLockEnabled(this)
 
         val pm = নিরাপত্তাManager.isPrivateModeসক্রিয়(this)
         privateModeSwitch.isChecked = pm
@@ -130,53 +130,53 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
     }
 
     private fun setupListeners() {
-        appLockSwitch.setচালুCheckedChangeListener { _, checked ->
+        appLockSwitch.setEnabledCheckedChangeListener { _, checked ->
             if (checked) {
                 if (!নিরাপত্তাManager.hasPin(this) && !PatternManager.isPatternSet(this)) {
                     appLockSwitch.isChecked = false
                     toast("Pehle PIN ya Pattern set karo")
                     speak("Pehle PIN ya pattern set karo tab lock enable hoga", true)
-                    return@setচালুCheckedChangeListener
+                    return@setEnabledCheckedChangeListener
                 }
-                নিরাপত্তাManager.setAppLockচালু(this, true)
+                নিরাপত্তাManager.setAppLockEnabled(this, true)
                 if (PatternManager.isPatternSet(this)) {
                     PatternManager.enablePatternLock(this)
                 }
                 loadCurrentStatus()
                 speak("App lock on ho gaya!", true)
             } else {
-                নিরাপত্তাManager.setAppLockচালু(this, false)
+                নিরাপত্তাManager.setAppLockEnabled(this, false)
                 PatternManager.disablePatternLock(this)
                 loadCurrentStatus()
                 AppLockActivity.isআনলক আছেThisSession = true
                 speak("App lock band kar diya", true)
             }
         }
-        setPinBtn.setচালুClickListener { showPinSetupDialog() }
-        setPatternBtn.setচালুClickListener { startPatternSetup() }
-        setভয়েসBtn.setচালুClickListener { showভয়েসSetupDialog() }
+        setPinBtn.setEnabledClickListener { showPinSetupDialog() }
+        setPatternBtn.setEnabledClickListener { startPatternSetup() }
+        setVoiceBtn.setEnabledClickListener { showVoiceSetupDialog() }
 
-        fingerprintSwitch.setচালুCheckedChangeListener { _, checked ->
-            নিরাপত্তাManager.setবায়োমেট্রিকচালু(this, checked)
+        fingerprintSwitch.setEnabledCheckedChangeListener { _, checked ->
+            নিরাপত্তাManager.setবায়োমেট্রিকEnabled(this, checked)
             speak(if (checked) "Fingerprint unlock enable ho gaya" else "Fingerprint unlock band kar diya", true)
         }
 
-        deviceLockSwitch.setচালুCheckedChangeListener { _, checked ->
-            নিরাপত্তাManager.setDeviceLockচালু(this, checked)
-            speak(if (checked) "সিস্টেম screen lock enable ho gaya" else "সিস্টেম lock band kar diya", true)
+        deviceLockSwitch.setEnabledCheckedChangeListener { _, checked ->
+            নিরাপত্তাManager.setDeviceLockEnabled(this, checked)
+            speak(if (checked) "System screen lock enable ho gaya" else "System lock band kar diya", true)
         }
 
-        selectAppsBtn.setচালুClickListener {
-            startActivity(Intent(this, Appসিলেক্ট করোionActivity::class.java))
+        selectAppsBtn.setEnabledClickListener {
+            startActivity(Intent(this, AppSelect কRowionActivity::class.java))
         }
-        usageStatsBtn.setচালুClickListener {
-            startActivity(Intent(সেটিংস.ACTION_USAGE_ACCESS_SETTINGS))
+        usageStatsBtn.setEnabledClickListener {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
-        overlayPermissionBtn.setচালুClickListener {
-            val intent = Intent(সেটিংস.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageনাম"))
+        overlayPermissionBtn.setEnabledClickListener {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
             startActivity(intent)
         }
-        privateModeSwitch.setচালুCheckedChangeListener { _, checked ->
+        privateModeSwitch.setEnabledCheckedChangeListener { _, checked ->
             if (checked) {
                 নিরাপত্তাManager.enablePrivateMode(this)
                 privateModeStatusText.text = "🙈 Private Mode ON — Chat history hidden"
@@ -193,19 +193,19 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
 
     private fun showPinSetupDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_set_pin, null)
-        val newPinInput  = dialogView.findViewById<এডিট করোText>(R.id.newPinInput)
-        val confPinInput = dialogView.findViewById<এডিট করোText>(R.id.confirmPinInput)
-        val errorText    = dialogView.findViewById<TextView>(R.id.pinসমস্যাText)
+        val newPinInput  = dialogView.findViewById<Edit কRowText>(R.id.newPinInput)
+        val confPinInput = dialogView.findViewById<Edit কRowText>(R.id.confirmPinInput)
+        val errorText    = dialogView.findViewById<TextView>(R.id.pinErrorText)
 
         val dialog = AlertDialog.Builder(this)
             .setTitle("Set PIN")
             .setView(dialogView)
-            .setPositiveButton("সেভ করো", null)
+            .setPositiveButton("Save কRow", null)
             .setNegativeButton("বাতিল", null)
             .create()
 
-        dialog.setচালুদেখাওListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setচালুClickListener {
+        dialog.setEnabledVisibleওListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabledClickListener {
                 val pin  = newPinInput.text.toString().trim()
                 val conf = confPinInput.text.toString().trim()
                 when {
@@ -219,15 +219,15 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
                     }
                     else -> {
                         নিরাপত্তাManager.setPin(this, pin)
-                        নিরাপত্তাManager.setAppLockচালু(this, true)
+                        নিরাপত্তাManager.setAppLockEnabled(this, true)
                         loadCurrentStatus()
-                        speak("PIN সেট হয়ে গেছে!", true)
+                        speak("PIN Set হয়ে গেছে!", true)
                         dialog.dismiss()
                     }
                 }
             }
             if (নিরাপত্তাManager.hasPin(this)) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setচালুClickListener {
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setEnabledClickListener {
                     নিরাপত্তাManager.removePin(this)
                     loadCurrentStatus()
                     dialog.dismiss()
@@ -249,7 +249,7 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
         }
     }
 
-    private fun showভয়েসSetupDialog() {
+    private fun showVoiceSetupDialog() {
         // ... (rest of the voice setup logic)
     }
 
@@ -263,26 +263,26 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
                 liveAudioManager?.playChunk(data)
             }
             override fun onTextReceived(text: String) {}
-            override fun onসংযুক্ত ✅() { isGeminiসংযুক্ত ✅ = true }
+            override fun onConnected ✅() { isGeminiConnected ✅ = true }
             override fun onTurnComplete() {}
-            override fun onসমস্যা(msg: String) { isGeminiসংযুক্ত ✅ = false }
+            override fun onError(msg: String) { isGeminiConnected ✅ = false }
         })
         geminiClient?.start()
     }
 
     private fun checkPermissions() {
-        val usageStatsমঞ্জুর ✅ = isUsageStatsচালু()
+        val usageStatsমঞ্জুর ✅ = isUsageStatsEnabled()
         usageStatsBtn.text = if (usageStatsমঞ্জুর ✅) "✅ Usage Stats সবowed" else "সবow Usage Stats"
-        usageStatsBtn.isচালু = !usageStatsমঞ্জুর ✅
+        usageStatsBtn.isEnabled = !usageStatsমঞ্জুর ✅
 
-        val overlayমঞ্জুর ✅ = সেটিংস.canDrawওভারলেs(this)
+        val overlayমঞ্জুর ✅ = Settings.canDrawওভারলেs(this)
         overlayPermissionBtn.text = if (overlayমঞ্জুর ✅) "✅ ওভারলে সবowed" else "সবow ডিসপ্লে Over Apps"
-        overlayPermissionBtn.isচালু = !overlayমঞ্জুর ✅
+        overlayPermissionBtn.isEnabled = !overlayমঞ্জুর ✅
     }
 
-    private fun isUsageStatsচালু(): Boolean {
-        val appOps = getসিস্টেমService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = appOps.checkOpনাThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageনাম)
+    private fun isUsageStatsEnabled(): Boolean {
+        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpনাThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageName)
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
@@ -292,11 +292,11 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
     }
 
     private fun speak(text: String, hindi: Boolean) {
-        if (isGeminiসংযুক্ত ✅) {
-            geminiClient?.sendTextমেসেজ(text)
+        if (isGeminiConnected ✅) {
+            geminiClient?.sendTextMessage(text)
         } else if (isTtsReady) {
             tts?.language = if (hindi) Locale("bn", "BD") else Locale.ENGLISH
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "SEC_TTS_${সিস্টেম.currentসময়Millis()}")
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "SEC_TTS_${System.currentসময়Millis()}")
         }
     }
 
@@ -312,7 +312,7 @@ class নিরাপত্তাসেটিংসActivity : AppCompatActivity(
 
     companion object {
         fun launch(context: Context) {
-            context.startActivity(Intent(context, নিরাপত্তাসেটিংসActivity::class.java))
+            context.startActivity(Intent(context, নিরাপত্তাSettingsActivity::class.java))
         }
     }
 }

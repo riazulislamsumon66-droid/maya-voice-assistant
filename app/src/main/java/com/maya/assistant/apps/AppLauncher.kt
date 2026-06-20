@@ -7,15 +7,15 @@ import com.maya.assistant.utils.Logger
 object AppLauncher {
     private val TAG = "LAUNCHER"
 
-    fun launch(context: Context, appনাম: String): Boolean {
-        val intent = ইনস্টল করোedAppsManager.getLaunchIntent(context, appনাম) ?: run {
-            Logger.w(TAG, "App not found: $appনাম")
+    fun launch(context: Context, appName: String): Boolean {
+        val intent = Install কRowedAppsManager.getLaunchIntent(context, appName) ?: run {
+            Logger.w(TAG, "App not found: $appName")
             return false
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             context.startActivity(intent)
-            Logger.d(TAG, "Launched: $appনাম")
+            Logger.d(TAG, "Launched: $appName")
             return true
         } catch (e: Exception) {
             Logger.e(TAG, "Launch failed: ${e.message}")

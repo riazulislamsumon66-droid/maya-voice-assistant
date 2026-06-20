@@ -22,15 +22,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.maya.assistant.R
 import com.maya.assistant.ai.GeminiLiveClient
-import com.maya.assistant.service.কলMonitorService
+import com.maya.assistant.service.CallMonitorService
 import com.maya.assistant.utils.LiveAudioManager
 import java.util.Locale
 
 
 
-class কলঅ্যাসিস্ট্যান্টActivity : AppCompatActivity(), TextToSpeech.চালুInitListener {
+class কলAsিস্ট্যান্টActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
-    private lateinit var callerনামText: TextView
+    private lateinit var callerNameText: TextView
     private lateinit var statusText: TextView
     private var waveformView: WaveformView? = null
 
@@ -39,22 +39,22 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
     private var speechRecognizer: SpeechRecognizer? = null
     private val handler = Handler(Looper.getMainLooper())
 
-    private var callerনাম = "অজানা কলer"
+    private var callerName = "অজানা কলer"
     private var phoneNumber = ""
-    private var userনাম = "Sir"
+    private var userName = "Sir"
     private var personality = "gf"
     private var isWhatsAppকল = false
 
     // State management — FIXED: Proper flags
     private var isDecisionMade = false
-    private var isশুনছে… = false
+    private var isListening… = false
     private var announcementPlayed = false
-    private var isবলছে… = false
+    private var isSpeaking… = false
     private var isকলAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
     private lateinit var liveAudioManager: LiveAudioManager
-    private var isLiveসংযুক্ত ✅ = false
+    private var isLiveConnected ✅ = false
 
     private val TAG = "MAYA_CALL_UI"
 
@@ -62,19 +62,19 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
     private val callStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                কলMonitorService.ACTION_CALL_ENDED -> {
+                CallMonitorService.ACTION_CALL_ENDED -> {
                     Log.d(TAG, "কল ended → closing assistant UI")
                     if (!isDecisionMade) {
                         // কল ended before user decision — just finish
                         safeFinish()
                     }
                 }
-                কলMonitorService.ACTION_CALL_ACTIVE -> {
+                CallMonitorService.ACTION_CALL_ACTIVE -> {
                     Log.d(TAG, "কল active → closing assistant UI")
                     isকলAnswered = true
                     safeFinish()
                 }
-                কলMonitorService.ACTION_CALL_RINGING -> {
+                CallMonitorService.ACTION_CALL_RINGING -> {
                     Log.d(TAG, "কল ringing received")
                 }
             }
@@ -86,8 +86,8 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
 
         // Lock screen pe bhi dikhao
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setদেখাওWhenলক আছে(true)
-            setTurnস্ক্রিনচালু(true)
+            setVisibleওWhenলক আছে(true)
+            setTurnস্ক্রিনEnabled(true)
         } else {
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
@@ -100,13 +100,13 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         setContentView(R.layout.activity_call_assistant)
 
         // Intent se data lo — FIXED: WhatsApp call detection
-        callerনাম  = intent.getStringExtra("CALLER_NAME") ?: "অজানা কলer"
+        callerName  = intent.getStringExtra("CALLER_NAME") ?: "অজানা কলer"
         phoneNumber = intent.getStringExtra("PHONE_NUMBER") ?: ""
-        userনাম    = intent.getStringExtra("USER_NAME") ?: getPrefsValue("user_name", "Sir")
+        userName    = intent.getStringExtra("USER_NAME") ?: getPrefsValue("user_name", "Sir")
         personality = intent.getStringExtra("PERSONALITY") ?: getPrefsValue("personality_mode", "gf")
         isWhatsAppকল = intent.getBooleanExtra("IS_WHATSAPP_CALL", false)
 
-        Log.d(TAG, "কলঅ্যাসিস্ট্যান্ট started: caller=$callerনাম, whatsapp=$isWhatsAppকল, personality=$personality")
+        Log.d(TAG, "কলAsিস্ট্যান্ট started: caller=$callerName, whatsapp=$isWhatsAppকল, personality=$personality")
 
         initViews()
 
@@ -121,9 +121,9 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
 
         // Broadcast register karo
         val filter = IntentFilter().apply {
-            addAction(কলMonitorService.ACTION_CALL_ENDED)
-            addAction(কলMonitorService.ACTION_CALL_ACTIVE)
-            addAction(কলMonitorService.ACTION_CALL_RINGING)
+            addAction(CallMonitorService.ACTION_CALL_ENDED)
+            addAction(CallMonitorService.ACTION_CALL_ACTIVE)
+            addAction(CallMonitorService.ACTION_CALL_RINGING)
         }
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -135,16 +135,16 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             Log.e(TAG, "Receiver register failed: ${e.message}")
         }
 
-        // ফোন state monitor
+        // Phone state monitor
         startকলStateMonitor()
     }
 
     private fun initViews() {
-        callerনামText = findViewById(R.id.callerনামText)
+        callerNameText = findViewById(R.id.callerNameText)
         statusText     = findViewById(R.id.callStatusText)
         waveformView   = findViewById<WaveformView?>(R.id.callWaveform)
 
-        callerনামText.text = callerনাম
+        callerNameText.text = callerName
         statusText.text = "MAYA preparing..."
     }
 
@@ -166,7 +166,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
      */
     private fun startAnnouncement() {
         if (isDecisionMade || announcementPlayed) {
-            if (!isDecisionMade) startশুনছে…()
+            if (!isDecisionMade) startListening…()
             return
         }
 
@@ -183,48 +183,48 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         // WebSocket audio duration estimate
         val estimatedDuration = (msg.length * 80L).coerceIn(3000L, 8000L)
         handler.postDelayed({
-            if (!isDecisionMade && !isবলছে…) startশুনছে…()
+            if (!isDecisionMade && !isSpeaking…) startListening…()
         }, estimatedDuration)
     }
 
     private fun buildAnnouncementText(): String {
-        val isKnownContact = !isNumberLike(callerনাম)
+        val isKnownContact = !isNumberLike(callerName)
 
         return if (isWhatsAppকল) {
             // WhatsApp call announcement
             when (personality) {
                 "gf" -> when {
                     isKnownContact ->
-                        "$userনাম, $callerনাম ka WhatsApp call aa raha hai. Uthana hai ya nahi?"
+                        "$userName, $callerName ka WhatsApp call aa raha hai. Uthana hai ya nahi?"
                     else ->
-                        "$userনাম, ek anjaan number se WhatsApp call aa rahi hai. Uthana hai ya nahi?"
+                        "$userName, ek anjaan number se WhatsApp call aa rahi hai. Uthana hai ya nahi?"
                 }
                 "professional" -> when {
                     isKnownContact ->
-                        "$userনাম, incoming WhatsApp call from $callerনাম. Should I answer or decline?"
+                        "$userName, incoming WhatsApp call from $callerName. Should I answer or decline?"
                     else ->
-                        "$userনাম, unknown WhatsApp caller. Should I answer or decline?"
+                        "$userName, unknown WhatsApp caller. Should I answer or decline?"
                 }
                 else ->
-                    "$userনাম, $callerনাম ka WhatsApp call aa raha hai. Kya karna hai?"
+                    "$userName, $callerName ka WhatsApp call aa raha hai. Kya karna hai?"
             }
         } else {
             // নাrmal call announcement
             when (personality) {
                 "gf" -> when {
                     isKnownContact ->
-                        "$userনাম, $callerনাম ka call aa raha hai. Uthana hai ya nahi?"
+                        "$userName, $callerName ka call aa raha hai. Uthana hai ya nahi?"
                     else ->
-                        "$userনাম, ek anjaan number se call aa rahi hai. Uthana hai ya nahi?"
+                        "$userName, ek anjaan number se call aa rahi hai. Uthana hai ya nahi?"
                 }
                 "professional" -> when {
                     isKnownContact ->
-                        "$userনাম, incoming call from $callerনাম. Should I answer or decline?"
+                        "$userName, incoming call from $callerName. Should I answer or decline?"
                     else ->
-                        "$userনাম, unknown caller. Should I answer or decline?"
+                        "$userName, unknown caller. Should I answer or decline?"
                 }
                 else ->
-                    "$userনাম, $callerনাম ka call aa raha hai. Kya karna hai?"
+                    "$userName, $callerName ka call aa raha hai. Kya karna hai?"
             }
         }
     }
@@ -243,9 +243,9 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         val callType = if (isWhatsAppকল) "WhatsApp call" else "phone call"
 
         val prompt = """
-            You are MAYA, a caring AI assistant for $userনাম. ব্যক্তিগতity: $personality.
+            You are MAYA, a caring AI assistant for $userName. ব্যক্তিগতity: $personality.
 
-            SITUATION: Incoming $callType from $callerনাম.
+            SITUATION: Incoming $callType from $callerName.
             
             TASKS:
             1. Announce the incoming call naturally in হাইnglish.
@@ -257,10 +257,10 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
 
         liveClient = GeminiLiveClient(apiKey, prompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) {
-                isবলছে… = true
+                isSpeaking… = true
                 liveAudioManager.playChunk(data)
-                runচালুUiThread {
-                    statusText.text = "বলছে…... 💬"
+                runEnabledUiThread {
+                    statusText.text = "Speaking…... 💬"
                     waveformView?.startAnimation()
                 }
             }
@@ -269,24 +269,24 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
                 Log.d(TAG, "Gemini Text: $text")
             }
 
-            override fun onসংযুক্ত ✅() {
-                isLiveসংযুক্ত ✅ = true
-                Log.d(TAG, "Gemini Live সংযুক্ত ✅ ✅")
-                // শুরু করো announcement once connected
+            override fun onConnected ✅() {
+                isLiveConnected ✅ = true
+                Log.d(TAG, "Gemini Live Connected ✅ ✅")
+                // Start কRow announcement once connected
                 handler.postDelayed({ startAnnouncement() }, 500)
             }
 
             override fun onTurnComplete() {
-                isবলছে… = false
-                runচালুUiThread {
+                isSpeaking… = false
+                runEnabledUiThread {
                     waveformView?.stopAnimation()
-                    if (!isDecisionMade) startশুনছে…()
+                    if (!isDecisionMade) startListening…()
                 }
             }
 
-            override fun onসমস্যা(msg: String) {
-                isLiveসংযুক্ত ✅ = false
-                Log.e(TAG, "Gemini সমস্যা: $msg")
+            override fun onError(msg: String) {
+                isLiveConnected ✅ = false
+                Log.e(TAG, "Gemini Error: $msg")
                 // Fallback to TTS
                 handler.postDelayed({
                     if (!announcementPlayed) startAnnouncement()
@@ -300,10 +300,10 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
      * ✅ NEW: Speak via WebSocket (natural voice)
      */
     private fun speakViaWebSocket(text: String) {
-        if (isLiveসংযুক্ত ✅) {
-            isবলছে… = true
-            liveClient.sendTextমেসেজ(text)
-            Log.d(TAG, "বলছে… via WebSocket: $text")
+        if (isLiveConnected ✅) {
+            isSpeaking… = true
+            liveClient.sendTextMessage(text)
+            Log.d(TAG, "Speaking… via WebSocket: $text")
             return
         }
         // Fallback to TTS
@@ -311,19 +311,19 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
     }
 
     /**
-     * Fallback TTS (বন্ধ - only WebSocket natural voice allowed)
+     * Fallback TTS (Off - only WebSocket natural voice allowed)
      */
     private fun speakTTS(text: String) {
         // Robotic TTS removed as per user request
         Log.d(TAG, "Robotic TTS skipped for: $text")
     }
 
-    private fun startশুনছে…() {
-        if (isDecisionMade || isশুনছে… || isবলছে…) return
-        isশুনছে… = true
+    private fun startListening…() {
+        if (isDecisionMade || isListening… || isSpeaking…) return
+        isListening… = true
 
         statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
-        Log.d(TAG, "শুরু করোing voice recognition")
+        Log.d(TAG, "Start কRowing voice recognition")
 
         if (!SpeechRecognizer.isRecognitionপাওয়া যাচ্ছে(this)) {
             Log.e(TAG, "Speech recognition not available")
@@ -336,7 +336,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
 
             override fun onResults(results: Bundle?) {
-                isশুনছে… = false
+                isListening… = false
                 val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 val spoken = texts?.firstOrNull()?.lowercase()?.trim() ?: ""
                 Log.d(TAG, "ব্যবহারকারী said: '$spoken'")
@@ -348,8 +348,8 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
                 processCommand(spoken)
             }
 
-            override fun onসমস্যা(errorCode: Int) {
-                isশুনছে… = false
+            override fun onError(errorCode: Int) {
+                isListening… = false
                 val errorMsg = when (errorCode) {
                     SpeechRecognizer.ERROR_NO_MATCH -> "NO_MATCH"
                     SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "TIMEOUT"
@@ -359,7 +359,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
                 Log.w(TAG, "Speech error: $errorMsg")
 
                 if (!isDecisionMade) {
-                    handler.postDelayed({ if (!isDecisionMade) startশুনছে…() }, 1500)
+                    handler.postDelayed({ if (!isDecisionMade) startListening…() }, 1500)
                 }
             }
 
@@ -379,7 +379,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
                 waveformView?.stopAnimation()
             }
             override fun onPartialResults(p0: Bundle?) {}
-            override fun onইভেন্ট(p0: Int, p1: Bundle?) {}
+            override fun onEvent(p0: Int, p1: Bundle?) {}
         })
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -392,7 +392,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000)
         }
-        speechRecognizer?.startশুনছে…(intent)
+        speechRecognizer?.startListening…(intent)
     }
 
     /**
@@ -480,15 +480,15 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             isReject -> performReject()
             else -> {
                 // ✅ ENHANCED: If not answer/reject, let Gemini handle the query naturally
-                if (isLiveসংযুক্ত ✅) {
+                if (isLiveConnected ✅) {
                     Log.d(TAG, "Passing unrecognized command to Gemini: $spoken")
-                    isবলছে… = true
-                    runচালুUiThread { statusText.text = "ভাবছে…... 🤔" }
-                    liveClient.sendTextমেসেজ(spoken)
+                    isSpeaking… = true
+                    runEnabledUiThread { statusText.text = "Thinking…... 🤔" }
+                    liveClient.sendTextMessage(spoken)
                 } else {
                     val confusion = when (personality) {
                         "gf"  -> "Jaan, samajh nahi aaya. 'Uthao' ya 'Nahi' bolo."
-                        else  -> "অনুগ্রহ করে say 'Answer' or 'Reject'."
+                        else  -> "Onুগ্রহ করে say 'Answer' or 'Reject'."
                     }
                     speakViaWebSocket(confusion)
                     handler.postDelayed({ if (!isDecisionMade) repeatAnnouncement() }, 4000)
@@ -504,11 +504,11 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         if (isDecisionMade) return
         isDecisionMade = true
         isকলAnswered = true
-        stopশুনছে…()
+        stopListening…()
 
         val confirmMsg = when (personality) {
-            "gf"  -> "Ji $userনাম, call utha rahi hoon! 📞"
-            else  -> "Answering the call, $userনাম."
+            "gf"  -> "Ji $userName, call utha rahi hoon! 📞"
+            else  -> "Answering the call, $userName."
         }
         speakViaWebSocket(confirmMsg)
         statusText.text = "Answering... 📞"
@@ -526,7 +526,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             }
 
             if (!success) {
-                speakViaWebSocket("দুঃখিত $userনাম, call nahi uth payi")
+                speakViaWebSocket("দুঃখিত $userName, call nahi uth payi")
             }
 
             handler.postDelayed({ safeFinish() }, 2000)
@@ -542,7 +542,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         // Method 1: TelecomManager acceptRingingকল
         try {
             if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
-                val telecom = getসিস্টেমService(Context.TELECOM_SERVICE) as TelecomManager
+                val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     @Suppress("DEPRECATION")
                     telecom.acceptRingingকল()
@@ -557,13 +557,13 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         // Method 2: অ্যাক্সেসিবিলিটি fallback
         if (!success) {
             try {
-                val answered = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                val answered = com.maya.assistant.service.SmartAccessibilityEngine.click(
                     text = "Answer"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     contentDesc = "Answer"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     text = "Accept"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     contentDesc = "Accept"
                 )
                 Log.d(TAG, "অ্যাক্সেসিবিলিটি answer: $answered")
@@ -584,17 +584,17 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
 
         try {
             // Try to click WhatsApp answer button
-            success = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            success = com.maya.assistant.service.SmartAccessibilityEngine.click(
                 text = "Answer"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 contentDesc = "Answer"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 text = "Accept"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 contentDesc = "Accept call"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 id = "com.whatsapp:id/incoming_call_answer"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 id = "com.whatsapp.w4b:id/incoming_call_answer"
             )
 
@@ -612,11 +612,11 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
     private fun performReject() {
         if (isDecisionMade) return
         isDecisionMade = true
-        stopশুনছে…()
+        stopListening…()
 
         val confirmMsg = when (personality) {
-            "gf"  -> "Theek hai $userনাম, call reject kar diya. ❌"
-            else  -> "কল declined, $userনাম."
+            "gf"  -> "Theek hai $userName, call reject kar diya. ❌"
+            else  -> "কল declined, $userName."
         }
         speakViaWebSocket(confirmMsg)
         statusText.text = "Rejecting... ❌"
@@ -634,7 +634,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             }
 
             if (!success) {
-                speakViaWebSocket("দুঃখিত $userনাম, call reject nahi ho paya")
+                speakViaWebSocket("দুঃখিত $userName, call reject nahi ho paya")
             }
 
             handler.postDelayed({ safeFinish() }, 2000)
@@ -651,7 +651,7 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
-                    val telecom = getসিস্টেমService(Context.TELECOM_SERVICE) as TelecomManager
+                    val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
                     @Suppress("DEPRECATION")
                     telecom.endকল()
                     Log.d(TAG, "✅ কল rejected via TelecomManager.endকল()")
@@ -669,13 +669,13 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         // Method 2: অ্যাক্সেসিবিলিটি fallback
         if (!success) {
             try {
-                val rejected = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                val rejected = com.maya.assistant.service.SmartAccessibilityEngine.click(
                     text = "Decline"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     text = "Reject"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     contentDesc = "Decline"
-                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                     contentDesc = "Reject call"
                 )
                 Log.d(TAG, "অ্যাক্সেসিবিলিটি reject: $rejected")
@@ -695,15 +695,15 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         var success = false
 
         try {
-            success = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            success = com.maya.assistant.service.SmartAccessibilityEngine.click(
                 text = "Decline"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 contentDesc = "Decline"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 text = "Reject"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 id = "com.whatsapp:id/incoming_call_decline"
-            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
+            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
                 id = "com.whatsapp.w4b:id/incoming_call_decline"
             )
 
@@ -720,8 +720,8 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
         startAnnouncement()
     }
 
-    private fun stopশুনছে…() {
-        isশুনছে… = false
+    private fun stopListening…() {
+        isListening… = false
         try {
             speechRecognizer?.cancel()
         } catch (_: Exception) {}
@@ -729,12 +729,12 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
     }
 
     private fun startকলStateMonitor() {
-        val tm = getসিস্টেমService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val monitor = object : Runnable {
             override fun run() {
                 if (isDecisionMade || isকলAnswered) return
                 if (tm.callState == TelephonyManager.CALL_STATE_IDLE && !isWhatsAppকল) {
-                    Log.d(TAG, "ফোন idle — closing call assistant")
+                    Log.d(TAG, "Phone idle — closing call assistant")
                     safeFinish()
                     return
                 }
@@ -749,11 +749,11 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
             try { speechRecognizer?.cancel() } catch (_: Exception) {}
             try { speechRecognizer?.destroy() } catch (_: Exception) {}
 
-            // ✅ FIXED: রিসেট করো state properly
+            // ✅ FIXED: Reset কRow state properly
             isDecisionMade = false
-            isশুনছে… = false
+            isListening… = false
             announcementPlayed = false
-            isবলছে… = false
+            isSpeaking… = false
 
             finish()
         }
@@ -774,20 +774,20 @@ class কলঅ্যাসিস্ট্যান্টActivity : AppCompatAct
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeকলbacksAndমেসেজs(null)
+        handler.removeকলbacksAndMessages(null)
         try { unregisterReceiver(callStateReceiver) } catch (_: Exception) {}
         tts?.shutdown()
         if (::liveClient.isInitialized) liveClient.disconnect()
         liveAudioManager.stop()
         speechRecognizer?.destroy()
 
-        // ✅ FIXED: রিসেট করো all states on destroy
+        // ✅ FIXED: Reset কRow all states on destroy
         isDecisionMade = false
-        isশুনছে… = false
+        isListening… = false
         announcementPlayed = false
-        isবলছে… = false
+        isSpeaking… = false
         isকলAnswered = false
 
-        Log.d(TAG, "কলঅ্যাসিস্ট্যান্টActivity destroyed")
+        Log.d(TAG, "কলAsিস্ট্যান্টActivity destroyed")
     }
 }

@@ -9,8 +9,8 @@ import android.os.IBinder
  * This exists for the project structure as specified in the prompt.
  */
 class FloatingBubbleService : Service() {
-    override fun onশুরু করোCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Floatingঅ্যাসিস্ট্যান্টController.show(this)
+    override fun onStart কRowCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        FloatingAsিস্ট্যান্টController.show(this)
         stopSelf()
         return START_NOT_STICKY
     }

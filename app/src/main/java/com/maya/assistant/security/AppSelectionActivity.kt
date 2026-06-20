@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.maya.assistant.R
 import kotlinx.coroutines.*
 
-class Appসিলেক্ট করোionActivity : AppCompatActivity() {
+class AppSelect কRowionActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -37,19 +37,19 @@ class Appসিলেক্ট করোionActivity : AppCompatActivity() {
             val apps = withContext(Dispatchers.IO) {
                 val pm = packageManager
                 val lockedApps =
-                    নিরাপত্তাManager.getলক আছেPackages(this@Appসিলেক্ট করোionActivity)
+                    নিরাপত্তাManager.getলক আছেPackages(this@AppSelect কRowionActivity)
 
-                pm.getইনস্টল করোedApplications(PackageManager.GET_META_DATA)
+                pm.getInstall কRowedApplications(PackageManager.GET_META_DATA)
                     .filter {
                         (it.flags and Applicationতথ্য.FLAG_SYSTEM) == 0 &&
-                                it.packageনাম != packageনাম
+                                it.packageName != packageName
                     }
                     .map {
                         Appতথ্য(
                             name = it.loadLabel(pm).toString(),
-                            packageনাম = it.packageনাম,
+                            packageName = it.packageName,
                             icon = it.loadIcon(pm),
-                            isলক আছে = lockedApps.contains(it.packageনাম)
+                            isলক আছে = lockedApps.contains(it.packageName)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -66,7 +66,7 @@ class Appসিলেক্ট করোionActivity : AppCompatActivity() {
 
     data class Appতথ্য(
         val name: String,
-        val packageনাম: String,
+        val packageName: String,
         val icon: Drawable,
         var isলক আছে: Boolean
     )
@@ -79,7 +79,7 @@ class Appসিলেক্ট করোionActivity : AppCompatActivity() {
             : RecyclerView.ViewHolder(view) {
 
             val icon: ImageView = view.findViewById(R.id.appIcon)
-            val name: TextView = view.findViewById(R.id.appনাম)
+            val name: TextView = view.findViewById(R.id.appName)
             val checkbox: CheckBox = view.findViewById(R.id.appCheckbox)
         }
 
@@ -105,14 +105,14 @@ class Appসিলেক্ট করোionActivity : AppCompatActivity() {
             holder.icon.setImageDrawable(app.icon)
             holder.name.text = app.name
 
-            holder.checkbox.setচালুCheckedChangeListener(null)
+            holder.checkbox.setEnabledCheckedChangeListener(null)
             holder.checkbox.isChecked = app.isলক আছে
 
-            holder.checkbox.setচালুCheckedChangeListener { _, isChecked ->
+            holder.checkbox.setEnabledCheckedChangeListener { _, isChecked ->
                 updateLock(app, isChecked)
             }
 
-            holder.itemView.setচালুClickListener {
+            holder.itemView.setEnabledClickListener {
                 holder.checkbox.isChecked = !holder.checkbox.isChecked
             }
         }
@@ -125,17 +125,17 @@ class Appসিলেক্ট করোionActivity : AppCompatActivity() {
 
             if (locked) {
                 নিরাপত্তাManager.addলক আছেPackage(
-                    this@Appসিলেক্ট করোionActivity,
-                    app.packageনাম
+                    this@AppSelect কRowionActivity,
+                    app.packageName
                 )
             } else {
                 নিরাপত্তাManager.removeলক আছেPackage(
-                    this@Appসিলেক্ট করোionActivity,
-                    app.packageনাম
+                    this@AppSelect কRowionActivity,
+                    app.packageName
                 )
             }
         }
 
-        override fun getItemগণনা() = apps.size
+        override fun getItemCount() = apps.size
     }
 }

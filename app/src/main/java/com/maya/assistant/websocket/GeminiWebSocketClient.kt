@@ -12,19 +12,19 @@ import java.util.concurrent.সময়Unit
 class GeminiWebSocketClient(
     private val apiKey: String,
     private val systemPrompt: String,
-    private val onসংযুক্ত ✅: () -> Unit,
+    private val onConnected ✅: () -> Unit,
     private val onAudioReceived: (ByteArray) -> Unit,
     private val onTextReceived: (String) -> Unit,
     private val onTurnComplete: () -> Unit,
-    private val onসমস্যা: (String) -> Unit
+    private val onError: (String) -> Unit
 ) {
     private val TAG = "GEMINI_WS"
     private var webSocket: WebSocket? = null
     private var isSetupComplete = false
 
     private val client = OkHttpClient.Builder()
-        .readটাইমআউট(0, সময়Unit.MILLISECONDS)
-        .connectটাইমআউট(20, সময়Unit.SECONDS)
+        .readTimeআউট(0, সময়Unit.MILLISECONDS)
+        .connectTimeআউট(20, সময়Unit.SECONDS)
         .pingInterval(25, সময়Unit.SECONDS)
         .build()
 
@@ -38,28 +38,28 @@ class GeminiWebSocketClient(
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onখোলো(ws: WebSocket, response: Response) {
-                Log.d(TAG, "সংযুক্ত ✅ ✅")
+            override fun onOpen(ws: WebSocket, response: Response) {
+                Log.d(TAG, "Connected ✅ ✅")
                 sendSetup(ws)
             }
 
-            override fun onমেসেজ(ws: WebSocket, text: String) {
+            override fun onMessage(ws: WebSocket, text: String) {
                 handleResponse(text)
             }
 
-            override fun onমেসেজ(ws: WebSocket, bytes: ByteString) {
+            override fun onMessage(ws: WebSocket, bytes: ByteString) {
                 try { handleResponse(bytes.utf8()) } catch (e: Exception) { Log.e(TAG, "Binary parse error") }
             }
 
             override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
                 isSetupComplete = false
                 Log.e(TAG, "WS Failure: ${t.message}")
-                onসমস্যা("Connection failed: ${t.message}")
+                onError("Connection failed: ${t.message}")
             }
 
-            override fun onবন্ধ করোd(ws: WebSocket, code: Int, reason: String) {
+            override fun onOff কRowd(ws: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
-                Log.d(TAG, "WS বন্ধ করোd: $reason")
+                Log.d(TAG, "WS Off কRowd: $reason")
             }
         })
     }
@@ -72,8 +72,8 @@ class GeminiWebSocketClient(
                     put("responseModalities", JSONArray().put("AUDIO"))
                     put("speechConfig", JSONObject().apply {
                         put("voiceConfig", JSONObject().apply {
-                            put("prebuiltভয়েসConfig", JSONObject().apply {
-                                put("voiceনাম", Constants.GEMINI_VOICE)
+                            put("prebuiltVoiceConfig", JSONObject().apply {
+                                put("voiceName", Constants.GEMINI_VOICE)
                             })
                         })
                     })
@@ -105,7 +105,7 @@ class GeminiWebSocketClient(
         }
     }
 
-    fun sendTextমেসেজ(text: String) {
+    fun sendTextMessage(text: String) {
         if (!isSetupComplete) return
         try {
             val msg = JSONObject().apply {
@@ -131,7 +131,7 @@ class GeminiWebSocketClient(
             if (obj.has("setupComplete") || obj.optJSONObject("setupComplete") != null) {
                 isSetupComplete = true
                 Log.d(TAG, "Gemini Ready ✅")
-                onসংযুক্ত ✅()
+                onConnected ✅()
                 return
             }
 
@@ -164,10 +164,10 @@ class GeminiWebSocketClient(
     }
 
     fun disconnect() {
-        webSocket?.close(1000, "বাই")
+        webSocket?.close(1000, "By")
         webSocket = null
         isSetupComplete = false
     }
 
-    fun isসংযুক্ত ✅() = isSetupComplete
+    fun isConnected ✅() = isSetupComplete
 }

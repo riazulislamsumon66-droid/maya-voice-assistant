@@ -12,9 +12,9 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 /**
- * নিরাপত্তাManager — AES-256 Encryption + PIN + ভয়েস + App Lock per package
+ * নিরাপত্তাManager — AES-256 Encryption + PIN + Voice + App Lock per package
  *
- * ADDED: isPackageলক আছে() — অ্যাক্সেসিবিলিটিসাহায্যerService ke liye
+ * ADDED: isPackageলক আছে() — AccessibilityHelperService ke liye
  */
 object নিরাপত্তাManager {
 
@@ -95,8 +95,8 @@ object নিরাপত্তাManager {
 
     fun verifyPin(context: Context, inputPin: String): PinResult {
         val lockUntil = getPrefs(context).getLong(KEY_LOCKOUT_TIME, 0L)
-        if (সিস্টেম.currentসময়Millis() < lockUntil) {
-            val rem = (lockUntil - সিস্টেম.currentসময়Millis()) / 1000
+        if (System.currentসময়Millis() < lockUntil) {
+            val rem = (lockUntil - System.currentসময়Millis()) / 1000
             return PinResult.LOCKED_OUT(rem)
         }
         val stored = getPrefs(context).getString(KEY_PIN_HASH, null) ?: return PinResult.NOT_SET
@@ -114,7 +114,7 @@ object নিরাপত্তাManager {
         val attempts = prefs.getInt(KEY_WRONG_ATTEMPTS, 0) + 1
         prefs.edit().putInt(KEY_WRONG_ATTEMPTS, attempts).apply()
         if (attempts >= MAX_ATTEMPTS) {
-            prefs.edit().putLong(KEY_LOCKOUT_TIME, সিস্টেম.currentসময়Millis() + LOCKOUT_MS).apply()
+            prefs.edit().putLong(KEY_LOCKOUT_TIME, System.currentসময়Millis() + LOCKOUT_MS).apply()
             return PinResult.WRONG(attempts, lockedOut = true)
         }
         return PinResult.WRONG(attempts, lockedOut = false)
@@ -133,19 +133,19 @@ object নিরাপত্তাManager {
     fun getRemainingAttempts(context: Context) = (MAX_ATTEMPTS - getWrongAttempts(context)).coerceAtLeast(0)
 
     private fun hashPin(pin: String): String {
-        val digest = java.security.মেসেজDigest.getInstance("SHA-256")
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
         return Base64.encodeToString(digest.digest(pin.toByteArray(Charsets.UTF_8)), Base64.NO_WRAP)
     }
 
     // ── VOICE PASSPHRASE ────────────────────────────────────────
 
-    fun setভয়েসPassphrase(context: Context, phrase: String) {
+    fun setVoicePassphrase(context: Context, phrase: String) {
         getPrefs(context).edit()
             .putString(KEY_VOICE_PHRASE, encrypt(normalise(phrase)))
             .apply()
     }
 
-    fun verifyভয়েসPassphrase(context: Context, spoken: String): Boolean {
+    fun verifyVoicePassphrase(context: Context, spoken: String): Boolean {
         val stored = getPrefs(context).getString(KEY_VOICE_PHRASE, null) ?: return false
         val storedPhrase = decrypt(stored)
         val spokenনাrm = normalise(spoken)
@@ -157,45 +157,45 @@ object নিরাপত্তাManager {
         val spokenWords  = spokenনাrm.split(" ").filter { it.isনাtEmpty() }
         if (storedWords.isEmpty()) return false
 
-        val matchগণনা = storedWords.count { sw -> spokenWords.any { it.contains(sw) || sw.contains(it) } }
-        return matchগণনা.toFloat() / storedWords.size >= 0.8f
+        val matchCount = storedWords.count { sw -> spokenWords.any { it.contains(sw) || sw.contains(it) } }
+        return matchCount.toFloat() / storedWords.size >= 0.8f
     }
 
-    fun hasভয়েসPassphrase(context: Context) = getPrefs(context).contains(KEY_VOICE_PHRASE)
+    fun hasVoicePassphrase(context: Context) = getPrefs(context).contains(KEY_VOICE_PHRASE)
 
     private fun normalise(phrase: String) =
         phrase.lowercase().trim().replace(Regex("[^a-z0-9\\s]"), "").replace(Regex("\\s+"), " ")
 
     // ── APP LOCK (global) ────────────────────────────────────────
 
-    fun setAppLockচালু(context: Context, enabled: Boolean) {
+    fun setAppLockEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_APP_LOCK_ON, enabled).apply()
         Log.d(TAG, "Global App Lock set to: $enabled")
     }
 
-    fun isAppLockচালু(context: Context): Boolean {
-        val masterচালু = getPrefs(context).getBoolean(KEY_APP_LOCK_ON, false)
-        val patternচালু = PatternManager.isPatternLockচালু(context)
-        return masterচালু || patternচালু
+    fun isAppLockEnabled(context: Context): Boolean {
+        val masterEnabled = getPrefs(context).getBoolean(KEY_APP_LOCK_ON, false)
+        val patternEnabled = PatternManager.isPatternLockEnabled(context)
+        return masterEnabled || patternEnabled
     }
 
     // ── BIOMETRIC ────────────────────────────────────────────────
 
-    fun isবায়োমেট্রিকচালু(context: Context): Boolean {
+    fun isবায়োমেট্রিকEnabled(context: Context): Boolean {
         val enabled = getPrefs(context).getBoolean(KEY_BIOMETRIC_ON, false)
-        Log.d(TAG, "isবায়োমেট্রিকচালু: $enabled")
+        Log.d(TAG, "isবায়োমেট্রিকEnabled: $enabled")
         return enabled
     }
     
-    fun setবায়োমেট্রিকচালু(context: Context, enabled: Boolean) {
+    fun setবায়োমেট্রিকEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_BIOMETRIC_ON, enabled).apply()
-        Log.d(TAG, "setবায়োমেট্রিকচালু: $enabled")
+        Log.d(TAG, "setবায়োমেট্রিকEnabled: $enabled")
     }
 
-    // ── DEVICE LOCK (সিস্টেম Lock) ────────────────────────────────
+    // ── DEVICE LOCK (System Lock) ────────────────────────────────
 
-    fun isDeviceLockচালু(context: Context) = getPrefs(context).getBoolean(KEY_DEVICE_LOCK_ON, false)
-    fun setDeviceLockচালু(context: Context, enabled: Boolean) {
+    fun isDeviceLockEnabled(context: Context) = getPrefs(context).getBoolean(KEY_DEVICE_LOCK_ON, false)
+    fun setDeviceLockEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_DEVICE_LOCK_ON, enabled).apply()
     }
 
@@ -204,9 +204,9 @@ object নিরাপত্তাManager {
     /**
      * ✅ FIXED: Checks if any lock method is active + package is in list
      */
-    fun isPackageলক আছে(context: Context, packageনাম: String): Boolean {
+    fun isPackageলক আছে(context: Context, packageName: String): Boolean {
         // Master check: If global app lock is off AND pattern is off, nothing is locked
-        if (!isAppLockচালু(context) && !isবায়োমেট্রিকচালু(context) && !isDeviceLockচালু(context)) {
+        if (!isAppLockEnabled(context) && !isবায়োমেট্রিকEnabled(context) && !isDeviceLockEnabled(context)) {
             return false
         }
 
@@ -217,24 +217,24 @@ object নিরাপত্তাManager {
             "com.google.android.packageinstaller",
             "com.maya.assistant" // Don't lock yourself
         )
-        if (systemApps.contains(packageনাম)) return false // সেটিংস should NOT be locked for now to avoid loops
+        if (systemApps.contains(packageName)) return false // Settings should NOT be locked for now to avoid loops
 
         // লক আছে packages list check karo
         val locked = getলক আছেPackages(context)
-        val isলক আছে = locked.contains(packageনাম)
-        Log.d(TAG, "Checking lock for $packageনাম: $isলক আছে")
+        val isলক আছে = locked.contains(packageName)
+        Log.d(TAG, "Checking lock for $packageName: $isলক আছে")
         return isলক আছে
     }
 
-    fun addলক আছেPackage(context: Context, packageনাম: String) {
+    fun addলক আছেPackage(context: Context, packageName: String) {
         val current = getলক আছেPackages(context).toMutableSet()
-        current.add(packageনাম)
+        current.add(packageName)
         saveলক আছেPackages(context, current)
     }
 
-    fun removeলক আছেPackage(context: Context, packageনাম: String) {
+    fun removeলক আছেPackage(context: Context, packageName: String) {
         val current = getলক আছেPackages(context).toMutableSet()
-        current.remove(packageনাম)
+        current.remove(packageName)
         saveলক আছেPackages(context, current)
     }
 

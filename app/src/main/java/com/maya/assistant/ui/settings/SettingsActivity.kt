@@ -2,14 +2,14 @@ package com.maya.assistant.ui.settings
 
 import android.Manifest
 import android.app.admin.DevicePolicyManager
-import android.content.Componentনাম
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.কন্টাক্টContract
-import android.provider.সেটিংস
+import android.provider.Settings
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,19 +18,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
-import com.maya.assistant.service.অ্যাক্সেসিবিলিটিসাহায্যerService
-import com.maya.assistant.service.MayaDeviceঅ্যাডমিনReceiver
-import com.maya.assistant.security.নিরাপত্তাসেটিংসActivity
+import com.maya.assistant.service.AccessibilityHelperService
+import com.maya.assistant.service.MayaDeviceAdminReceiver
+import com.maya.assistant.security.নিরাপত্তাSettingsActivity
 
 
-class সেটিংসActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     // ── Original Views ──────────────────────────────────────────
-    private lateinit var apiKeyInput: এডিট করোText
-    private lateinit var ttsApiKeyInput: এডিট করোText
-    private lateinit var userনামInput: এডিট করোText
-    private lateinit var primeনামInput: এডিট করোText
-    private lateinit var primeNumberInput: এডিট করোText
+    private lateinit var apiKeyInput: Edit কRowText
+    private lateinit var ttsApiKeyInput: Edit কRowText
+    private lateinit var userNameInput: Edit কRowText
+    private lateinit var primeNameInput: Edit কRowText
+    private lateinit var primeNumberInput: Edit কRowText
     private lateinit var personalityGroup: RadioGroup
     private lateinit var voiceTypeGroup: RadioGroup
     private lateinit var liveModeSwitch: Switch
@@ -43,14 +43,14 @@ class সেটিংসActivity : AppCompatActivity() {
     private lateinit var callAnnounceSwitch: Switch
     private lateinit var callAnnounceStatusText: TextView
     private lateinit var grantPermissionsBtn: Button
-    private lateinit var setডিফল্টঅ্যাসিস্ট্যান্টBtn: Button
+    private lateinit var setDefaultAsিস্ট্যান্টBtn: Button
     private lateinit var permissionsStatusText: TextView
 
     private lateinit var devicePolicyManager: DevicePolicyManager
-    private lateinit var componentনাম: Componentনাম
+    private lateinit var componentName: ComponentName
 
     private val contactPickerLauncher = registerForActivityResult(
-        ActivityResultContracts.শুরু করোActivityForResult()
+        ActivityResultContracts.Start কRowActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_ঠিক আছে) {
             val contactUri = result.data?.data ?: return@registerForActivityResult
@@ -75,8 +75,8 @@ class সেটিংসActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        devicePolicyManager = getসিস্টেমService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        componentনাম = Componentনাম(this, MayaDeviceঅ্যাডমিনReceiver::class.java)
+        devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        componentName = ComponentName(this, MayaDeviceAdminReceiver::class.java)
 
         initViews()
         loadPreferences()
@@ -88,8 +88,8 @@ class সেটিংসActivity : AppCompatActivity() {
         // Original views
         apiKeyInput = findViewById(R.id.apiKeyInput)
         ttsApiKeyInput = findViewById(R.id.ttsApiKeyInput)
-        userনামInput = findViewById(R.id.userনামInput)
-        primeনামInput = findViewById(R.id.primeনামInput)
+        userNameInput = findViewById(R.id.userNameInput)
+        primeNameInput = findViewById(R.id.primeNameInput)
         primeNumberInput = findViewById(R.id.primeNumberInput)
         personalityGroup = findViewById(R.id.personalityGroup)
         voiceTypeGroup = findViewById(R.id.voiceTypeGroup)
@@ -103,7 +103,7 @@ class সেটিংসActivity : AppCompatActivity() {
         callAnnounceSwitch = findViewById(R.id.callAnnounceSwitch)
         callAnnounceStatusText = findViewById(R.id.callAnnounceStatusText)
         grantPermissionsBtn = findViewById(R.id.grantPermissionsBtn)
-        setডিফল্টঅ্যাসিস্ট্যান্টBtn = findViewById(R.id.setডিফল্টঅ্যাসিস্ট্যান্টBtn)
+        setDefaultAsিস্ট্যান্টBtn = findViewById(R.id.setDefaultAsিস্ট্যান্টBtn)
         permissionsStatusText = findViewById(R.id.permissionsStatusText)
     }
 
@@ -111,8 +111,8 @@ class সেটিংসActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
         apiKeyInput.setText(prefs.getString("api_key", ""))
         ttsApiKeyInput.setText(prefs.getString("tts_api_key", ""))
-        userনামInput.setText(prefs.getString("user_name", "Sir"))
-        primeনামInput.setText(prefs.getString("prime_name", ""))
+        userNameInput.setText(prefs.getString("user_name", "Sir"))
+        primeNameInput.setText(prefs.getString("prime_name", ""))
         primeNumberInput.setText(prefs.getString("prime_number", ""))
 
         when (prefs.getString("personality_mode", "gf")) {
@@ -123,63 +123,63 @@ class সেটিংসActivity : AppCompatActivity() {
 
         when (prefs.getString("voice_engine", "system")) {
             "elevenlabs" -> findViewById<RadioButton>(R.id.radioEleven).isChecked = true
-            else -> findViewById<RadioButton>(R.id.radioসিস্টেম).isChecked = true
+            else -> findViewById<RadioButton>(R.id.radioSystem).isChecked = true
         }
 
         liveModeSwitch.isChecked = prefs.getBoolean("live_mode_enabled", false)
 
         // কল announce (default ON for better UX)
-        val announceচালু = prefs.getBoolean("call_announce_enabled", true)
-        callAnnounceSwitch.isChecked = announceচালু
-        updateকলAnnounceStatus(announceচালু)
+        val announceEnabled = prefs.getBoolean("call_announce_enabled", true)
+        callAnnounceSwitch.isChecked = announceEnabled
+        updateকলAnnounceStatus(announceEnabled)
     }
 
     private fun setupListeners() {
-        saveBtn.setচালুClickListener { savePreferences() }
+        saveBtn.setEnabledClickListener { savePreferences() }
 
-        pickContactBtn.setচালুClickListener {
-            val intent = Intent(Intent.ACTION_PICK, কন্টাক্টContract.CommonDataKinds.ফোন.CONTENT_URI)
+        pickContactBtn.setEnabledClickListener {
+            val intent = Intent(Intent.ACTION_PICK, কন্টাক্টContract.CommonDataKinds.Phone.CONTENT_URI)
             contactPickerLauncher.launch(intent)
         }
 
         // Original cards
-        findViewById<View>(R.id.accessibilityCard).setচালুClickListener {
-            startActivity(Intent(android.provider.সেটিংস.ACTION_ACCESSIBILITY_SETTINGS))
+        findViewById<View>(R.id.accessibilityCard).setEnabledClickListener {
+            startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
 
-        findViewById<View>(R.id.deviceঅ্যাডমিনCard).setচালুClickListener {
-            if (!devicePolicyManager.isঅ্যাডমিনসক্রিয়(componentনাম)) {
+        findViewById<View>(R.id.deviceAdminCard).setEnabledClickListener {
+            if (!devicePolicyManager.isAdminসক্রিয়(componentName)) {
                 val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                    putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentনাম)
+                    putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
                     putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "MAYA needs admin to control system.")
                 }
                 startActivity(intent)
             } else {
-                Toast.makeText(this, "অ্যাডমিন is already active ✅", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Admin is already active ✅", Toast.LENGTH_SHORT).show()
             }
         }
 
-        findViewById<View>(R.id.securityসেটিংসCard).setচালুClickListener {
-            startActivity(Intent(this, নিরাপত্তাসেটিংসActivity::class.java))
+        findViewById<View>(R.id.securitySettingsCard).setEnabledClickListener {
+            startActivity(Intent(this, নিরাপত্তাSettingsActivity::class.java))
         }
 
         // NEW: কল announce switch
-        callAnnounceSwitch.setচালুCheckedChangeListener { _, isChecked ->
+        callAnnounceSwitch.setEnabledCheckedChangeListener { _, isChecked ->
             updateকলAnnounceStatus(isChecked)
         }
 
         // NEW: Grant permissions button
-        grantPermissionsBtn.setচালুClickListener {
+        grantPermissionsBtn.setEnabledClickListener {
             checkAndRequestPermissions()
         }
 
         // NEW: Set default assistant button
-        setডিফল্টঅ্যাসিস্ট্যান্টBtn.setচালুClickListener {
+        setDefaultAsিস্ট্যান্টBtn.setEnabledClickListener {
             try {
-                startActivity(Intent(সেটিংস.ACTION_VOICE_INPUT_SETTINGS))
-                Toast.makeText(this, "MAYA ko ডিফল্ট অ্যাসিস্ট্যান্ট chuno 👆", Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
+                Toast.makeText(this, "MAYA ko Default Asিস্ট্যান্ট chuno 👆", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
-                Toast.makeText(this, "সেটিংস → Apps → ডিফল্ট Apps → অ্যাসিস্ট্যান্ট → MAYA", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Settings → Apps → Default Apps → Asিস্ট্যান্ট → MAYA", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -213,22 +213,22 @@ class সেটিংসActivity : AppCompatActivity() {
 
                 val permanentlyঅস্বীকৃত = permissions.filterIndexed { index, _ ->
                     grantResults[index] == PackageManager.PERMISSION_DENIED &&
-                    !ActivityCompat.shouldদেখাওRequestPermissionRationale(this, permissions[index])
+                    !ActivityCompat.shouldVisibleওRequestPermissionRationale(this, permissions[index])
                 }
 
                 if (permanentlyঅস্বীকৃত.isনাtEmpty()) {
                     AlertDialog.Builder(this)
                         .setTitle("Permissions প্রয়োজন ⚠️")
-                        .setমেসেজ("কিছু permissions permanently deny ho gayi hain. সেটিংস se manually enable karo.\n\n" +
+                        .setMessage("Keyছু permissions permanently deny ho gayi hain. Settings se manually enable karo.\n\n" +
                                 permanentlyঅস্বীকৃত.joinToString("\n") { "• ${it.split('.').last()}" })
-                        .setPositiveButton("খোলো সেটিংস") { _, _ ->
+                        .setPositiveButton("Open Settings") { _, _ ->
                             try {
-                                val intent = Intent(সেটিংস.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", packageনাম, null)
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", packageName, null)
                                 }
                                 startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(this, "সেটিংস open nahi ho paya", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Settings open nahi ho paya", Toast.LENGTH_SHORT).show()
                             }
                         }
                         .setNegativeButton("বাতিল", null)
@@ -269,9 +269,9 @@ class সেটিংসActivity : AppCompatActivity() {
     private fun handleContactResult(uri: android.net.Uri) {
         val cursor = contentResolver.query(uri, null, null, null, null)
         if (cursor?.moveToFirst() == true) {
-            val nameIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.ফোন.DISPLAY_NAME)
-            val numIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.ফোন.NUMBER)
-            primeনামInput.setText(cursor.getString(nameIndex))
+            val nameIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.Phone.NUMBER)
+            primeNameInput.setText(cursor.getString(nameIndex))
             primeNumberInput.setText(cursor.getString(numIndex).replace(" ", ""))
         }
         cursor?.close()
@@ -282,8 +282,8 @@ class সেটিংসActivity : AppCompatActivity() {
 
         prefs.putString("api_key", apiKeyInput.text.toString().trim())
         prefs.putString("tts_api_key", ttsApiKeyInput.text.toString().trim())
-        prefs.putString("user_name", userনামInput.text.toString().trim())
-        prefs.putString("prime_name", primeনামInput.text.toString().trim())
+        prefs.putString("user_name", userNameInput.text.toString().trim())
+        prefs.putString("prime_name", primeNameInput.text.toString().trim())
         prefs.putString("prime_number", primeNumberInput.text.toString().trim())
 
         val personality = when (personalityGroup.checkedRadioButtonId) {
@@ -303,17 +303,17 @@ class সেটিংসActivity : AppCompatActivity() {
         prefs.putBoolean("call_announce_enabled", callAnnounceSwitch.isChecked)
 
         prefs.apply()
-        Toast.makeText(this, "সেটিংস সেভ করোd! MAYA updated. ✅", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Settings Save কRowd! MAYA updated. ✅", Toast.LENGTH_SHORT).show()
         finish()
     }
 
     private fun updateStatus() {
-        val enabled = অ্যাক্সেসিবিলিটিসাহায্যerService.isচালু(this)
-        accessibilityStatus.text = if (enabled) "✅ Full Control চালু" else "❌ অ্যাক্সেসিবিলিটি বন্ধ"
+        val enabled = AccessibilityHelperService.isEnabled(this)
+        accessibilityStatus.text = if (enabled) "✅ Full Control Enabled" else "❌ অ্যাক্সেসিবিলিটি Off"
         accessibilityStatus.setTextরঙ(if (enabled) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 
-        val adminসক্রিয় = devicePolicyManager.isঅ্যাডমিনসক্রিয়(componentনাম)
-        adminStatusText.text = if (adminসক্রিয়) "✅ অ্যাডমিন সক্রিয়" else "❌ অ্যাডমিন নিষ্ক্রিয়"
+        val adminসক্রিয় = devicePolicyManager.isAdminসক্রিয়(componentName)
+        adminStatusText.text = if (adminসক্রিয়) "✅ Admin সক্রিয়" else "❌ Admin নিষ্ক্রিয়"
         adminStatusText.setTextরঙ(if (adminসক্রিয়) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 
         updatePermissionsStatus()

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.maya.assistant.services.Foregroundভয়েসService
+import com.maya.assistant.services.ForegroundVoiceService
 import com.maya.assistant.utils.Constants
 
 class BootReceiver : BroadcastReceiver() {
@@ -13,7 +13,7 @@ class BootReceiver : BroadcastReceiver() {
             val prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
             val apiKey = prefs.getString(Constants.KEY_API_KEY, "") ?: ""
             if (apiKey.isনাtEmpty()) {
-                ContextCompat.startForegroundService(context, Intent(context, Foregroundভয়েসService::class.java))
+                ContextCompat.startForegroundService(context, Intent(context, ForegroundVoiceService::class.java))
             }
         }
     }

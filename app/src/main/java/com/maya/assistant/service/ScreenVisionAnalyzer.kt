@@ -4,11 +4,11 @@ import android.util.Log
 import com.maya.assistant.automation.ActionExecutor
 import com.maya.assistant.automation.UiTreeSerializer
 
-object স্ক্রিনVisionAnalyzer {
+object ScreenVisionAnalyzer {
 
     private const val TAG = "MAYA_VISION"
 
-    data class স্ক্রিনPoint(
+    data class ScreenPoint(
         val x: Int,
         val y: Int
     )
@@ -21,23 +21,23 @@ object স্ক্রিনVisionAnalyzer {
         command: String,
         screenWidth: Int = 1080,
         screenHeight: Int = 2400
-    ): স্ক্রিনPoint? {
+    ): ScreenPoint? {
 
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return null
-        val root = service.rootInসক্রিয়Window ?: return null
+        val service = SmartAccessibilityEngine.service ?: return null
+        val root = service.rootInActiveWindow ?: return null
 
         Log.d(TAG, "Finding element for: $command")
 
         // Try to find matching elements using UI tree
         val matches = UiTreeSerializer.findMatchingElements(root, command)
 
-        if (matches.isনাtEmpty()) {
+        if (matches.isNotEmpty()) {
             val element = matches[0]
-            val center = UiTreeSerializer.getনাdeCenter(element)
+            val center = UiTreeSerializer.getNodeCenter(element)
 
             Log.d(TAG, "Found element at: ${center.first}, ${center.second}")
 
-            return স্ক্রিনPoint(center.first, center.second)
+            return ScreenPoint(center.first, center.second)
         }
 
         return null
@@ -51,10 +51,10 @@ object স্ক্রিনVisionAnalyzer {
         intent: String,
         screenWidth: Int = 1080,
         screenHeight: Int = 2400
-    ): স্ক্রিনPoint? {
+    ): ScreenPoint? {
 
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return null
-        val root = service.rootInসক্রিয়Window ?: return null
+        val service = SmartAccessibilityEngine.service ?: return null
+        val root = service.rootInActiveWindow ?: return null
 
         Log.d(TAG, "Finding button for intent: $intent")
 
@@ -74,22 +74,22 @@ object স্ক্রিনVisionAnalyzer {
         for (keyword in buttonKeywords) {
             val matches = UiTreeSerializer.findMatchingElements(root, keyword)
 
-            if (matches.isনাtEmpty()) {
+            if (matches.isNotEmpty()) {
                 val clickables = matches.filter { it.isClickable }
-                if (clickables.isনাtEmpty()) {
-                    val center = UiTreeSerializer.getনাdeCenter(clickables[0])
+                if (clickables.isNotEmpty()) {
+                    val center = UiTreeSerializer.getNodeCenter(clickables[0])
                     Log.d(TAG, "Found $intent button at: ${center.first}, ${center.second}")
-                    return স্ক্রিনPoint(center.first, center.second)
+                    return ScreenPoint(center.first, center.second)
                 }
             }
         }
 
         // Fallback: find any clickable on screen
         val allClickable = UiTreeSerializer.findClickableElements(root)
-        if (allClickable.isনাtEmpty()) {
-            val center = UiTreeSerializer.getনাdeCenter(allClickable[0])
+        if (allClickable.isNotEmpty()) {
+            val center = UiTreeSerializer.getNodeCenter(allClickable[0])
             Log.d(TAG, "Using first clickable at: ${center.first}, ${center.second}")
-            return স্ক্রিনPoint(center.first, center.second)
+            return ScreenPoint(center.first, center.second)
         }
 
         return null
@@ -101,7 +101,7 @@ object স্ক্রিনVisionAnalyzer {
      */
     fun analyzeAndExecute(command: String): Boolean {
 
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return false
+        val service = SmartAccessibilityEngine.service ?: return false
 
         Log.d(TAG, "Analyze & Execute -> $command")
 
@@ -115,7 +115,7 @@ object স্ক্রিনVisionAnalyzer {
 
         // Try semantic intent matching
         val intent = extractIntent(command)
-        if (intent.isনাtEmpty()) {
+        if (intent.isNotEmpty()) {
             val buttonPoint = findButtonByIntent(intent)
             if (buttonPoint != null) {
                 Log.d(TAG, "Tapping button for intent: $intent")
@@ -142,15 +142,15 @@ object স্ক্রিনVisionAnalyzer {
     /**
      * Get all interactive elements on current screen
      */
-    fun getসবInteractiveElements(): List<স্ক্রিনPoint> {
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return emptyList()
-        val root = service.rootInসক্রিয়Window ?: return emptyList()
+    fun getAllInteractiveElements(): List<ScreenPoint> {
+        val service = SmartAccessibilityEngine.service ?: return emptyList()
+        val root = service.rootInActiveWindow ?: return emptyList()
 
         val clickable = UiTreeSerializer.findClickableElements(root)
 
         return clickable.map { element ->
-            val center = UiTreeSerializer.getনাdeCenter(element)
-            স্ক্রিনPoint(center.first, center.second)
+            val center = UiTreeSerializer.getNodeCenter(element)
+            ScreenPoint(center.first, center.second)
         }
     }
 
@@ -158,13 +158,13 @@ object স্ক্রিনVisionAnalyzer {
      * Check if element with text is visible and clickable
      */
     fun isElementInteractive(text: String): Boolean {
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return false
-        val root = service.rootInসক্রিয়Window ?: return false
+        val service = SmartAccessibilityEngine.service ?: return false
+        val root = service.rootInActiveWindow ?: return false
 
         val matches = UiTreeSerializer.findMatchingElements(root, text)
 
-        return matches.any { 
-            it.isClickable && it.isদৃশ্যমানToব্যবহারকারী 
+        return matches.any {
+            it.isClickable && it.isVisibleToUser
         }
     }
 
@@ -177,12 +177,12 @@ object স্ক্রিনVisionAnalyzer {
         screenDump: String,
         screenWidth: Int = 1080,
         screenHeight: Int = 2400
-    ): স্ক্রিনPoint? {
+    ): ScreenPoint? {
         return findInteractiveElement(command, screenWidth, screenHeight)
     }
 
     fun clickByVision(command: String): Boolean {
-        val service = Smartঅ্যাক্সেসিবিলিটিEngine.service ?: return false
+        val service = SmartAccessibilityEngine.service ?: return false
 
         Log.d(TAG, "Click by vision: $command")
 

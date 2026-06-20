@@ -35,7 +35,7 @@ object Constants {
     const val ACTION_START_LISTENING = "START_LISTENING"
     const val ACTION_STOP_LISTENING = "STOP_LISTENING"
 
-    // ভয়েস States
+    // Voice States
     const val STATE_IDLE = "IDLE"
     const val STATE_LISTENING = "LISTENING"
     const val STATE_THINKING = "THINKING"

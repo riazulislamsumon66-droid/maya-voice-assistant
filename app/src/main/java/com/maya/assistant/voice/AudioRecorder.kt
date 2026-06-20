@@ -49,7 +49,7 @@ class AudioRecorder(
                 val buffer = ByteArray(CHUNK_SIZE)
                 while (isRecording && !Thread.interrupted()) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: -1
-                    if (read > 0 && !ভয়েসStateManager.isAiবলছে…()) {
+                    if (read > 0 && !VoiceStateManager.isAiSpeaking…()) {
                         onChunk(buffer.copyOf(read))
                     }
                 }
@@ -61,7 +61,7 @@ class AudioRecorder(
 
             Logger.d(TAG, "Recording started")
         } catch (e: Exception) {
-            Logger.e(TAG, "ব্যর্থ to start recording: ${e.message}")
+            Logger.e(TAG, "Failed to start recording: ${e.message}")
         }
     }
 
@@ -76,7 +76,7 @@ class AudioRecorder(
             audioRecord = null
             EchoবাতিলlationManager.release()
         } catch (e: Exception) {
-            Logger.e(TAG, "বন্ধ করো error: ${e.message}")
+            Logger.e(TAG, "Off কRow error: ${e.message}")
         }
         Logger.d(TAG, "Recording stopped")
     }

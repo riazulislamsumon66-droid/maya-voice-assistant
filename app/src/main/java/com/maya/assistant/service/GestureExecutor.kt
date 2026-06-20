@@ -1,6 +1,6 @@
 package com.maya.assistant.service
 
-import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
+import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.util.Log
@@ -10,7 +10,7 @@ object GestureExecutor {
     private const val TAG = "MAYA_GESTURE"
 
     fun tap(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         x: Int,
         y: Int
     ): Boolean {
@@ -52,7 +52,7 @@ object GestureExecutor {
     }
 
     fun longTap(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         x: Int,
         y: Int
     ): Boolean {
@@ -89,7 +89,7 @@ object GestureExecutor {
     }
 
     fun swipe(
-        service: অ্যাক্সেসিবিলিটিService,
+        service: AccessibilityService,
         startX: Int,
         startY: Int,
         endX: Int,

@@ -9,5 +9,5 @@ class AudioStreamReceiver(private val player: AudioPlayer) {
         if (data.isনাtEmpty()) player.playChunk(data)
     }
 
-    fun clear() = player.clearAndবন্ধ করো()
+    fun clear() = player.clearAndOff কRow()
 }

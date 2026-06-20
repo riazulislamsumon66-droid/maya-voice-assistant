@@ -118,7 +118,7 @@ class LiveAudioManager(private val context: Context) {
         try {
             MediaPlayer().apply {
                 setDataSource(path)
-                setচালুCompletionListener { release() }
+                setEnabledCompletionListener { release() }
                 prepare()
                 start()
             }
@@ -138,7 +138,7 @@ class LiveAudioManager(private val context: Context) {
 
             MediaPlayer().apply {
                 setDataSource(tempFile.absolutePath)
-                setচালুCompletionListener {
+                setEnabledCompletionListener {
                     release()
                     tempFile.delete()
                 }
@@ -164,7 +164,7 @@ class LiveAudioManager(private val context: Context) {
 
             Log.d(TAG, "Audio stopped")
         } catch (e: Exception) {
-            Log.e(TAG, "বন্ধ করো error: ${e.message}")
+            Log.e(TAG, "Off কRow error: ${e.message}")
         }
     }
 

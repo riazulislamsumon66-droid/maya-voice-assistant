@@ -7,7 +7,7 @@ import android.graphics.Path
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.Motionইভেন্ট
+import android.view.MotionEvent
 import android.view.View
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -31,9 +31,9 @@ class PatternLockView @JvmOverloads constructor(
     }
 
     interface PatternListener {
-        fun onPatternশুরু করোed()
+        fun onPatternStart কRowed()
         fun onPatternComplete(pattern: List<Int>)
-        fun onPatternপরিষ্কার করোed()
+        fun onPatternপরিষ্কার কRowed()
     }
 
     var listener: PatternListener? = null
@@ -115,25 +115,25 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
-    override fun onTouchইভেন্ট(event: Motionইভেন্ট): Boolean {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
         if (state != PatternState.NORMAL) return true
 
         val radius = minOf(width, height) * TOUCH_RADIUS_RATIO
 
         when (event.action) {
-            Motionইভেন্ট.ACTION_DOWN -> {
+            MotionEvent.ACTION_DOWN -> {
                 clearPatternInternal()
                 handleTouch(event.x, event.y, radius)
             }
 
-            Motionইভেন্ট.ACTION_MOVE -> {
+            MotionEvent.ACTION_MOVE -> {
                 currentX = event.x
                 currentY = event.y
                 handleTouch(event.x, event.y, radius)
                 invalidate()
             }
 
-            Motionইভেন্ট.ACTION_UP -> {
+            MotionEvent.ACTION_UP -> {
                 currentX = -1f
                 currentY = -1f
                 finishPattern()
@@ -147,7 +147,7 @@ class PatternLockView @JvmOverloads constructor(
         val dot = findNearestDot(x, y, radius) ?: return
 
         if (!selectedDots.contains(dot)) {
-            if (selectedDots.isEmpty()) listener?.onPatternশুরু করোed()
+            if (selectedDots.isEmpty()) listener?.onPatternStart কRowed()
 
             addএড়িয়ে যাওpedDot(dot)
             selectedDots.add(dot)
@@ -193,11 +193,11 @@ class PatternLockView @JvmOverloads constructor(
         if (selectedDots.size >= MIN_PATTERN_LENGTH) {
             listener?.onPatternComplete(selectedDots.toList())
         } else {
-            showসমস্যা()
+            showError()
         }
     }
 
-    fun showসমস্যা() {
+    fun showError() {
         state = PatternState.ERROR
         invalidate()
 
@@ -206,7 +206,7 @@ class PatternLockView @JvmOverloads constructor(
         }, 900)
     }
 
-    fun showসফল() {
+    fun showSuccess() {
         state = PatternState.SUCCESS
         invalidate()
 
@@ -219,7 +219,7 @@ class PatternLockView @JvmOverloads constructor(
         clearPatternInternal()
         state = PatternState.NORMAL
         invalidate()
-        listener?.onPatternপরিষ্কার করোed()
+        listener?.onPatternপরিষ্কার কRowed()
     }
 
     private fun clearPatternInternal() {
@@ -230,6 +230,6 @@ class PatternLockView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        handler.removeকলbacksAndমেসেজs(null)
+        handler.removeকলbacksAndMessages(null)
     }
 }

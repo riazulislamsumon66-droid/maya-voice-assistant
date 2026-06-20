@@ -9,7 +9,7 @@ import com.maya.assistant.websocket.GeminiWebSocketClient
 class AudioStreamSender(private val client: GeminiWebSocketClient) {
 
     fun send(pcm: ByteArray) {
-        if (ভয়েসStateManager.isAiবলছে…()) return
+        if (VoiceStateManager.isAiSpeaking…()) return
         client.sendAudioChunk(pcm)
     }
 }

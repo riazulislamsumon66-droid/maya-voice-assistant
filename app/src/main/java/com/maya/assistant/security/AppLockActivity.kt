@@ -13,7 +13,7 @@ import android.speech.tts.TextToSpeech
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.বায়োমেট্রিকManager
+import androidx.biometric.BiometricManager
 import androidx.biometric.বায়োমেট্রিকPrompt
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
@@ -25,11 +25,11 @@ import java.util.Locale
 /**
  * AppLockActivity — MAYA Complete Lock স্ক্রিন
  */
-class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListener {
+class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private lateinit var tabPin: TextView
     private lateinit var tabPattern: TextView
-    private lateinit var tabভয়েস: TextView
+    private lateinit var tabVoice: TextView
     private lateinit var tabFinger: TextView
     private lateinit var pinSection: View
     private lateinit var patternSection: View
@@ -53,7 +53,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     private var tts: TextToSpeech? = null
     private var geminiClient: GeminiLiveClient? = null
     private var liveAudioManager: LiveAudioManager? = null
-    private var isGeminiসংযুক্ত ✅ = false
+    private var isGeminiConnected ✅ = false
     private var isTtsReady = false
     private var speechRecognizer: SpeechRecognizer? = null
     private val handler = Handler(Looper.getMainLooper())
@@ -75,20 +75,20 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         super.onCreate(savedInstanceState)
         
         // Ensure Fingerprint tab is visible if enabled
-        val isFingerprintচালু = নিরাপত্তাManager.isবায়োমেট্রিকচালু(this)
+        val isFingerprintEnabled = নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)
         
-        val anyLockচালু = নিরাপত্তাManager.isAppLockচালু(this) || 
-                            isFingerprintচালু || 
-                            নিরাপত্তাManager.isDeviceLockচালু(this)
+        val anyLockEnabled = নিরাপত্তাManager.isAppLockEnabled(this) || 
+                            isFingerprintEnabled || 
+                            নিরাপত্তাManager.isDeviceLockEnabled(this)
         
-        if (!anyLockচালু) {
+        if (!anyLockEnabled) {
             finish(); return
         }
         setContentView(R.layout.activity_app_lock)
         initViews()
         
         // Force refresh Fingerprint tab visibility
-        tabFinger.visibility = if (isFingerprintচালু) View.VISIBLE else View.GONE
+        tabFinger.visibility = if (isFingerprintEnabled) View.VISIBLE else View.GONE
         
         liveAudioManager = LiveAudioManager(this)
         initGemini()
@@ -96,21 +96,21 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         setupTabs()
         setupPinPad()
         setupPattern()
-        setupভয়েস()
+        setupVoice()
         setupFinger()
         checkLockout()
 
         // Device lock auto-trigger if enabled
-        if (নিরাপত্তাManager.isDeviceLockচালু(this)) {
+        if (নিরাপত্তাManager.isDeviceLockEnabled(this)) {
             handler.postDelayed({ launchবায়োমেট্রিক(true) }, 500)
         }
         
-        // ডিফল্ট to first available lock - Priority: Fingerprint > Pattern > PIN
+        // Default to first available lock - Priority: Fingerprint > Pattern > PIN
         val defaultTab = when {
-            isFingerprintচালু -> Tab.FINGER
+            isFingerprintEnabled -> Tab.FINGER
             PatternManager.isPatternSet(this) -> Tab.PATTERN
             নিরাপত্তাManager.hasPin(this) -> Tab.PIN
-            নিরাপত্তাManager.hasভয়েসPassphrase(this) -> Tab.VOICE
+            নিরাপত্তাManager.hasVoicePassphrase(this) -> Tab.VOICE
             else -> Tab.PIN
         }
         switchTab(defaultTab)
@@ -122,9 +122,9 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
             tts?.language = Locale("bn", "BD")
             // Fallback in case WebSocket doesn't connect quickly
             handler.postDelayed({ 
-                if (!isGeminiসংযুক্ত ✅) {
+                if (!isGeminiConnected ✅) {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
-                    val greeting = if (mode == "gf") "আগে unlock করো জান, তারপর use করতে দিবো।" else "আগে unlock করো, তারপর continue করো।"
+                    val greeting = if (mode == "gf") "আগে unlock কRow জান, তারপর use করতে দিবো।" else "আগে unlock কRow, তারপর continue কRow।"
                     speak(greeting, true) 
                 }
             }, 3000)
@@ -134,7 +134,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     private fun initViews() {
         tabPin     = findViewById(R.id.tabPin)
         tabPattern = findViewById(R.id.tabPattern)
-        tabভয়েস   = findViewById(R.id.tabভয়েস)
+        tabVoice   = findViewById(R.id.tabVoice)
         tabFinger  = findViewById(R.id.tabFinger)
         pinSection     = findViewById(R.id.pinSection)
         patternSection = findViewById(R.id.patternSection)
@@ -158,18 +158,18 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     private fun setupTabs() {
         val hasPin = নিরাপত্তাManager.hasPin(this)
         val hasPattern = PatternManager.isPatternSet(this)
-        val hasভয়েস = নিরাপত্তাManager.hasভয়েসPassphrase(this)
-        val hasFinger = নিরাপত্তাManager.isবায়োমেট্রিকচালু(this)
+        val hasVoice = নিরাপত্তাManager.hasVoicePassphrase(this)
+        val hasFinger = নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)
 
         tabPin.visibility = if (hasPin) View.VISIBLE else View.GONE
         tabPattern.visibility = if (hasPattern) View.VISIBLE else View.GONE
-        tabভয়েস.visibility = if (hasভয়েস) View.VISIBLE else View.GONE
+        tabVoice.visibility = if (hasVoice) View.VISIBLE else View.GONE
         tabFinger.visibility = if (hasFinger) View.VISIBLE else View.GONE
 
-        tabPin.setচালুClickListener     { switchTab(Tab.PIN) }
-        tabPattern.setচালুClickListener { switchTab(Tab.PATTERN) }
-        tabভয়েস.setচালুClickListener   { switchTab(Tab.VOICE) }
-        tabFinger.setচালুClickListener  { switchTab(Tab.FINGER) }
+        tabPin.setEnabledClickListener     { switchTab(Tab.PIN) }
+        tabPattern.setEnabledClickListener { switchTab(Tab.PATTERN) }
+        tabVoice.setEnabledClickListener   { switchTab(Tab.VOICE) }
+        tabFinger.setEnabledClickListener  { switchTab(Tab.FINGER) }
     }
 
     private fun switchTab(tab: Tab) {
@@ -181,7 +181,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         val pink = 0xFFE91E8C.toInt(); val grey = 0xFF888888.toInt()
         tabPin.setTextরঙ(if (tab == Tab.PIN) pink else grey)
         tabPattern.setTextরঙ(if (tab == Tab.PATTERN) pink else grey)
-        tabভয়েস.setTextরঙ(if (tab == Tab.VOICE) pink else grey)
+        tabVoice.setTextরঙ(if (tab == Tab.VOICE) pink else grey)
         tabFinger.setTextরঙ(if (tab == Tab.FINGER) pink else grey)
 
         if (tab == Tab.FINGER) launchবায়োমেট্রিক(false)
@@ -191,8 +191,8 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         val map = mapOf(R.id.btn0 to "0", R.id.btn1 to "1", R.id.btn2 to "2",
             R.id.btn3 to "3", R.id.btn4 to "4", R.id.btn5 to "5",
             R.id.btn6 to "6", R.id.btn7 to "7", R.id.btn8 to "8", R.id.btn9 to "9")
-        map.forEach { (id, d) -> findViewById<Button>(id)?.setচালুClickListener { appendPin(d) } }
-        findViewById<ImageButton>(R.id.backspaceBtn)?.setচালুClickListener { backspacePin() }
+        map.forEach { (id, d) -> findViewById<Button>(id)?.setEnabledClickListener { appendPin(d) } }
+        findViewById<ImageButton>(R.id.backspaceBtn)?.setEnabledClickListener { backspacePin() }
     }
 
     private fun appendPin(d: String) {
@@ -212,12 +212,12 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     private fun submitPin() {
         val result = নিরাপত্তাManager.verifyPin(this, enteredPin)
         if (result is নিরাপত্তাManager.PinResult.CORRECT) {
-            onসফল()
+            onSuccess()
         } else {
             enteredPin = ""
             pinডিসপ্লে.text = "○○○○"
             when (result) {
-                নিরাপত্তাManager.PinResult.NOT_SET -> onসফল()
+                নিরাপত্তাManager.PinResult.NOT_SET -> onSuccess()
                 is নিরাপত্তাManager.PinResult.WRONG -> onPinWrong(result)
                 is নিরাপত্তাManager.PinResult.LOCKED_OUT -> startLockout(result.secondsRemaining)
                 else -> {}
@@ -239,26 +239,26 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     private fun setupPattern() {
         patternInstructionText.text = "তোমার unlock pattern এঁকো"
         patternLockView.listener = object : PatternLockView.PatternListener {
-            override fun onPatternশুরু করোed() { patternInstructionText.text = "আঁকতে থাকো..." }
+            override fun onPatternStart কRowed() { patternInstructionText.text = "আঁকতে থাকো..." }
             override fun onPatternComplete(pattern: List<Int>) {
                 handler.postDelayed({ verifyPattern(pattern) }, 150)
             }
-            override fun onPatternপরিষ্কার করোed() { patternInstructionText.text = "তোমার unlock pattern এঁকো" }
+            override fun onPatternপরিষ্কার কRowed() { patternInstructionText.text = "তোমার unlock pattern এঁকো" }
         }
     }
 
     private fun verifyPattern(pattern: List<Int>) {
         when (val r = PatternManager.verify(this, pattern)) {
-            PatternManager.PatternResult.CORRECT -> { patternLockView.showসফল(); onসফল() }
-            PatternManager.PatternResult.NOT_SET -> onসফল()
+            PatternManager.PatternResult.CORRECT -> { patternLockView.showSuccess(); onSuccess() }
+            PatternManager.PatternResult.NOT_SET -> onSuccess()
             PatternManager.PatternResult.TOO_SHORT -> {
-                patternLockView.showসমস্যা()
-                patternInstructionText.text = "অনেক ছোট — কমপক্ষে 4টা dots connect করো"
-                speak("কমপক্ষে 4টা dots connect করো", true)
+                patternLockView.showError()
+                patternInstructionText.text = "Onেক ছোট — কমপক্ষে 4টা dots connect কRow"
+                speak("কমপক্ষে 4টা dots connect কRow", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 900)
             }
             is PatternManager.PatternResult.WRONG -> {
-                patternLockView.showসমস্যা()
+                patternLockView.showError()
                 val rem = PatternManager.getRemainingAttempts(this)
                 patternAttemptsText.text = "Wrong — $rem attempts left"
                 patternAttemptsText.setTextরঙ(if (r.attempts >= 3) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
@@ -268,26 +268,26 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
                 speakWrong(r.attempts, r.lockedOut, "pattern")
             }
             is PatternManager.PatternResult.LOCKED_OUT -> {
-                patternLockView.showসমস্যা()
+                patternLockView.showError()
                 startLockout(r.secondsRemaining)
             }
         }
     }
 
-    private fun setupভয়েস() {
-        val has = নিরাপত্তাManager.hasভয়েসPassphrase(this)
-        voiceInstructionText.text = if (has) "মাইক ট্যাপ করো এবং passphrase বলো" else "ভয়েস passphrase সেট করা হয়নি"
+    private fun setupVoice() {
+        val has = নিরাপত্তাManager.hasVoicePassphrase(this)
+        voiceInstructionText.text = if (has) "মাইক ট্যাপ কRow এবং passphrase বলো" else "Voice passphrase Set করা হয়নি"
         voiceBtn.alpha = if (has) 1f else 0.4f
-        voiceBtn.isচালু = has
-        voiceBtn.setচালুClickListener { if (has) startভয়েসListen() }
+        voiceBtn.isEnabled = has
+        voiceBtn.setEnabledClickListener { if (has) startVoiceListen() }
     }
 
     private fun setupFinger() {
-        val biometricManager = বায়োমেট্রিকManager.from(this)
-        val canAuth = biometricManager.canভেরিফাই করো(বায়োমেট্রিকManager.Authenticators.BIOMETRIC_STRONG or বায়োমেট্রিকManager.Authenticators.DEVICE_CREDENTIAL)
+        val biometricManager = BiometricManager.from(this)
+        val canAuth = biometricManager.canভেরিফাই কRow(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
         
-        if (canAuth == বায়োমেট্রিকManager.BIOMETRIC_SUCCESS || নিরাপত্তাManager.isবায়োমেট্রিকচালু(this)) {
-            fingerBtn.setচালুClickListener { launchবায়োমেট্রিক(false) }
+        if (canAuth == BiometricManager.BIOMETRIC_SUCCESS || নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)) {
+            fingerBtn.setEnabledClickListener { launchবায়োমেট্রিক(false) }
             tabFinger.visibility = View.VISIBLE
         } else {
             tabFinger.visibility = View.GONE
@@ -300,31 +300,31 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         val biometricPrompt = বায়োমেট্রিকPrompt(this, executor, object : বায়োমেট্রিকPrompt.প্রমাণীকরণকলback() {
             override fun onপ্রমাণীকরণSucceeded(result: বায়োমেট্রিকPrompt.প্রমাণীকরণResult) {
                 super.onপ্রমাণীকরণSucceeded(result)
-                fingerStatusText.text = "✅ সফল!"
-                onসফল()
+                fingerStatusText.text = "✅ Success!"
+                onSuccess()
             }
-            override fun onপ্রমাণীকরণসমস্যা(errorCode: Int, errString: CharSequence) {
-                super.onপ্রমাণীকরণসমস্যা(errorCode, errString)
+            override fun onপ্রমাণীকরণError(errorCode: Int, errString: CharSequence) {
+                super.onপ্রমাণীকরণError(errorCode, errString)
                 fingerStatusText.text = "❌ $errString"
                 if (errorCode == বায়োমেট্রিকPrompt.ERROR_NEGATIVE_BUTTON) {
                     switchTab(Tab.PATTERN)
                 }
             }
-            override fun onপ্রমাণীকরণব্যর্থ() {
-                super.onপ্রমাণীকরণব্যর্থ()
-                fingerStatusText.text = "❌ প্রমাণীকরণ ব্যর্থ"
+            override fun onপ্রমাণীকরণFailed() {
+                super.onপ্রমাণীকরণFailed()
+                fingerStatusText.text = "❌ প্রমাণীকরণ Failed"
             }
         })
 
         val promptতথ্য = বায়োমেট্রিকPrompt.Promptতথ্য.Builder()
             .setTitle("MAYA Unlock")
-            .setSubtitle("তোমার identity confirm করো")
+            .setSubtitle("তোমার identity confirm কRow")
             .apply {
-                if (নিরাপত্তাManager.isDeviceLockচালু(this@AppLockActivity) || allowDeviceCredential) {
-                    setসবowedAuthenticators(বায়োমেট্রিকManager.Authenticators.BIOMETRIC_STRONG or বায়োমেট্রিকManager.Authenticators.DEVICE_CREDENTIAL)
+                if (নিরাপত্তাManager.isDeviceLockEnabled(this@AppLockActivity) || allowDeviceCredential) {
+                    setসবowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 } else {
-                    setসবowedAuthenticators(বায়োমেট্রিকManager.Authenticators.BIOMETRIC_STRONG)
-                    setNegativeButtonText("Pattern/PIN ব্যবহার করো")
+                    setসবowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                    setNegativeButtonText("Pattern/PIN ব্যবহার কRow")
                 }
             }
             .build()
@@ -332,7 +332,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         biometricPrompt.authenticate(promptতথ্য)
     }
 
-    private fun startভয়েসListen() {
+    private fun startVoiceListen() {
         voiceStatusText.text = "🎙️ passphrase শুনছি..."
         voiceBtn.setImageResource(R.drawable.ic_mic_on)
         speechRecognizer?.destroy()
@@ -341,20 +341,20 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
             override fun onResults(results: Bundle?) {
                 val spoken = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
-                if (নিরাপত্তাManager.verifyভয়েসPassphrase(this@AppLockActivity, spoken)) {
+                if (নিরাপত্তাManager.verifyVoicePassphrase(this@AppLockActivity, spoken)) {
                     voiceStatusText.text = "✅ Verified!"
-                    onসফল()
+                    onSuccess()
                 } else {
                     voiceStatusText.text = "❌ Passphrase মিলেনি"
                     shakeView(voiceBtn)
                     speakWrong(1, false, "voice")
-                    handler.postDelayed({ voiceStatusText.text = "আবার try করতে মাইক ট্যাপ করো" }, 2000)
+                    handler.postDelayed({ voiceStatusText.text = "আবার try করতে মাইক ট্যাপ কRow" }, 2000)
                 }
             }
-            override fun onসমস্যা(e: Int) {
+            override fun onError(e: Int) {
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
-                voiceStatusText.text = "শুনতে পাচ্ছি না — আবার try করতে ট্যাপ করো"
-                speak("বুঝতে পাচ্ছি না, আবার try করো", true)
+                voiceStatusText.text = "শুনতে পাচ্ছি না — আবার try করতে ট্যাপ কRow"
+                speak("বুঝতে পাচ্ছি না, আবার try কRow", true)
             }
             override fun onReadyForSpeech(p: Bundle?) { voiceStatusText.text = "passphrase বলো..." }
             override fun onBeginningOfSpeech() {}
@@ -362,16 +362,16 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
             override fun onBufferReceived(b: ByteArray?) {}
             override fun onEndOfSpeech() { voiceStatusText.text = "প্রসেস করছি..." }
             override fun onPartialResults(p: Bundle?) {}
-            override fun onইভেন্ট(t: Int, b: Bundle?) {}
+            override fun onEvent(t: Int, b: Bundle?) {}
         })
-        speechRecognizer?.startশুনছে…(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        speechRecognizer?.startListening…(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, "bn-BD")
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
         })
     }
 
-    private fun onসফল() {
+    private fun onSuccess() {
         isআনলক আছেThisSession = true
         val prefs = getSharedPreferences("maya_prefs", MODE_PRIVATE)
         val name  = prefs.getString("user_name", "Jaan") ?: "Jaan"
@@ -396,10 +396,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
                 if (rem <= 0) {
                     lockoutওভারলে.visibility = View.GONE
                     PatternManager.resetAttempts(this@AppLockActivity)
-                    speak("এখন আবার try করতে পারো", true)
+                    speak("এখন আবার try করতে পাRow", true)
                     return
                 }
-                lockoutসময়rText.text = "পর আবার try করো ${rem}s"
+                lockoutসময়rText.text = "পর আবার try কRow ${rem}s"
                 rem--
                 handler.postDelayed(this, 1000)
             }
@@ -419,25 +419,25 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         val msg = when {
             lockedOut -> when (mode) {
                 "gf"  -> "জান! ৩ বার ভুল? রুকো, 30 second ke liye lock kar diya!"
-                "professional" -> "অনেক বেশি ভুল। ৩০ সেকেন্ড লক।"
-                else  -> "অনেক ভুল। ৩০ সেকেন্ড রুকো।"
+                "professional" -> "Onেক বেশি ভুল। ৩০ সেকেন্ড লক।"
+                else  -> "Onেক ভুল। ৩০ সেকেন্ড রুকো।"
             }
             type == "voice" -> when (mode) {
-                "gf"  -> "এই passphrase ছিল না জান! সঠিক বলে try করো।"
-                "professional" -> "ভয়েস passphrase মিলেনি। আবার try করো।"
-                else  -> "ভুল passphrase। আবার try করো।"
+                "gf"  -> "এই passphrase ছিল না জান! সঠিক বলে try কRow।"
+                "professional" -> "Voice passphrase মিলেনি। আবার try কRow।"
+                else  -> "ভুল passphrase। আবার try কRow।"
             }
             attempts == 1 -> when (mode) {
                 "gf"  -> "আরে ভুল! মন দিয়ে দাও, $rem mauke bache hain."
-                "professional" -> "ভুল। $rem বার আর চেষ্টা বাকি।"
-                else  -> "ভুল! $rem বার আর try করতে পারো।"
+                "professional" -> "ভুল। $rem বার আর চেষ্টা বাKey।"
+                else  -> "ভুল! $rem বার আর try করতে পাRow।"
             }
             attempts == 2 -> when (mode) {
                 "gf"  -> "আবার ভুল?! আরেকটা ভুল হলে লক হয়ে যাবে!"
-                "professional" -> "দ্বিতীয় ব্যর্থতা। Lockout এর আগে আরেকটা চেষ্টা।"
-                else  -> "আবার ভুল! আরেকটা সুযোগ বাকি!"
+                "professional" -> "দ্বিতীয় Failedতা। Lockout এর আগে আরেকটা চেষ্টা।"
+                else  -> "আবার ভুল! আরেকটা সুযোগ বাKey!"
             }
-            else -> "ভুল! আবার try করো।"
+            else -> "ভুল! আবার try কRow।"
         }
         speak(msg, true)
     }
@@ -457,30 +457,30 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
         geminiClient = GeminiLiveClient(apiKey, systemPrompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) { liveAudioManager?.playChunk(data) }
             override fun onTextReceived(text: String) {}
-            override fun onসংযুক্ত ✅() { 
-                isGeminiসংযুক্ত ✅ = true 
-                Log.d("MAYA_LOCK", "Gemini WebSocket সংযুক্ত ✅ ✅")
-                runচালুUiThread {
+            override fun onConnected ✅() { 
+                isGeminiConnected ✅ = true 
+                Log.d("MAYA_LOCK", "Gemini WebSocket Connected ✅ ✅")
+                runEnabledUiThread {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
-                    val greeting = if (mode == "gf") "আগে unlock করো জান, তারপর use করতে দিবো।" else "আগে unlock করো, তারপর continue করো।"
+                    val greeting = if (mode == "gf") "আগে unlock কRow জান, তারপর use করতে দিবো।" else "আগে unlock কRow, তারপর continue কRow।"
                     speak(greeting, true)
                 }
             }
             override fun onTurnComplete() {}
-            override fun onসমস্যা(msg: String) { 
-                isGeminiসংযুক্ত ✅ = false 
-                Log.e("MAYA_LOCK", "Gemini WebSocket সমস্যা: $msg")
+            override fun onError(msg: String) { 
+                isGeminiConnected ✅ = false 
+                Log.e("MAYA_LOCK", "Gemini WebSocket Error: $msg")
             }
         })
         geminiClient?.start()
     }
 
     private fun speak(text: String, hindi: Boolean) {
-        if (isGeminiসংযুক্ত ✅) {
-            geminiClient?.sendTextমেসেজ(text)
+        if (isGeminiConnected ✅) {
+            geminiClient?.sendTextMessage(text)
         } else if (isTtsReady) {
             tts?.language = if (hindi) Locale("bn", "BD") else Locale.ENGLISH
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LOCK_${সিস্টেম.currentসময়Millis()}")
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LOCK_${System.currentসময়Millis()}")
         }
     }
 
@@ -495,7 +495,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.চালুInitListen
     }
 
     override fun onপিছনেPressed() { 
-        speak("আগে unlock করো!", true)
+        speak("আগে unlock কRow!", true)
         // If they try to back out, go to home screen so they can't access the app
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_HOME)

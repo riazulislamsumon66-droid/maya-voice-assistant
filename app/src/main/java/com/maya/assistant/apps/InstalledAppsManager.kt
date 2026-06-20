@@ -7,7 +7,7 @@ import android.content.pm.PackageManager
 import com.maya.assistant.models.AppModel
 import com.maya.assistant.utils.Logger
 
-object ইনস্টল করোedAppsManager {
+object Install কRowedAppsManager {
     private val TAG = "APPS"
     private var cachedApps: List<AppModel>? = null
 
@@ -15,16 +15,16 @@ object ইনস্টল করোedAppsManager {
         if (cachedApps != null) return cachedApps!!
 
         val pm = context.packageManager
-        val apps = pm.getইনস্টল করোedApplications(PackageManager.GET_META_DATA)
+        val apps = pm.getInstall কRowedApplications(PackageManager.GET_META_DATA)
 
         cachedApps = apps.mapনাtNull { info ->
             try {
                 val label = pm.getApplicationLabel(info).toString()
-                val launchIntent = pm.getLaunchIntentForPackage(info.packageনাম)
+                val launchIntent = pm.getLaunchIntentForPackage(info.packageName)
                 if (launchIntent != null) {
                     AppModel(
                         name = label.lowercase(),
-                        packageনাম = info.packageনাম,
+                        packageName = info.packageName,
                         label = label
                     )
                 } else null
@@ -40,7 +40,7 @@ object ইনস্টল করোedAppsManager {
         val apps = getসবApps(context)
 
         // Exact match first
-        apps.find { it.name == normalized || it.packageনাম.contains(normalized) }
+        apps.find { it.name == normalized || it.packageName.contains(normalized) }
             ?.let { return it }
 
         // Contains match
@@ -56,7 +56,7 @@ object ইনস্টল করোedAppsManager {
 
     fun getLaunchIntent(context: Context, query: String): Intent? {
         val app = findApp(context, query) ?: return null
-        return context.packageManager.getLaunchIntentForPackage(app.packageনাম)
+        return context.packageManager.getLaunchIntentForPackage(app.packageName)
     }
 
     fun invalidateCache() { cachedApps = null }

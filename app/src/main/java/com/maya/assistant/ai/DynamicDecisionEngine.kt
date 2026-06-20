@@ -3,64 +3,64 @@ package com.maya.assistant.ai
 import android.content.Context
 import com.maya.assistant.apps.AppLauncher
 import com.maya.assistant.models.CommandType
-import com.maya.assistant.models.ভয়েসCommand
-import com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine
+import com.maya.assistant.models.VoiceCommand
+import com.maya.assistant.service.SmartAccessibilityEngine
 import com.maya.assistant.utils.Logger
 
 object DynamicDecisionEngine {
     private val TAG = "DECISION"
 
-    suspend fun execute(context: Context, command: ভয়েসCommand): String {
+    suspend fun execute(context: Context, command: VoiceCommand): String {
         Logger.d(TAG, "Executing: ${command.type} - ${command.raw}")
 
         return when (command.type) {
             CommandType.OPEN_APP -> {
                 val app = command.args["app"] ?: ""
-                if (AppLauncher.launch(context, app)) "খোলোing $app"
-                else "App not found: $app"
+                if (AppLauncher.launch(context, app)) "খোলা হচ্ছে $app"
+                else "App পাওয়া যায়নি: $app"
             }
 
             CommandType.VOLUME_UP -> {
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("VOLUME_UP")
-                "ভলিউম badha diya"
+                SmartAccessibilityEngine.execute("VOLUME_UP")
+                "ভলিউম বাড়ানো হলো"
             }
 
             CommandType.VOLUME_DOWN -> {
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("VOLUME_DOWN")
-                "ভলিউম kam kiya"
+                SmartAccessibilityEngine.execute("VOLUME_DOWN")
+                "ভলিউম কমানো হলো"
             }
 
             CommandType.FLASHLIGHT_ON -> {
                 toggleFlashlight(context, true)
-                "Torch চালু করে দিলাম"
+                "Torch Enabled করে দিলাম"
             }
 
             CommandType.FLASHLIGHT_OFF -> {
                 toggleFlashlight(context, false)
-                "Torch বন্ধ করে দিলাম"
+                "Torch Off করে দিলাম"
             }
 
             CommandType.WHATSAPP_CALL -> {
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("WHATSAPP_CALL ${command.args["name"] ?: ""}")
-                "WhatsApp call kar rahi hoon"
+                SmartAccessibilityEngine.execute("WHATSAPP_CALL ${command.args["name"] ?: ""}")
+                "WhatsApp call করছি"
             }
 
             CommandType.WHATSAPP_MSG -> {
                 val name = command.args["name"] ?: ""
                 val msg = command.args["message"] ?: ""
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("WHATSAPP_MSG $name $msg")
-                "মেসেজ bhej rahi hoon"
+                SmartAccessibilityEngine.execute("WHATSAPP_MSG $name $msg")
+                "Message Sendচ্ছি"
             }
 
             CommandType.YOUTUBE_PLAY -> {
                 val query = command.args["query"] ?: ""
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("YOUTUBE_PLAY $query")
-                "YouTube play kar rahi hoon"
+                SmartAccessibilityEngine.execute("YOUTUBE_PLAY $query")
+                "YouTube এ চালাচ্ছি"
             }
 
             CommandType.CALL -> {
-                Smartঅ্যাক্সেসিবিলিটিEngine.execute("CALL ${command.args["name"] ?: ""}")
-                "কল kar rahi hoon"
+                SmartAccessibilityEngine.execute("CALL ${command.args["name"] ?: ""}")
+                "কল করছি"
             }
 
             else -> ""
@@ -69,7 +69,7 @@ object DynamicDecisionEngine {
 
     private fun toggleFlashlight(context: Context, on: Boolean) {
         try {
-            val cm = context.getসিস্টেমService(Context.CAMERA_SERVICE) as android.hardware.camera2.ক্যামেরাManager
+            val cm = context.getSystemService(Context.CAMERA_SERVICE) as android.hardware.camera2.CameraManager
             val cameraId = cm.cameraIdList.firstOrNull() ?: return
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 cm.setTorchMode(cameraId, on)

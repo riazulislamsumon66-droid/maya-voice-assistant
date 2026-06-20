@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat
 import com.maya.assistant.service.MayaওভারলেService
 import com.maya.assistant.utils.Constants
 
-object Floatingঅ্যাসিস্ট্যান্টController {
+object FloatingAsিস্ট্যান্টController {
 
     fun show(context: Context) {
         if (!ওভারলেPermissionManager.hasPermission(context)) {

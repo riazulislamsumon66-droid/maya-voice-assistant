@@ -4,9 +4,9 @@ import android.content.Context
 
 /**
  * Facade for the primary assistant service layer.
- * Routes to Foregroundভয়েসService + Smartঅ্যাক্সেসিবিলিটিEngine.
+ * Routes to ForegroundVoiceService + SmartAccessibilityEngine.
  */
-object Mainঅ্যাসিস্ট্যান্টService {
+object MainAsিস্ট্যান্টService {
 
     fun initialize(context: Context) {
         RealtimeConversationService.start(context)
@@ -17,7 +17,7 @@ object Mainঅ্যাসিস্ট্যান্টService {
     }
 
     fun speak(text: String) {
-        RealtimeConversationService.sendমেসেজ(text)
+        RealtimeConversationService.sendMessage(text)
     }
 
     fun isসক্রিয়() = RealtimeConversationService.isRunning()

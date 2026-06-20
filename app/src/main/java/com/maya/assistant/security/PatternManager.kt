@@ -41,8 +41,8 @@ object PatternManager {
 
         val prefs = getPrefs(context)
         val lockUntil = prefs.getLong(KEY_LOCKOUT_TILL, 0L)
-        if (সিস্টেম.currentসময়Millis() < lockUntil) {
-            val remaining = (lockUntil - সিস্টেম.currentসময়Millis()) / 1000
+        if (System.currentসময়Millis() < lockUntil) {
+            val remaining = (lockUntil - System.currentসময়Millis()) / 1000
             return PatternResult.LOCKED_OUT(remaining)
         }
 
@@ -66,7 +66,7 @@ object PatternManager {
         prefs.edit().putInt(KEY_WRONG_COUNT, attempts).apply()
 
         if (attempts >= MAX_ATTEMPTS) {
-            val lockUntil = সিস্টেম.currentসময়Millis() + LOCKOUT_MS
+            val lockUntil = System.currentসময়Millis() + LOCKOUT_MS
             prefs.edit().putLong(KEY_LOCKOUT_TILL, lockUntil).apply()
             return PatternResult.WRONG(attempts, lockedOut = true)
         }
@@ -82,7 +82,7 @@ object PatternManager {
 
     fun isPatternSet(context: Context): Boolean = getPrefs(context).contains(KEY_PATTERN)
 
-    fun isPatternLockচালু(context: Context): Boolean = getPrefs(context).getBoolean(KEY_PATTERN_ON, false)
+    fun isPatternLockEnabled(context: Context): Boolean = getPrefs(context).getBoolean(KEY_PATTERN_ON, false)
 
     fun enablePatternLock(context: Context) = getPrefs(context).edit().putBoolean(KEY_PATTERN_ON, true).apply()
 
@@ -101,8 +101,8 @@ object PatternManager {
 
     fun getLockoutRemaining(context: Context): Long {
         val until = getPrefs(context).getLong(KEY_LOCKOUT_TILL, 0L)
-        return if (সিস্টেম.currentসময়Millis() < until)
-            (until - সিস্টেম.currentসময়Millis()) / 1000
+        return if (System.currentসময়Millis() < until)
+            (until - System.currentসময়Millis()) / 1000
         else 0L
     }
 

@@ -27,7 +27,7 @@ object EchoবাতিলlationManager {
                 Logger.d(TAG, "AGC enabled")
             }
         } catch (e: Exception) {
-            Logger.e(TAG, "ব্যর্থ to attach effects: ${e.message}")
+            Logger.e(TAG, "Failed to attach effects: ${e.message}")
         }
     }
 

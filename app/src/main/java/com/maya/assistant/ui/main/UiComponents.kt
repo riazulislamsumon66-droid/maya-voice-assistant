@@ -26,9 +26,9 @@ class WaveformView @JvmOverloads constructor(
 
     private val waveAnimator = ValueAnimator.ofFloat(0f, (2 * Math.PI).toFloat()).apply {
         duration = 800
-        repeatগণনা = ValueAnimator.INFINITE
+        repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addআপডেটListener {
+        addUpDateListener {
             phase = it.animatedValue as Float
             invalidate()
         }
@@ -39,9 +39,9 @@ class WaveformView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    private val barগণনা = 20
-    private val barHeights = FloatArray(barগণনা) { 0.1f }
-    private var targetHeights = FloatArray(barগণনা) { 0.1f }
+    private val barCount = 20
+    private val barHeights = FloatArray(barCount) { 0.1f }
+    private var targetHeights = FloatArray(barCount) { 0.1f }
 
     fun startAnimation() {
         isAnimating = true
@@ -67,7 +67,7 @@ class WaveformView @JvmOverloads constructor(
     }
 
     private fun updateBarHeights() {
-        for (i in 0 until barগণনা) {
+        for (i in 0 until barCount) {
             val wave = sin(i * 0.5f + phase)
             targetHeights[i] = (0.1f + amplitude * 0.9f * abs(wave.toFloat()))
                 .coerceIn(0.05f, 1f)
@@ -78,10 +78,10 @@ class WaveformView @JvmOverloads constructor(
         if (!isAnimating) return
         val w = width.toFloat()
         val h = height.toFloat()
-        val barWidth = w / (barগণনা * 2f)
+        val barWidth = w / (barCount * 2f)
         val spacing = barWidth
 
-        for (i in 0 until barগণনা) {
+        for (i in 0 until barCount) {
             barHeights[i] += (targetHeights[i] - barHeights[i]) * 0.3f
             val barH = h * barHeights[i]
             val left = i * (barWidth + spacing) + spacing / 2
@@ -96,34 +96,34 @@ class WaveformView @JvmOverloads constructor(
     }
 }
 
-// ─── Chatমেসেজ data class ──────────────────────────────────────────────────
-data class Chatমেসেজ(
+// ─── ChatMessage data class ──────────────────────────────────────────────────
+data class ChatMessage(
     val text: String,
     val isব্যবহারকারী: Boolean,
-    val timestamp: Long = সিস্টেম.currentসময়Millis()
+    val timestamp: Long = System.currentসময়Millis()
 )
 
 // ─── ChatAdapter ─────────────────────────────────────────────────────────────
 class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val messages = mutableListOf<Chatমেসেজ>()
+    private val messages = mutableListOf<ChatMessage>()
 
     companion object {
         const val VIEW_USER = 0
         const val VIEW_MAYA = 1
     }
 
-    fun addমেসেজ(message: Chatমেসেজ) {
+    fun addMessage(message: ChatMessage) {
         messages.add(message)
         notifyItemInserted(messages.size - 1)
     }
 
-    fun clearমেসেজs() {
+    fun clearMessages() {
         messages.clear()
         notifyDataSetChanged()
     }
 
-    fun getLastBotমেসেজ(): String? {
+    fun getLastBotMessage(): String? {
         return messages.lastOrNull { !it.isব্যবহারকারী }?.text
     }
 
@@ -134,18 +134,18 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == VIEW_USER) {
             val view = inflater.inflate(R.layout.item_chat_user, parent, false)
-            ব্যবহারকারীমেসেজViewHolder(view)
+            ব্যবহারকারীMessageViewHolder(view)
         } else {
             val view = inflater.inflate(R.layout.item_chat_maya, parent, false)
-            MayaমেসেজViewHolder(view)
+            MayaMessageViewHolder(view)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val msg = messages[position]
         when (holder) {
-            is ব্যবহারকারীমেসেজViewHolder -> holder.bind(msg)
-            is MayaমেসেজViewHolder -> holder.bind(msg)
+            is ব্যবহারকারীMessageViewHolder -> holder.bind(msg)
+            is MayaMessageViewHolder -> holder.bind(msg)
         }
         // Slide-in animation for newly added messages
         if (position == messages.size - 1) {
@@ -162,13 +162,13 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun getItemগণনা() = messages.size
+    override fun getItemCount() = messages.size
 
-    inner class ব্যবহারকারীমেসেজViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ব্যবহারকারীMessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val msgText: TextView = view.findViewById(R.id.msgText)
         private val timeText: TextView = view.findViewById(R.id.timeText)
 
-        fun bind(msg: Chatমেসেজ) {
+        fun bind(msg: ChatMessage) {
             msgText.text = msg.text
             timeText.text = formatসময়(msg.timestamp)
 
@@ -178,11 +178,11 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    inner class MayaমেসেজViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MayaMessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val msgText: TextView = view.findViewById(R.id.msgText)
         private val timeText: TextView = view.findViewById(R.id.timeText)
 
-        fun bind(msg: Chatমেসেজ) {
+        fun bind(msg: ChatMessage) {
             msgText.text = msg.text
             timeText.text = formatসময়(msg.timestamp)
 
@@ -193,7 +193,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private fun formatসময়(ts: Long): String {
-        val sdf = java.text.SimpleতারিখFormat("HH:mm", java.util.Locale.getডিফল্ট())
-        return sdf.format(java.util.তারিখ(ts))
+        val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+        return sdf.format(java.util.Date(ts))
     }
 }

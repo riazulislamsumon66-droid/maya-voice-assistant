@@ -4,17 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.provider.সেটিংস
+import android.provider.Settings
 
 object ওভারলেPermissionManager {
 
     fun hasPermission(context: Context): Boolean =
-        সেটিংস.canDrawওভারলেs(context)
+        Settings.canDrawওভারলেs(context)
 
     fun requestPermission(context: Context) {
         val intent = Intent(
-            সেটিংস.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.parse("package:${context.packageনাম}")
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:${context.packageName}")
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)

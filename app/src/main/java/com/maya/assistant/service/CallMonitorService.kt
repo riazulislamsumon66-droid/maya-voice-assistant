@@ -9,19 +9,19 @@ import android.content.pm.Serviceতথ্য
 import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
-import android.telephony.ফোনStateListener
+import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.core.app.নাtificationCompat
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
-import com.maya.assistant.ui.main.কলঅ্যাসিস্ট্যান্টActivity
+import com.maya.assistant.ui.main.কলAsিস্ট্যান্টActivity
 import java.util.*
 
-class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
+class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
 
     private var telephonyManager: TelephonyManager? = null
-    private var phoneListener: ফোনStateListener? = null
+    private var phoneListener: PhoneStateListener? = null
     private var tts: TextToSpeech? = null
     private var ttsReady = false
 
@@ -44,7 +44,7 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
 
         tts = TextToSpeech(this, this)
 
-        setupফোনListener()
+        setupPhoneListener()
     }
 
     override fun onInit(status: Int) {
@@ -54,11 +54,11 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
         }
     }
 
-    private fun setupফোনListener() {
+    private fun setupPhoneListener() {
         telephonyManager =
-            getসিস্টেমService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-        phoneListener = object : ফোনStateListener() {
+        phoneListener = object : PhoneStateListener() {
             override fun onকলStateChanged(state: Int, number: String?) {
                 super.onকলStateChanged(state, number)
 
@@ -87,17 +87,17 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
 
         telephonyManager?.listen(
             phoneListener,
-            ফোনStateListener.LISTEN_CALL_STATE
+            PhoneStateListener.LISTEN_CALL_STATE
         )
     }
 
     private fun handleIncomingকল(number: String?) {
-        val callerনাম = resolveকলerনাম(number)
+        val callerName = resolveকলerName(number)
 
-        Log.d(TAG, "Incoming: $callerনাম")
+        Log.d(TAG, "Incoming: $callerName")
 
-        val intent = Intent(this, কলঅ্যাসিস্ট্যান্টActivity::class.java).apply {
-            putExtra("CALLER_NAME", callerনাম)
+        val intent = Intent(this, কলAsিস্ট্যান্টActivity::class.java).apply {
+            putExtra("CALLER_NAME", callerName)
             putExtra("PHONE_NUMBER", number ?: "")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -105,7 +105,7 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
         startActivity(intent)
     }
 
-    private fun resolveকলerনাম(number: String?): String {
+    private fun resolveকলerName(number: String?): String {
         if (number.isNullOrEmpty()) return "অজানা কলer"
 
         if (ContextCompat.checkSelfPermission(
@@ -118,13 +118,13 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
 
         return try {
             val uri = android.net.Uri.withAppendedPath(
-                android.provider.কন্টাক্টContract.ফোনLookup.CONTENT_FILTER_URI,
+                android.provider.কন্টাক্টContract.PhoneLookup.CONTENT_FILTER_URI,
                 android.net.Uri.encode(number)
             )
 
             contentResolver.query(
                 uri,
-                arrayOf(android.provider.কন্টাক্টContract.ফোনLookup.DISPLAY_NAME),
+                arrayOf(android.provider.কন্টাক্টContract.PhoneLookup.DISPLAY_NAME),
                 null,
                 null,
                 null
@@ -147,7 +147,7 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
             .setContentTitle("MAYA Running")
             .setContentText("Monitoring calls")
             .setSmallIcon(R.mipmap.img)
-            .setচালুgoing(true)
+            .setEnabledgoing(true)
             .build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -170,13 +170,13 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
             )
 
             val manager =
-                getসিস্টেমService(নাtificationManager::class.java)
+                getSystemService(নাtificationManager::class.java)
 
             manager.createনাtificationChannel(channel)
         }
     }
 
-    override fun onশুরু করোCommand(
+    override fun onStart কRowCommand(
         intent: Intent?,
         flags: Int,
         startId: Int
@@ -189,7 +189,7 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
     override fun onDestroy() {
         telephonyManager?.listen(
             phoneListener,
-            ফোনStateListener.LISTEN_NONE
+            PhoneStateListener.LISTEN_NONE
         )
 
         tts?.stop()

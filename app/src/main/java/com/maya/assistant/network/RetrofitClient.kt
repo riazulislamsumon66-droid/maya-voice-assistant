@@ -18,8 +18,8 @@ object RetrofitClient {
     }
 
     private fun okHttpClient() = OkHttpClient.Builder()
-        .connectটাইমআউট(30, সময়Unit.SECONDS)
-        .readটাইমআউট(60, সময়Unit.SECONDS)
+        .connectTimeআউট(30, সময়Unit.SECONDS)
+        .readTimeআউট(60, সময়Unit.SECONDS)
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         })

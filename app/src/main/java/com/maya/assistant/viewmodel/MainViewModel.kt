@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val aiResponse = MutableLiveData<String>()
-    val userমেসেজ = MutableLiveData<String>()
+    val userMessage = MutableLiveData<String>()
 
     fun processCommand(rawCommand: String) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -1,7 +1,7 @@
 package com.maya.assistant.ai
 
 import com.maya.assistant.models.CommandType
-import com.maya.assistant.models.ভয়েসCommand
+import com.maya.assistant.models.VoiceCommand
 
 object IntentAnalyzer {
 
@@ -16,7 +16,7 @@ object IntentAnalyzer {
     private val FLASHLIGHT_ON = listOf("flashlight on", "torch on", "light on")
     private val FLASHLIGHT_OFF = listOf("flashlight off", "torch off", "light off")
 
-    fun analyze(text: String): ভয়েসCommand {
+    fun analyze(text: String): VoiceCommand {
         val lower = text.lowercase().trim()
 
         // Structured command passthrough
@@ -26,87 +26,87 @@ object IntentAnalyzer {
         // Natural language analysis
         return when {
             FLASHLIGHT_ON.any { lower.contains(it) } ->
-                ভয়েসCommand(text, CommandType.FLASHLIGHT_ON)
+                VoiceCommand(text, CommandType.FLASHLIGHT_ON)
 
             FLASHLIGHT_OFF.any { lower.contains(it) } ->
-                ভয়েসCommand(text, CommandType.FLASHLIGHT_OFF)
+                VoiceCommand(text, CommandType.FLASHLIGHT_OFF)
 
             VOLUME_UP.any { lower.contains(it) } ->
-                ভয়েসCommand(text, CommandType.VOLUME_UP)
+                VoiceCommand(text, CommandType.VOLUME_UP)
 
             VOLUME_DOWN.any { lower.contains(it) } ->
-                ভয়েসCommand(text, CommandType.VOLUME_DOWN)
+                VoiceCommand(text, CommandType.VOLUME_DOWN)
 
             WHATSAPP_CALL.any { lower.contains(it) } -> {
                 val name = extractAfter(lower, WHATSAPP_CALL)
-                ভয়েসCommand(text, CommandType.WHATSAPP_CALL, mapOf("name" to name))
+                VoiceCommand(text, CommandType.WHATSAPP_CALL, mapOf("name" to name))
             }
 
             CALL_PATTERNS.any { lower.startsWith(it) || lower.contains(" $it ") } -> {
                 val name = extractAfter(lower, CALL_PATTERNS)
-                ভয়েসCommand(text, CommandType.CALL, mapOf("name" to name))
+                VoiceCommand(text, CommandType.CALL, mapOf("name" to name))
             }
 
             MSG_PATTERNS.any { lower.contains(it) } -> {
                 val parts = lower.split(" to ", " ko ")
                 val name = if (parts.size > 1) parts[1].split(" ")[0] else ""
-                ভয়েসCommand(text, CommandType.WHATSAPP_MSG, mapOf("name" to name, "message" to text))
+                VoiceCommand(text, CommandType.WHATSAPP_MSG, mapOf("name" to name, "message" to text))
             }
 
             OPEN_PATTERNS.any { lower.startsWith(it) || lower.contains("$it ") } -> {
-                val appনাম = extractAfter(lower, OPEN_PATTERNS)
-                ভয়েসCommand(text, CommandType.OPEN_APP, mapOf("app" to appনাম))
+                val appName = extractAfter(lower, OPEN_PATTERNS)
+                VoiceCommand(text, CommandType.OPEN_APP, mapOf("app" to appName))
             }
 
             YOUTUBE_PATTERNS.any { lower.contains(it) } -> {
                 val song = extractAfter(lower, YOUTUBE_PATTERNS)
-                ভয়েসCommand(text, CommandType.YOUTUBE_PLAY, mapOf("query" to song))
+                VoiceCommand(text, CommandType.YOUTUBE_PLAY, mapOf("query" to song))
             }
 
             SPOTIFY_PATTERNS.any { lower.contains(it) } -> {
                 val song = extractAfter(lower, SPOTIFY_PATTERNS)
-                ভয়েসCommand(text, CommandType.SPOTIFY_PLAY, mapOf("query" to song))
+                VoiceCommand(text, CommandType.SPOTIFY_PLAY, mapOf("query" to song))
             }
 
-            else -> ভয়েসCommand(text, CommandType.CONVERSATION)
+            else -> VoiceCommand(text, CommandType.CONVERSATION)
         }
     }
 
-    private fun parseStructured(text: String): ভয়েসCommand? {
+    private fun parseStructured(text: String): VoiceCommand? {
         val t = text.trim()
         return when {
             t.startsWith("OPEN_APP", true) -> {
                 val app = t.removePrefix("OPEN_APP").removePrefix(":").trim()
-                ভয়েসCommand(t, CommandType.OPEN_APP, mapOf("app" to app))
+                VoiceCommand(t, CommandType.OPEN_APP, mapOf("app" to app))
             }
             t.startsWith("CALL", true) && !t.startsWith("WHATSAPP_CALL", true) -> {
                 val name = t.removePrefix("CALL").trim()
-                ভয়েসCommand(t, CommandType.CALL, mapOf("name" to name))
+                VoiceCommand(t, CommandType.CALL, mapOf("name" to name))
             }
             t.startsWith("WHATSAPP_CALL", true) -> {
                 val name = t.removePrefix("WHATSAPP_CALL").trim()
-                ভয়েসCommand(t, CommandType.WHATSAPP_CALL, mapOf("name" to name))
+                VoiceCommand(t, CommandType.WHATSAPP_CALL, mapOf("name" to name))
             }
             t.startsWith("WHATSAPP_MSG", true) -> {
                 val rest = t.removePrefix("WHATSAPP_MSG").trim()
                 val parts = rest.split(" ", limit = 2)
-                ভয়েসCommand(t, CommandType.WHATSAPP_MSG, mapOf(
+                VoiceCommand(t, CommandType.WHATSAPP_MSG, mapOf(
                     "name" to (parts.getOrNull(0) ?: ""),
                     "message" to (parts.getOrNull(1) ?: "")
                 ))
             }
             t.startsWith("YOUTUBE_PLAY", true) -> {
                 val q = t.removePrefix("YOUTUBE_PLAY").trim()
-                ভয়েসCommand(t, CommandType.YOUTUBE_PLAY, mapOf("query" to q))
+                VoiceCommand(t, CommandType.YOUTUBE_PLAY, mapOf("query" to q))
             }
             t.startsWith("SPOTIFY_PLAY", true) -> {
                 val q = t.removePrefix("SPOTIFY_PLAY").trim()
-                ভয়েসCommand(t, CommandType.SPOTIFY_PLAY, mapOf("query" to q))
+                VoiceCommand(t, CommandType.SPOTIFY_PLAY, mapOf("query" to q))
             }
-            t.equals("FLASHLIGHT_ON", true) -> ভয়েসCommand(t, CommandType.FLASHLIGHT_ON)
-            t.equals("FLASHLIGHT_OFF", true) -> ভয়েসCommand(t, CommandType.FLASHLIGHT_OFF)
-            t.equals("VOLUME_UP", true) -> ভয়েসCommand(t, CommandType.VOLUME_UP)
-            t.equals("VOLUME_DOWN", true) -> ভয়েসCommand(t, CommandType.VOLUME_DOWN)
+            t.equals("FLASHLIGHT_ON", true) -> VoiceCommand(t, CommandType.FLASHLIGHT_ON)
+            t.equals("FLASHLIGHT_OFF", true) -> VoiceCommand(t, CommandType.FLASHLIGHT_OFF)
+            t.equals("VOLUME_UP", true) -> VoiceCommand(t, CommandType.VOLUME_UP)
+            t.equals("VOLUME_DOWN", true) -> VoiceCommand(t, CommandType.VOLUME_DOWN)
             else -> null
         }
     }

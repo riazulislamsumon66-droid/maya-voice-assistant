@@ -1,31 +1,31 @@
 package com.maya.assistant.accessibility
 
 import android.graphics.Rect
-import android.view.accessibility.অ্যাক্সেসিবিলিটিনাdeতথ্য
-import com.maya.assistant.models.স্ক্রিননাdeModel
+import android.view.accessibility.AccessibilityNodeInfo
+import com.maya.assistant.models.স্ক্রিনNodeModel
 
-object নাdeReader {
-    fun readসব(root: অ্যাক্সেসিবিলিটিনাdeতথ্য?): List<স্ক্রিননাdeModel> {
-        val nodes = mutableListOf<স্ক্রিননাdeModel>()
+object NodeReader {
+    fun readসব(root: AccessibilityNodeInfo?): List<স্ক্রিনNodeModel> {
+        val nodes = mutableListOf<স্ক্রিনNodeModel>()
         if (root == null) return nodes
         traverse(root, nodes)
         return nodes
     }
 
-    private fun traverse(node: অ্যাক্সেসিবিলিটিনাdeতথ্য, list: MutableList<স্ক্রিননাdeModel>) {
-        list.add(স্ক্রিননাdeModel(
+    private fun traverse(node: AccessibilityNodeInfo, list: MutableList<স্ক্রিনNodeModel>) {
+        list.add(স্ক্রিনNodeModel(
             text = node.text?.toString(),
             contentDesc = node.contentDescription?.toString(),
-            classনাম = node.classনাম?.toString(),
+            className = node.className?.toString(),
             isClickable = node.isClickable,
-            isএডিট করোable = node.isএডিট করোable,
+            isEdit কRowable = node.isEdit কRowable,
             bounds = Rect().also { node.getBoundsInস্ক্রিন(it) },
-            viewId = node.viewIdResourceনাম
+            viewId = node.viewIdResourceName
         ))
-        for (i in 0 until node.childগণনা) { node.getChild(i)?.let { traverse(it, list) } }
+        for (i in 0 until node.childCount) { node.getChild(i)?.let { traverse(it, list) } }
     }
 
-    fun dumpText(root: অ্যাক্সেসিবিলিটিনাdeতথ্য?): String =
+    fun dumpText(root: AccessibilityNodeInfo?): String =
         readসব(root).mapনাtNull { it.text?.ifBlank { null } ?: it.contentDesc?.ifBlank { null } }
             .joinToString(" | ")
 }
