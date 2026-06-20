@@ -1,8 +1,6 @@
 #!/bin/sh
 
 # Gradle wrapper script for Android
-# Downloads and runs the correct Gradle version
-
 APP_BASE_NAME=$(basename "$0")
 APP_HOME=$(cd "$(dirname "$0")" && pwd -P)
 CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
@@ -16,10 +14,9 @@ fi
 
 # Check for Android SDK
 if [ -z "$ANDROID_HOME" ] && [ -z "$ANDROID_SDK_ROOT" ]; then
-    # Try common Android SDK locations on Android
     for path in \
-        /storage/emulated/0/AndroidIDEProjects/maya-voice-assistant \
         /data/data/com.tom.rv2ide/files/home/.androidide \
+        /storage/emulated/0/AndroidIDEProjects/maya-voice-assistant \
         /sdcard/AndroidIDEProjects/maya-voice-assistant; do
         if [ -d "$path" ]; then
             export ANDROID_HOME="$path"
