@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Error starting CallMonitorService: ${e.message}")
         }
 
-        registerReceiver(callEndedReceiver, IntentFilter("com.myra.CALL_ENDED"))
+        registerReceiver(callEndedReceiver, IntentFilter("com.myra.CALL_ENDED"), RECEIVER_NOT_EXPORTED)
 
         orbView.postDelayed({ initGeminiLive() }, 300)
     }
@@ -275,12 +275,6 @@ class MainActivity : AppCompatActivity() {
                 orbView.setState(OrbState.IDLE)
                 statusText.text = "ট্যাপ করে বলো 💬" // "Tap to speak"
                 setActiveMode(false)
-            }
-        }
-
-        geminiLive.onOutputTranscript = { text ->
-            runOnUiThread {
-                orbView.setState(OrbState.SPEAKING)
             }
         }
 
