@@ -14,7 +14,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
-import androidx.biometric.বায়োমেট্রিকPrompt
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
 import com.maya.assistant.ai.GeminiLiveClient
@@ -35,7 +35,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     private lateinit var patternSection: View
     private lateinit var voiceSection: View
     private lateinit var fingerSection: View
-    private lateinit var pinডিসপ্লে: TextView
+    private lateinit var pinDisplay: TextView
     private lateinit var pinStatusText: TextView
     private lateinit var pinAttemptsText: TextView
     private lateinit var patternLockView: PatternLockView
@@ -46,8 +46,8 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     private lateinit var voiceInstructionText: TextView
     private lateinit var fingerBtn: ImageButton
     private lateinit var fingerStatusText: TextView
-    private lateinit var lockoutওভারলে: LinearLayout
-    private lateinit var lockoutসময়rText: TextView
+    private lateinit var lockoutOverlay: LinearLayout
+    private lateinit var lockoutTimerText: TextView
 
     private var enteredPin = ""
     private var tts: TextToSpeech? = null
@@ -63,7 +63,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     enum class Tab { PIN, PATTERN, VOICE, FINGER }
 
     companion object {
-        var isআনলক আছেThisSession = false
+        var isUnlockedThisSession = false
         fun launch(context: Context) {
             context.startActivity(Intent(context, AppLockActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -75,11 +75,11 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         super.onCreate(savedInstanceState)
         
         // Ensure Fingerprint tab is visible if enabled
-        val isFingerprintEnabled = নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)
+        val isFingerprintEnabled = SecurityManager.isBiometricEnabled(this)
         
-        val anyLockEnabled = নিরাপত্তাManager.isAppLockEnabled(this) || 
+        val anyLockEnabled = SecurityManager.isAppLockEnabled(this) || 
                             isFingerprintEnabled || 
-                            নিরাপত্তাManager.isDeviceLockEnabled(this)
+                            SecurityManager.isDeviceLockEnabled(this)
         
         if (!anyLockEnabled) {
             finish(); return
@@ -101,16 +101,16 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         checkLockout()
 
         // Device lock auto-trigger if enabled
-        if (নিরাপত্তাManager.isDeviceLockEnabled(this)) {
-            handler.postDelayed({ launchবায়োমেট্রিক(true) }, 500)
+        if (SecurityManager.isDeviceLockEnabled(this)) {
+            handler.postDelayed({ launchBiometric(true) }, 500)
         }
         
         // Default to first available lock - Priority: Fingerprint > Pattern > PIN
         val defaultTab = when {
             isFingerprintEnabled -> Tab.FINGER
             PatternManager.isPatternSet(this) -> Tab.PATTERN
-            নিরাপত্তাManager.hasPin(this) -> Tab.PIN
-            নিরাপত্তাManager.hasVoicePassphrase(this) -> Tab.VOICE
+            SecurityManager.hasPin(this) -> Tab.PIN
+            SecurityManager.hasVoicePassphrase(this) -> Tab.VOICE
             else -> Tab.PIN
         }
         switchTab(defaultTab)
@@ -140,7 +140,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         patternSection = findViewById(R.id.patternSection)
         voiceSection   = findViewById(R.id.voiceSection)
         fingerSection  = findViewById(R.id.fingerSection)
-        pinডিসপ্লে      = findViewById(R.id.pinডিসপ্লে)
+        pinDisplay      = findViewById(R.id.pinDisplay)
         pinStatusText   = findViewById(R.id.pinStatusText)
         pinAttemptsText = findViewById(R.id.pinAttemptsText)
         patternLockView        = findViewById(R.id.patternLockView)
@@ -151,15 +151,15 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         voiceInstructionText = findViewById(R.id.voiceInstructionText)
         fingerBtn            = findViewById(R.id.fingerBtn)
         fingerStatusText     = findViewById(R.id.fingerStatusText)
-        lockoutওভারলে   = findViewById(R.id.lockoutওভারলে)
-        lockoutসময়rText = findViewById(R.id.lockoutসময়rText)
+        lockoutOverlay   = findViewById(R.id.lockoutOverlay)
+        lockoutTimerText = findViewById(R.id.lockoutTimerText)
     }
 
     private fun setupTabs() {
-        val hasPin = নিরাপত্তাManager.hasPin(this)
+        val hasPin = SecurityManager.hasPin(this)
         val hasPattern = PatternManager.isPatternSet(this)
-        val hasVoice = নিরাপত্তাManager.hasVoicePassphrase(this)
-        val hasFinger = নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)
+        val hasVoice = SecurityManager.hasVoicePassphrase(this)
+        val hasFinger = SecurityManager.isBiometricEnabled(this)
 
         tabPin.visibility = if (hasPin) View.VISIBLE else View.GONE
         tabPattern.visibility = if (hasPattern) View.VISIBLE else View.GONE
@@ -179,12 +179,12 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         voiceSection.visibility   = if (tab == Tab.VOICE)   View.VISIBLE else View.GONE
         fingerSection.visibility  = if (tab == Tab.FINGER)  View.VISIBLE else View.GONE
         val pink = 0xFFE91E8C.toInt(); val grey = 0xFF888888.toInt()
-        tabPin.setTextরঙ(if (tab == Tab.PIN) pink else grey)
-        tabPattern.setTextরঙ(if (tab == Tab.PATTERN) pink else grey)
-        tabVoice.setTextরঙ(if (tab == Tab.VOICE) pink else grey)
-        tabFinger.setTextরঙ(if (tab == Tab.FINGER) pink else grey)
+        tabPin.setTextColor(if (tab == Tab.PIN) pink else grey)
+        tabPattern.setTextColor(if (tab == Tab.PATTERN) pink else grey)
+        tabVoice.setTextColor(if (tab == Tab.VOICE) pink else grey)
+        tabFinger.setTextColor(if (tab == Tab.FINGER) pink else grey)
 
-        if (tab == Tab.FINGER) launchবায়োমেট্রিক(false)
+        if (tab == Tab.FINGER) launchBiometric(false)
     }
 
     private fun setupPinPad() {
@@ -198,52 +198,52 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     private fun appendPin(d: String) {
         if (enteredPin.length >= 4) return
         enteredPin += d
-        pinডিসপ্লে.text = "●".repeat(enteredPin.length).padEnd(4, '○')
+        pinDisplay.text = "●".repeat(enteredPin.length).padEnd(4, '○')
         if (enteredPin.length == 4) handler.postDelayed({ submitPin() }, 250)
     }
 
     private fun backspacePin() {
-        if (enteredPin.isনাtEmpty()) {
+        if (enteredPin.isNotEmpty()) {
             enteredPin = enteredPin.dropLast(1)
-            pinডিসপ্লে.text = "●".repeat(enteredPin.length).padEnd(4, '○')
+            pinDisplay.text = "●".repeat(enteredPin.length).padEnd(4, '○')
         }
     }
 
     private fun submitPin() {
-        val result = নিরাপত্তাManager.verifyPin(this, enteredPin)
-        if (result is নিরাপত্তাManager.PinResult.CORRECT) {
+        val result = SecurityManager.verifyPin(this, enteredPin)
+        if (result is SecurityManager.PinResult.CORRECT) {
             onSuccess()
         } else {
             enteredPin = ""
-            pinডিসপ্লে.text = "○○○○"
+            pinDisplay.text = "○○○○"
             when (result) {
-                নিরাপত্তাManager.PinResult.NOT_SET -> onSuccess()
-                is নিরাপত্তাManager.PinResult.WRONG -> onPinWrong(result)
-                is নিরাপত্তাManager.PinResult.LOCKED_OUT -> startLockout(result.secondsRemaining)
+                SecurityManager.PinResult.NOT_SET -> onSuccess()
+                is SecurityManager.PinResult.WRONG -> onPinWrong(result)
+                is SecurityManager.PinResult.LOCKED_OUT -> startLockout(result.secondsRemaining)
                 else -> {}
             }
         }
     }
 
-    private fun onPinWrong(r: নিরাপত্তাManager.PinResult.WRONG) {
+    private fun onPinWrong(r: SecurityManager.PinResult.WRONG) {
         pinAttemptsText.text = "Wrong: ${r.attempts}/3"
-        pinAttemptsText.setTextরঙ(if (r.attempts >= 2) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
-        shakeView(pinডিসপ্লে)
+        pinAttemptsText.setTextColor(if (r.attempts >= 2) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
+        shakeView(pinDisplay)
         pinStatusText.text = if (r.lockedOut) "🔒 লক আছে 30s" else "❌ ভুল PIN"
-        pinStatusText.setTextরঙ(0xFFFF1744.toInt())
+        pinStatusText.setTextColor(0xFFFF1744.toInt())
         if (r.lockedOut) startLockout(30)
-        else handler.postDelayed({ pinStatusText.text = "Enter PIN"; pinStatusText.setTextরঙ(0xFFFFFFFF.toInt()) }, 1500)
+        else handler.postDelayed({ pinStatusText.text = "Enter PIN"; pinStatusText.setTextColor(0xFFFFFFFF.toInt()) }, 1500)
         speakWrong(r.attempts, r.lockedOut, "pin")
     }
 
     private fun setupPattern() {
         patternInstructionText.text = "তোমার unlock pattern এঁকো"
         patternLockView.listener = object : PatternLockView.PatternListener {
-            override fun onPatternStart কRowed() { patternInstructionText.text = "আঁকতে থাকো..." }
+            override fun onPatternStarted() { patternInstructionText.text = "আঁকতে থাকো..." }
             override fun onPatternComplete(pattern: List<Int>) {
                 handler.postDelayed({ verifyPattern(pattern) }, 150)
             }
-            override fun onPatternপরিষ্কার কRowed() { patternInstructionText.text = "তোমার unlock pattern এঁকো" }
+            override fun onPatternCleared() { patternInstructionText.text = "তোমার unlock pattern এঁকো" }
         }
     }
 
@@ -261,7 +261,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
                 patternLockView.showError()
                 val rem = PatternManager.getRemainingAttempts(this)
                 patternAttemptsText.text = "Wrong — $rem attempts left"
-                patternAttemptsText.setTextরঙ(if (r.attempts >= 3) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
+                patternAttemptsText.setTextColor(if (r.attempts >= 3) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
                 if (r.lockedOut) startLockout(30)
                 else handler.postDelayed({ patternLockView.clearPattern()
                     patternInstructionText.text = "তোমার unlock pattern এঁকো" }, 900)
@@ -275,7 +275,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     private fun setupVoice() {
-        val has = নিরাপত্তাManager.hasVoicePassphrase(this)
+        val has = SecurityManager.hasVoicePassphrase(this)
         voiceInstructionText.text = if (has) "মাইক ট্যাপ কRow এবং passphrase বলো" else "Voice passphrase Set করা হয়নি"
         voiceBtn.alpha = if (has) 1f else 0.4f
         voiceBtn.isEnabled = has
@@ -284,10 +284,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private fun setupFinger() {
         val biometricManager = BiometricManager.from(this)
-        val canAuth = biometricManager.canভেরিফাই কRow(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+        val canAuth = biometricManager.canVerify(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
         
-        if (canAuth == BiometricManager.BIOMETRIC_SUCCESS || নিরাপত্তাManager.isবায়োমেট্রিকEnabled(this)) {
-            fingerBtn.setEnabledClickListener { launchবায়োমেট্রিক(false) }
+        if (canAuth == BiometricManager.BIOMETRIC_SUCCESS || SecurityManager.isBiometricEnabled(this)) {
+            fingerBtn.setEnabledClickListener { launchBiometric(false) }
             tabFinger.visibility = View.VISIBLE
         } else {
             tabFinger.visibility = View.GONE
@@ -295,41 +295,41 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         }
     }
 
-    private fun launchবায়োমেট্রিক(allowDeviceCredential: Boolean) {
+    private fun launchBiometric(allowDeviceCredential: Boolean) {
         val executor = ContextCompat.getMainExecutor(this)
-        val biometricPrompt = বায়োমেট্রিকPrompt(this, executor, object : বায়োমেট্রিকPrompt.প্রমাণীকরণকলback() {
-            override fun onপ্রমাণীকরণSucceeded(result: বায়োমেট্রিকPrompt.প্রমাণীকরণResult) {
-                super.onপ্রমাণীকরণSucceeded(result)
+        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.প্রমাণীকরণকলback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
+                super.onAuthenticationSucceeded(result)
                 fingerStatusText.text = "✅ Success!"
                 onSuccess()
             }
-            override fun onপ্রমাণীকরণError(errorCode: Int, errString: CharSequence) {
-                super.onপ্রমাণীকরণError(errorCode, errString)
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
                 fingerStatusText.text = "❌ $errString"
-                if (errorCode == বায়োমেট্রিকPrompt.ERROR_NEGATIVE_BUTTON) {
+                if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
                     switchTab(Tab.PATTERN)
                 }
             }
-            override fun onপ্রমাণীকরণFailed() {
-                super.onপ্রমাণীকরণFailed()
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
                 fingerStatusText.text = "❌ প্রমাণীকরণ Failed"
             }
         })
 
-        val promptতথ্য = বায়োমেট্রিকPrompt.Promptতথ্য.Builder()
+        val promptInfo = BiometricPrompt.Promptতথ্য.Builder()
             .setTitle("MAYA Unlock")
             .setSubtitle("তোমার identity confirm কRow")
             .apply {
-                if (নিরাপত্তাManager.isDeviceLockEnabled(this@AppLockActivity) || allowDeviceCredential) {
-                    setসবowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                if (SecurityManager.isDeviceLockEnabled(this@AppLockActivity) || allowDeviceCredential) {
+                    setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 } else {
-                    setসবowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                    setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                     setNegativeButtonText("Pattern/PIN ব্যবহার কRow")
                 }
             }
             .build()
 
-        biometricPrompt.authenticate(promptতথ্য)
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun startVoiceListen() {
@@ -341,7 +341,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             override fun onResults(results: Bundle?) {
                 val spoken = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
-                if (নিরাপত্তাManager.verifyVoicePassphrase(this@AppLockActivity, spoken)) {
+                if (SecurityManager.verifyVoicePassphrase(this@AppLockActivity, spoken)) {
                     voiceStatusText.text = "✅ Verified!"
                     onSuccess()
                 } else {
@@ -372,7 +372,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     private fun onSuccess() {
-        isআনলক আছেThisSession = true
+        isUnlockedThisSession = true
         val prefs = getSharedPreferences("maya_prefs", MODE_PRIVATE)
         val name  = prefs.getString("user_name", "Jaan") ?: "Jaan"
         val mode  = prefs.getString("personality_mode", "gf") ?: "gf"
@@ -388,18 +388,18 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     private fun startLockout(seconds: Long) {
-        lockoutওভারলে.visibility = View.VISIBLE
+        lockoutOverlay.visibility = View.VISIBLE
         var rem = seconds
         lockoutRunnable?.let { handler.removeকলbacks(it) }
         lockoutRunnable = object : Runnable {
             override fun run() {
                 if (rem <= 0) {
-                    lockoutওভারলে.visibility = View.GONE
+                    lockoutOverlay.visibility = View.GONE
                     PatternManager.resetAttempts(this@AppLockActivity)
                     speak("এখন আবার try করতে পাRow", true)
                     return
                 }
-                lockoutসময়rText.text = "পর আবার try কRow ${rem}s"
+                lockoutTimerText.text = "পর আবার try কRow ${rem}s"
                 rem--
                 handler.postDelayed(this, 1000)
             }

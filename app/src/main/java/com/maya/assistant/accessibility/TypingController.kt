@@ -6,8 +6,8 @@ import com.maya.assistant.service.SmartAccessibilityEngine
 
 object TypingController {
     fun typeText(text: String): Boolean {
-        val root = SmartAccessibilityEngine.service?.rootInসক্রিয়Window ?: return false
-        val et = NodeFinder.findEdit কRowText(root) ?: return false
+        val root = SmartAccessibilityEngine.service?.rootInActiveWindow ?: return false
+        val et = NodeFinder.findEditText(root) ?: return false
         et.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
         val args = Bundle().apply {
             putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text)

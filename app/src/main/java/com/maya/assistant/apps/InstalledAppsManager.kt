@@ -2,22 +2,22 @@ package com.maya.assistant.apps
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.Applicationতথ্য
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.maya.assistant.models.AppModel
 import com.maya.assistant.utils.Logger
 
-object Install কRowedAppsManager {
+object InstalledAppsManager {
     private val TAG = "APPS"
     private var cachedApps: List<AppModel>? = null
 
-    fun getসবApps(context: Context): List<AppModel> {
+    fun getAllApps(context: Context): List<AppModel> {
         if (cachedApps != null) return cachedApps!!
 
         val pm = context.packageManager
-        val apps = pm.getInstall কRowedApplications(PackageManager.GET_META_DATA)
+        val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-        cachedApps = apps.mapনাtNull { info ->
+        cachedApps = apps.mapNotNull { info ->
             try {
                 val label = pm.getApplicationLabel(info).toString()
                 val launchIntent = pm.getLaunchIntentForPackage(info.packageName)
@@ -37,7 +37,7 @@ object Install কRowedAppsManager {
 
     fun findApp(context: Context, query: String): AppModel? {
         val normalized = query.lowercase().trim()
-        val apps = getসবApps(context)
+        val apps = getAllApps(context)
 
         // Exact match first
         apps.find { it.name == normalized || it.packageName.contains(normalized) }

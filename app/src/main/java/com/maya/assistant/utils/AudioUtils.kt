@@ -7,8 +7,8 @@ import java.nio.ByteOrder
 
 object AudioUtils {
 
-    fun getMinBufferআকার(sampleRate: Int = Constants.SAMPLE_RATE_IN): Int =
-        AudioRecord.getMinBufferআকার(
+    fun getMinBufferSize(sampleRate: Int = Constants.SAMPLE_RATE_IN): Int =
+        AudioRecord.getMinBufferSize(
             sampleRate,
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT

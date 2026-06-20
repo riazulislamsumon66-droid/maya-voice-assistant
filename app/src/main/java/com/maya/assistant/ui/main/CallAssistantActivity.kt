@@ -43,14 +43,14 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     private var phoneNumber = ""
     private var userName = "Sir"
     private var personality = "gf"
-    private var isWhatsAppকল = false
+    private var isWhatsAppCall = false
 
     // State management — FIXED: Proper flags
     private var isDecisionMade = false
     private var isListening… = false
     private var announcementPlayed = false
     private var isSpeaking… = false
-    private var isকলAnswered = false
+    private var isCallAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
     private lateinit var liveAudioManager: LiveAudioManager
@@ -71,7 +71,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
                 }
                 CallMonitorService.ACTION_CALL_ACTIVE -> {
                     Log.d(TAG, "কল active → closing assistant UI")
-                    isকলAnswered = true
+                    isCallAnswered = true
                     safeFinish()
                 }
                 CallMonitorService.ACTION_CALL_RINGING -> {
@@ -86,8 +86,8 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
 
         // Lock screen pe bhi dikhao
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setVisibleওWhenলক আছে(true)
-            setTurnস্ক্রিনEnabled(true)
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
         } else {
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
@@ -104,9 +104,9 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         phoneNumber = intent.getStringExtra("PHONE_NUMBER") ?: ""
         userName    = intent.getStringExtra("USER_NAME") ?: getPrefsValue("user_name", "Sir")
         personality = intent.getStringExtra("PERSONALITY") ?: getPrefsValue("personality_mode", "gf")
-        isWhatsAppকল = intent.getBooleanExtra("IS_WHATSAPP_CALL", false)
+        isWhatsAppCall = intent.getBooleanExtra("IS_WHATSAPP_CALL", false)
 
-        Log.d(TAG, "কলAsিস্ট্যান্ট started: caller=$callerName, whatsapp=$isWhatsAppকল, personality=$personality")
+        Log.d(TAG, "কলAsিস্ট্যান্ট started: caller=$callerName, whatsapp=$isWhatsAppCall, personality=$personality")
 
         initViews()
 
@@ -136,7 +136,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         }
 
         // Phone state monitor
-        startকলStateMonitor()
+        startCallStateMonitor()
     }
 
     private fun initViews() {
@@ -150,7 +150,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setভাষা(Locale("bn", "BD"))
+            val result = tts?.setLanguage(Locale("bn", "BD"))
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts?.language = Locale.ENGLISH
             }
@@ -190,7 +190,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     private fun buildAnnouncementText(): String {
         val isKnownContact = !isNumberLike(callerName)
 
-        return if (isWhatsAppকল) {
+        return if (isWhatsAppCall) {
             // WhatsApp call announcement
             when (personality) {
                 "gf" -> when {
@@ -240,7 +240,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
             return
         }
 
-        val callType = if (isWhatsAppকল) "WhatsApp call" else "phone call"
+        val callType = if (isWhatsAppCall) "WhatsApp call" else "phone call"
 
         val prompt = """
             You are MAYA, a caring AI assistant for $userName. ব্যক্তিগতity: $personality.
@@ -325,7 +325,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
         Log.d(TAG, "Start কRowing voice recognition")
 
-        if (!SpeechRecognizer.isRecognitionপাওয়া যাচ্ছে(this)) {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
             Log.e(TAG, "Speech recognition not available")
             handler.postDelayed({ repeatAnnouncement() }, 1000)
             return
@@ -503,7 +503,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     private fun performAnswer() {
         if (isDecisionMade) return
         isDecisionMade = true
-        isকলAnswered = true
+        isCallAnswered = true
         stopListening…()
 
         val confirmMsg = when (personality) {
@@ -517,12 +517,12 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         handler.postDelayed({
             var success = false
 
-            if (isWhatsAppকল) {
+            if (isWhatsAppCall) {
                 // WhatsApp call answer
-                success = answerWhatsAppকল()
+                success = answerWhatsAppCall()
             } else {
                 // নাrmal call answer
-                success = answerনাrmalকল()
+                success = answerNormalCall()
             }
 
             if (!success) {
@@ -536,7 +536,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     /**
      * ✅ NEW: Separate method for normal call answer
      */
-    private fun answerনাrmalকল(): Boolean {
+    private fun answerNormalCall(): Boolean {
         var success = false
 
         // Method 1: TelecomManager acceptRingingকল
@@ -579,7 +579,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     /**
      * ✅ NEW: Answer WhatsApp call via accessibility
      */
-    private fun answerWhatsAppকল(): Boolean {
+    private fun answerWhatsAppCall(): Boolean {
         var success = false
 
         try {
@@ -625,12 +625,12 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         handler.postDelayed({
             var success = false
 
-            if (isWhatsAppকল) {
+            if (isWhatsAppCall) {
                 // WhatsApp call reject
-                success = rejectWhatsAppকল()
+                success = rejectWhatsAppCall()
             } else {
                 // নাrmal call reject
-                success = rejectনাrmalকল()
+                success = rejectNormalCall()
             }
 
             if (!success) {
@@ -644,7 +644,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     /**
      * ✅ NEW: Separate method for normal call reject
      */
-    private fun rejectনাrmalকল(): Boolean {
+    private fun rejectNormalCall(): Boolean {
         var success = false
 
         // Method 1: TelecomManager endকল
@@ -691,7 +691,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     /**
      * ✅ NEW: Reject WhatsApp call via accessibility
      */
-    private fun rejectWhatsAppকল(): Boolean {
+    private fun rejectWhatsAppCall(): Boolean {
         var success = false
 
         try {
@@ -728,12 +728,12 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         waveformView?.stopAnimation()
     }
 
-    private fun startকলStateMonitor() {
+    private fun startCallStateMonitor() {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val monitor = object : Runnable {
             override fun run() {
-                if (isDecisionMade || isকলAnswered) return
-                if (tm.callState == TelephonyManager.CALL_STATE_IDLE && !isWhatsAppকল) {
+                if (isDecisionMade || isCallAnswered) return
+                if (tm.callState == TelephonyManager.CALL_STATE_IDLE && !isWhatsAppCall) {
                     Log.d(TAG, "Phone idle — closing call assistant")
                     safeFinish()
                     return
@@ -786,7 +786,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         isListening… = false
         announcementPlayed = false
         isSpeaking… = false
-        isকলAnswered = false
+        isCallAnswered = false
 
         Log.d(TAG, "কলAsিস্ট্যান্টActivity destroyed")
     }

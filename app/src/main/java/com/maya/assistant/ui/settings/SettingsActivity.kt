@@ -8,7 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.কন্টাক্টContract
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.view.View
 import android.widget.*
@@ -20,17 +20,17 @@ import androidx.core.content.ContextCompat
 import com.maya.assistant.R
 import com.maya.assistant.service.AccessibilityHelperService
 import com.maya.assistant.service.MayaDeviceAdminReceiver
-import com.maya.assistant.security.নিরাপত্তাSettingsActivity
+import com.maya.assistant.security.SecuritySettingsActivity
 
 
 class SettingsActivity : AppCompatActivity() {
 
     // ── Original Views ──────────────────────────────────────────
-    private lateinit var apiKeyInput: Edit কRowText
-    private lateinit var ttsApiKeyInput: Edit কRowText
-    private lateinit var userNameInput: Edit কRowText
-    private lateinit var primeNameInput: Edit কRowText
-    private lateinit var primeNumberInput: Edit কRowText
+    private lateinit var apiKeyInput: EditText
+    private lateinit var ttsApiKeyInput: EditText
+    private lateinit var userNameInput: EditText
+    private lateinit var primeNameInput: EditText
+    private lateinit var primeNumberInput: EditText
     private lateinit var personalityGroup: RadioGroup
     private lateinit var voiceTypeGroup: RadioGroup
     private lateinit var liveModeSwitch: Switch
@@ -50,9 +50,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var componentName: ComponentName
 
     private val contactPickerLauncher = registerForActivityResult(
-        ActivityResultContracts.Start কRowActivityForResult()
+        ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_ঠিক আছে) {
+        if (result.resultCode == RESULT_OK) {
             val contactUri = result.data?.data ?: return@registerForActivityResult
             handleContactResult(contactUri)
         }
@@ -131,14 +131,14 @@ class SettingsActivity : AppCompatActivity() {
         // কল announce (default ON for better UX)
         val announceEnabled = prefs.getBoolean("call_announce_enabled", true)
         callAnnounceSwitch.isChecked = announceEnabled
-        updateকলAnnounceStatus(announceEnabled)
+        updateCallAnnounceStatus(announceEnabled)
     }
 
     private fun setupListeners() {
         saveBtn.setEnabledClickListener { savePreferences() }
 
         pickContactBtn.setEnabledClickListener {
-            val intent = Intent(Intent.ACTION_PICK, কন্টাক্টContract.CommonDataKinds.Phone.CONTENT_URI)
+            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
             contactPickerLauncher.launch(intent)
         }
 
@@ -148,7 +148,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.deviceAdminCard).setEnabledClickListener {
-            if (!devicePolicyManager.isAdminসক্রিয়(componentName)) {
+            if (!devicePolicyManager.isActive(componentName)) {
                 val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                     putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
                     putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "MAYA needs admin to control system.")
@@ -160,12 +160,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.securitySettingsCard).setEnabledClickListener {
-            startActivity(Intent(this, নিরাপত্তাSettingsActivity::class.java))
+            startActivity(Intent(this, SecuritySettingsActivity::class.java))
         }
 
         // NEW: কল announce switch
         callAnnounceSwitch.setEnabledCheckedChangeListener { _, isChecked ->
-            updateকলAnnounceStatus(isChecked)
+            updateCallAnnounceStatus(isChecked)
         }
 
         // NEW: Grant permissions button
@@ -192,7 +192,7 @@ class SettingsActivity : AppCompatActivity() {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
-        if (missing.isনাtEmpty()) {
+        if (missing.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, missing.toTypedArray(), PERMISSIONS_REQUEST_CODE)
         } else {
             Toast.makeText(this, "Sab permissions already granted! ✅", Toast.LENGTH_SHORT).show()
@@ -211,16 +211,16 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "$granted/$total permissions mili ⚠️", Toast.LENGTH_LONG).show()
 
-                val permanentlyঅস্বীকৃত = permissions.filterIndexed { index, _ ->
+                val permanentlyDenied = permissions.filterIndexed { index, _ ->
                     grantResults[index] == PackageManager.PERMISSION_DENIED &&
-                    !ActivityCompat.shouldVisibleওRequestPermissionRationale(this, permissions[index])
+                    !ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[index])
                 }
 
-                if (permanentlyঅস্বীকৃত.isনাtEmpty()) {
+                if (permanentlyDenied.isNotEmpty()) {
                     AlertDialog.Builder(this)
                         .setTitle("Permissions প্রয়োজন ⚠️")
                         .setMessage("Keyছু permissions permanently deny ho gayi hain. Settings se manually enable karo.\n\n" +
-                                permanentlyঅস্বীকৃত.joinToString("\n") { "• ${it.split('.').last()}" })
+                                permanentlyDenied.joinToString("\n") { "• ${it.split('.').last()}" })
                         .setPositiveButton("Open Settings") { _, _ ->
                             try {
                                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -239,13 +239,13 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateকলAnnounceStatus(enabled: Boolean) {
+    private fun updateCallAnnounceStatus(enabled: Boolean) {
         callAnnounceStatusText.text = if (enabled) {
             "📢 কল aane pe MAYA naam bolegi"
         } else {
             "🔇 কল announce band hai"
         }
-        callAnnounceStatusText.setTextরঙ(
+        callAnnounceStatusText.setTextColor(
             if (enabled) 0xFF00E676.toInt() else 0xFFFF1744.toInt()
         )
     }
@@ -259,7 +259,7 @@ class SettingsActivity : AppCompatActivity() {
             missing <= 2 -> "⚠️ $missing permissions pending"
             else -> "❌ $missing permissions missing"
         }
-        permissionsStatusText.setTextরঙ(when {
+        permissionsStatusText.setTextColor(when {
             missing == 0 -> 0xFF00E676.toInt()
             missing <= 2 -> 0xFFFFA726.toInt()
             else -> 0xFFFF1744.toInt()
@@ -269,8 +269,8 @@ class SettingsActivity : AppCompatActivity() {
     private fun handleContactResult(uri: android.net.Uri) {
         val cursor = contentResolver.query(uri, null, null, null, null)
         if (cursor?.moveToFirst() == true) {
-            val nameIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            val numIndex = cursor.getColumnIndex(কন্টাক্টContract.CommonDataKinds.Phone.NUMBER)
+            val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             primeNameInput.setText(cursor.getString(nameIndex))
             primeNumberInput.setText(cursor.getString(numIndex).replace(" ", ""))
         }
@@ -310,17 +310,17 @@ class SettingsActivity : AppCompatActivity() {
     private fun updateStatus() {
         val enabled = AccessibilityHelperService.isEnabled(this)
         accessibilityStatus.text = if (enabled) "✅ Full Control Enabled" else "❌ অ্যাক্সেসিবিলিটি Off"
-        accessibilityStatus.setTextরঙ(if (enabled) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
+        accessibilityStatus.setTextColor(if (enabled) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 
-        val adminসক্রিয় = devicePolicyManager.isAdminসক্রিয়(componentName)
-        adminStatusText.text = if (adminসক্রিয়) "✅ Admin সক্রিয়" else "❌ Admin নিষ্ক্রিয়"
-        adminStatusText.setTextরঙ(if (adminসক্রিয়) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
+        val adminActive = devicePolicyManager.isActive(componentName)
+        adminStatusText.text = if (adminActive) "✅ Admin সক্রিয়" else "❌ Admin নিষ্ক্রিয়"
+        adminStatusText.setTextColor(if (adminActive) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 
         updatePermissionsStatus()
     }
 
-    override fun onচালিয়ে যাও() {
-        super.onচালিয়ে যাও()
+    override fun onResume() {
+        super.onResume()
         updateStatus()
     }
 

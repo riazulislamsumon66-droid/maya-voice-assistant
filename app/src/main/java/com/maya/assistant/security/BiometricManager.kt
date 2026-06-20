@@ -7,7 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.biometric.বায়োমেট্রিকPrompt
+import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricManager
 import java.util.concurrent.Executor
 
@@ -86,13 +86,13 @@ object BiometricManager {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            showবায়োমেট্রিকPrompt(context, onSuccess, onError, onFallback)
+            showBiometricPrompt(context, onSuccess, onError, onFallback)
         } else {
             onFallback()
         }
     }
 
-    private fun showবায়োমেট্রিকPrompt(
+    private fun showBiometricPrompt(
         context: Context,
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
@@ -101,7 +101,7 @@ object BiometricManager {
         val executor = ContextCompat.getMainExecutor(context)
 
         // Create Promptতথ্য using the builder
-        val promptতথ্য = বায়োমেট্রিকPrompt.Promptতথ্য.Builder()
+        val promptতথ্য = BiometricPrompt.Promptতথ্য.Builder()
             .setTitle("MAYA নিরাপত্তা")
             .setSubtitle("যাচাই কRow your identity")
             .setDescription("আঙুল sensor এ রাখো")
@@ -111,11 +111,11 @@ object BiometricManager {
         // Get activity from context
         val activity = context as androidx.fragment.app.FragmentActivity
 
-        val biometricPrompt = বায়োমেট্রিকPrompt(
+        val biometricPrompt = BiometricPrompt(
             activity,
             executor,
-            object : বায়োমেট্রিকPrompt.প্রমাণীকরণকলback() {
-                override fun onপ্রমাণীকরণSucceeded(result: বায়োমেট্রিকPrompt.প্রমাণীকরণResult) {
+            object : BiometricPrompt.প্রমাণীকরণকলback() {
+                override fun onপ্রমাণীকরণSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
                     super.onপ্রমাণীকরণSucceeded(result)
                     Log.d(TAG, "✅ বায়োমেট্রিক authentication succeeded")
                     isভেরিফাই কRowd = true
@@ -133,8 +133,8 @@ object BiometricManager {
                 override fun onপ্রমাণীকরণError(errorCode: Int, errString: CharSequence) {
                     super.onপ্রমাণীকরণError(errorCode, errString)
                     Log.e(TAG, "বায়োমেট্রিক error: $errorCode - $errString")
-                    if (errorCode == বায়োমেট্রিকPrompt.ERROR_USER_CANCELED ||
-                        errorCode == বায়োমেট্রিকPrompt.ERROR_NEGATIVE_BUTTON) {
+                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
                         onFallback()
                     } else {
                         onError(errString.toString())

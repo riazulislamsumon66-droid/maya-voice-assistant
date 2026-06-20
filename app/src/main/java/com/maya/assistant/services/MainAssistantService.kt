@@ -20,5 +20,5 @@ object MainAsিস্ট্যান্টService {
         RealtimeConversationService.sendMessage(text)
     }
 
-    fun isসক্রিয়() = RealtimeConversationService.isRunning()
+    fun isActive() = RealtimeConversationService.isRunning()
 }

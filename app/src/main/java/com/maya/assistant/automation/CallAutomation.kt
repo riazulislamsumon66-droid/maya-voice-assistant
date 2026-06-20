@@ -8,11 +8,11 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.content.ContextCompat
 
-object কলঅটোmation {
+object CallAutomation {
 
     private const val TAG = "MAYA_CALL"
 
-    fun makeকল(
+    fun makeCall(
         context: Context,
         number: String
     ): Boolean {
@@ -45,12 +45,11 @@ object কলঅটোmation {
             }
 
             context.startActivity(intent)
-
-            Log.d(TAG, "কলing -> $cleanNumber")
+            Log.d(TAG, "Calling -> $cleanNumber")
             true
 
         } catch (e: Exception) {
-            Log.e(TAG, "কল failed: ${e.message}")
+            Log.e(TAG, "Call failed: ${e.message}")
             false
         }
     }

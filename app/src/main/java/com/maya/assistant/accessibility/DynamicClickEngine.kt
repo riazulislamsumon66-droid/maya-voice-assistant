@@ -5,7 +5,7 @@ import com.maya.assistant.service.SmartAccessibilityEngine
 
 object DynamicClickEngine {
     fun clickByText(text: String): Boolean {
-        val root = SmartAccessibilityEngine.service?.rootInসক্রিয়Window ?: return false
+        val root = SmartAccessibilityEngine.service?.rootInActiveWindow ?: return false
         val node = NodeFinder.findByText(root, text) ?: return false
         return click(node)
     }

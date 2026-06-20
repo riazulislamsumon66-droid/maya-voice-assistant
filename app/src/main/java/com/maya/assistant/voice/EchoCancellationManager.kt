@@ -1,29 +1,29 @@
 package com.maya.assistant.voice
 
-import android.media.audiofx.AcousticEchoবাতিলer
-import android.media.audiofx.অটোmaticGainControl
-import android.media.audiofx.নাiseSuppressor
+import android.media.audiofx.AcousticEchoCanceler
+import android.media.audiofx.AutomaticGainControl
+import android.media.audiofx.NoiseSuppressor
 import com.maya.assistant.utils.Logger
 
-object EchoবাতিলlationManager {
+object EchoCancellationManager {
     private val TAG = "ECHO"
 
-    private var aec: AcousticEchoবাতিলer? = null
-    private var ns: নাiseSuppressor? = null
-    private var agc: অটোmaticGainControl? = null
+    private var aec: AcousticEchoCanceler? = null
+    private var ns: NoiseSuppressor? = null
+    private var agc: AutomaticGainControl? = null
 
     fun attach(audioSessionId: Int) {
         try {
-            if (AcousticEchoবাতিলer.isপাওয়া যাচ্ছে()) {
-                aec = AcousticEchoবাতিলer.create(audioSessionId)?.apply { enabled = true }
+            if (AcousticEchoCanceler.isAvailable()) {
+                aec = AcousticEchoCanceler.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "AEC enabled")
             }
-            if (নাiseSuppressor.isপাওয়া যাচ্ছে()) {
-                ns = নাiseSuppressor.create(audioSessionId)?.apply { enabled = true }
+            if (NoiseSuppressor.isAvailable()) {
+                ns = NoiseSuppressor.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "NS enabled")
             }
-            if (অটোmaticGainControl.isপাওয়া যাচ্ছে()) {
-                agc = অটোmaticGainControl.create(audioSessionId)?.apply { enabled = true }
+            if (AutomaticGainControl.isAvailable()) {
+                agc = AutomaticGainControl.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "AGC enabled")
             }
         } catch (e: Exception) {

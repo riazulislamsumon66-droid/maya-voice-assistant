@@ -12,7 +12,7 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             val prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
             val apiKey = prefs.getString(Constants.KEY_API_KEY, "") ?: ""
-            if (apiKey.isনাtEmpty()) {
+            if (apiKey.isNotEmpty()) {
                 ContextCompat.startForegroundService(context, Intent(context, ForegroundVoiceService::class.java))
             }
         }

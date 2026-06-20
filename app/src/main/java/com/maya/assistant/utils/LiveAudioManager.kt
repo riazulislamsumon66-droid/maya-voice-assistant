@@ -33,7 +33,7 @@ class LiveAudioManager(private val context: Context) {
     }
 
     private fun initAudioTrack() {
-        val minBufferআকার = AudioTrack.getMinBufferআকার(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
+        val minBufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
 
         audioTrack = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
@@ -50,7 +50,7 @@ class LiveAudioManager(private val context: Context) {
                         .setChannelMask(CHANNEL_CONFIG)
                         .build()
                 )
-                .setBufferআকারInBytes(minBufferআকার * 2)
+                .setBufferSizeInBytes(minBufferSize * 2)
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build()
         } else {
@@ -60,7 +60,7 @@ class LiveAudioManager(private val context: Context) {
                 SAMPLE_RATE,
                 CHANNEL_CONFIG,
                 AUDIO_FORMAT,
-                minBufferআকার * 2,
+                minBufferSize * 2,
                 AudioTrack.MODE_STREAM
             )
         }

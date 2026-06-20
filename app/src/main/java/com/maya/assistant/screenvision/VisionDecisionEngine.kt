@@ -8,7 +8,7 @@ object VisionDecisionEngine {
     private val TAG = "VISION_DECISION"
 
     fun executeVisualAction(action: String): Boolean {
-        val nodes = স্ক্রিনহাইerarchyParser.getCurrentNodes()
+        val nodes = ScreenHierarchyParser.getCurrentNodes()
         val target = VisualUIAnalyzer.findBestActionTarget(nodes, action)
         if (target != null) {
             Logger.d(TAG, "Visual target found: ${target.text ?: target.contentDesc}")
@@ -21,5 +21,5 @@ object VisionDecisionEngine {
 
     fun fillInputField(text: String): Boolean = TypingController.typeText(text)
 
-    fun describeCurrentস্ক্রিন(): String = স্ক্রিনহাইerarchyParser.summarizeস্ক্রিন()
+    fun describeCurrentScreen(): String = ScreenHierarchyParser.summarizeস্ক্রিন()
 }

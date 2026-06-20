@@ -11,7 +11,7 @@ class PowerButtonReceiver : BroadcastReceiver() {
 
     companion object {
         private var pressCount = 0
-        private var lastPressসময় = 0L
+        private var lastPressTime = 0L
         private const val DOUBLE_PRESS_WINDOW = 700L
         private const val TAG = "MAYA_POWER"
     }
@@ -24,9 +24,9 @@ class PowerButtonReceiver : BroadcastReceiver() {
     }
 
     private fun detectDoublePress(context: Context) {
-        val now = System.currentসময়Millis()
+        val now = System.currentTimeMillis()
 
-        if (now - lastPressসময় <= DOUBLE_PRESS_WINDOW) {
+        if (now - lastPressTime <= DOUBLE_PRESS_WINDOW) {
             pressCount++
 
             if (pressCount >= 2) {
@@ -38,7 +38,7 @@ class PowerButtonReceiver : BroadcastReceiver() {
             pressCount = 1
         }
 
-        lastPressসময় = now
+        lastPressTime = now
     }
 
     private fun launchMaya(context: Context) {

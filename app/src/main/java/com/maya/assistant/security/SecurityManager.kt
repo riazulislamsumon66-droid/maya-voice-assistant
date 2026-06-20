@@ -12,11 +12,11 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 /**
- * নিরাপত্তাManager — AES-256 Encryption + PIN + Voice + App Lock per package
+ * SecurityManager — AES-256 Encryption + PIN + Voice + App Lock per package
  *
  * ADDED: isPackageলক আছে() — AccessibilityHelperService ke liye
  */
-object নিরাপত্তাManager {
+object SecurityManager {
 
     private const val TAG = "MAYA_SECURITY"
     private const val KEYSTORE_PROVIDER = "AndroidKeyStore"

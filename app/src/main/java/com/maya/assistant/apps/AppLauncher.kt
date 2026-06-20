@@ -8,7 +8,7 @@ object AppLauncher {
     private val TAG = "LAUNCHER"
 
     fun launch(context: Context, appName: String): Boolean {
-        val intent = Install কRowedAppsManager.getLaunchIntent(context, appName) ?: run {
+        val intent = InstalledAppsManager.getLaunchIntent(context, appName) ?: run {
             Logger.w(TAG, "App not found: $appName")
             return false
         }

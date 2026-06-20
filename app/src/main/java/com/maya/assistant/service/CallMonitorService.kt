@@ -5,14 +5,14 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.Serviceতথ্য
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.core.app.নাtificationCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
 import com.maya.assistant.ui.main.কলAsিস্ট্যান্টActivity
@@ -39,7 +39,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
     override fun onCreate() {
         super.onCreate()
 
-        createনাtificationChannel()
+        createNotificationChannel()
         startForegroundService()
 
         tts = TextToSpeech(this, this)
@@ -59,15 +59,15 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
             getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         phoneListener = object : PhoneStateListener() {
-            override fun onকলStateChanged(state: Int, number: String?) {
-                super.onকলStateChanged(state, number)
+            override fun onCallStateChanged(state: Int, number: String?) {
+                super.onCallStateChanged(state, number)
 
                 when (state) {
 
                     TelephonyManager.CALL_STATE_RINGING -> {
                         if (!announced) {
                             announced = true
-                            handleIncomingকল(number)
+                            handleIncomingCall(number)
                         }
                     }
 
@@ -91,8 +91,8 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
         )
     }
 
-    private fun handleIncomingকল(number: String?) {
-        val callerName = resolveকলerName(number)
+    private fun handleIncomingCall(number: String?) {
+        val callerName = resolveCallerName(number)
 
         Log.d(TAG, "Incoming: $callerName")
 
@@ -105,7 +105,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
         startActivity(intent)
     }
 
-    private fun resolveকলerName(number: String?): String {
+    private fun resolveCallerName(number: String?): String {
         if (number.isNullOrEmpty()) return "অজানা কলer"
 
         if (ContextCompat.checkSelfPermission(
@@ -118,13 +118,13 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
 
         return try {
             val uri = android.net.Uri.withAppendedPath(
-                android.provider.কন্টাক্টContract.PhoneLookup.CONTENT_FILTER_URI,
+                android.provider.ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                 android.net.Uri.encode(number)
             )
 
             contentResolver.query(
                 uri,
-                arrayOf(android.provider.কন্টাক্টContract.PhoneLookup.DISPLAY_NAME),
+                arrayOf(android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME),
                 null,
                 null,
                 null
@@ -143,7 +143,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
     }
 
     private fun startForegroundService() {
-        val notification = নাtificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MAYA Running")
             .setContentText("Monitoring calls")
             .setSmallIcon(R.mipmap.img)
@@ -154,29 +154,29 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
             startForeground(
                 1001,
                 notification,
-                Serviceতথ্য.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
             )
         } else {
             startForeground(1001, notification)
         }
     }
 
-    private fun createনাtificationChannel() {
+    private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = নাtificationChannel(
                 CHANNEL_ID,
                 "MAYA কল Monitor",
-                নাtificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_LOW
             )
 
             val manager =
-                getSystemService(নাtificationManager::class.java)
+                getSystemService(NotificationManager::class.java)
 
-            manager.createনাtificationChannel(channel)
+            manager.createNotificationChannel(channel)
         }
     }
 
-    override fun onStart কRowCommand(
+    override fun onStartCommand(
         intent: Intent?,
         flags: Int,
         startId: Int

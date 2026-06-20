@@ -35,7 +35,7 @@ class WaveformView @JvmOverloads constructor(
     }
 
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = রঙ.parseরঙ("#FF1744")
+        color = Color.parseColor("#FF1744")
         style = Paint.Style.FILL
     }
 
@@ -90,7 +90,7 @@ class WaveformView @JvmOverloads constructor(
             val bottom = top + barH
 
             val alpha = (180 + (75 * barHeights[i])).toInt().coerceIn(0, 255)
-            barPaint.color = রঙ.argb(alpha, 255, 23, 68)
+            barPaint.color = Color.argb(alpha, 255, 23, 68)
             canvas.drawRoundRect(left, top, right, bottom, 4f, 4f, barPaint)
         }
     }
@@ -99,8 +99,8 @@ class WaveformView @JvmOverloads constructor(
 // ─── ChatMessage data class ──────────────────────────────────────────────────
 data class ChatMessage(
     val text: String,
-    val isব্যবহারকারী: Boolean,
-    val timestamp: Long = System.currentসময়Millis()
+    val isUser: Boolean,
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 // ─── ChatAdapter ─────────────────────────────────────────────────────────────
@@ -124,17 +124,17 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun getLastBotMessage(): String? {
-        return messages.lastOrNull { !it.isব্যবহারকারী }?.text
+        return messages.lastOrNull { !it.isUser }?.text
     }
 
     override fun getItemViewType(position: Int) =
-        if (messages[position].isব্যবহারকারী) VIEW_USER else VIEW_MAYA
+        if (messages[position].isUser) VIEW_USER else VIEW_MAYA
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == VIEW_USER) {
             val view = inflater.inflate(R.layout.item_chat_user, parent, false)
-            ব্যবহারকারীMessageViewHolder(view)
+            UserMessageViewHolder(view)
         } else {
             val view = inflater.inflate(R.layout.item_chat_maya, parent, false)
             MayaMessageViewHolder(view)
@@ -144,13 +144,13 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val msg = messages[position]
         when (holder) {
-            is ব্যবহারকারীMessageViewHolder -> holder.bind(msg)
+            is UserMessageViewHolder -> holder.bind(msg)
             is MayaMessageViewHolder -> holder.bind(msg)
         }
         // Slide-in animation for newly added messages
         if (position == messages.size - 1) {
             val view = holder.itemView
-            val translationX = if (msg.isব্যবহারকারী) 80f else -80f
+            val translationX = if (msg.isUser) 80f else -80f
             view.translationX = translationX
             view.alpha = 0f
             view.animate()
@@ -164,13 +164,13 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount() = messages.size
 
-    inner class ব্যবহারকারীMessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class UserMessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val msgText: TextView = view.findViewById(R.id.msgText)
         private val timeText: TextView = view.findViewById(R.id.timeText)
 
         fun bind(msg: ChatMessage) {
             msgText.text = msg.text
-            timeText.text = formatসময়(msg.timestamp)
+            timeText.text = formatTime(msg.timestamp)
 
             // ✅ FIX: Ensure text doesn't overflow
             msgText.maxLines = 100
@@ -184,7 +184,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(msg: ChatMessage) {
             msgText.text = msg.text
-            timeText.text = formatসময়(msg.timestamp)
+            timeText.text = formatTime(msg.timestamp)
 
             // ✅ FIX: Ensure text doesn't overflow
             msgText.maxLines = 100
@@ -192,7 +192,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    private fun formatসময়(ts: Long): String {
+    private fun formatTime(ts: Long): String {
         val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
         return sdf.format(java.util.Date(ts))
     }

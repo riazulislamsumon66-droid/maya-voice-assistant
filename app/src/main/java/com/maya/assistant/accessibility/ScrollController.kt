@@ -7,7 +7,7 @@ object ScrollController {
     fun scrollDown() = scroll(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
     fun scrollUp() = scroll(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)
     private fun scroll(action: Int): Boolean {
-        val root = SmartAccessibilityEngine.service?.rootInসক্রিয়Window ?: return false
+        val root = SmartAccessibilityEngine.service?.rootInActiveWindow ?: return false
         return doScroll(root, action)
     }
     private fun doScroll(node: AccessibilityNodeInfo, action: Int): Boolean {

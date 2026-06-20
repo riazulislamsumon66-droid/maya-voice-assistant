@@ -1,11 +1,11 @@
 package com.maya.assistant.screenvision
 
 import android.graphics.Bitmap
-import com.maya.assistant.models.স্ক্রিনNodeModel
+import com.maya.assistant.models.ScreenNodeModel
 
 object VisualUIAnalyzer {
 
-    fun analyze(bitmap: Bitmap?, nodes: List<স্ক্রিনNodeModel>): String {
+    fun analyze(bitmap: Bitmap?, nodes: List<ScreenNodeModel>): String {
         val nodesSummary = nodes
             .filter { (it.text != null || it.contentDesc != null) }
             .take(20)
@@ -13,11 +13,11 @@ object VisualUIAnalyzer {
         return "স্ক্রিন context: $nodesSummary"
     }
 
-    fun findBestActionTarget(nodes: List<স্ক্রিনNodeModel>, intent: String): স্ক্রিনNodeModel? {
+    fun findBestActionTarget(nodes: List<ScreenNodeModel>, intent: String): ScreenNodeModel? {
         val lower = intent.lowercase()
         return nodes.find { node ->
             val t = (node.text ?: node.contentDesc ?: "").lowercase()
-            t.isনাtBlank() && (t.contains(lower) || lower.contains(t))
+            t.isNotBlank() && (t.contains(lower) || lower.contains(t))
         }
     }
 }

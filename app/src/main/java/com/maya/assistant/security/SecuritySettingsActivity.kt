@@ -23,9 +23,9 @@ import com.maya.assistant.utils.LiveAudioManager
 import java.util.Locale
 
 /**
- * নিরাপত্তাSettingsActivity — MAYA নিরাপত্তা Configuration
+ * SecuritySettingsActivity — MAYA নিরাপত্তা Configuration
  */
-class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
+class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private lateinit var appLockSwitch: Switch
     private lateinit var appLockStatusText: TextView
@@ -94,18 +94,18 @@ class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToS
         val lockEnabled = নিরাপত্তাManager.isAppLockEnabled(this) || PatternManager.isPatternLockEnabled(this)
         appLockSwitch.isChecked = lockEnabled
         appLockStatusText.text = if (lockEnabled) "🔒 App Lock Enabled" else "🔓 App Lock Off"
-        appLockStatusText.setTextরঙ(if (lockEnabled) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        appLockStatusText.setTextColor(if (lockEnabled) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         checkPermissions()
         
         pinStatusText.text = if (নিরাপত্তাManager.hasPin(this)) "✅ PIN Set আছে" else "❌ PIN Set নেই"
-        pinStatusText.setTextরঙ(if (নিরাপত্তাManager.hasPin(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        pinStatusText.setTextColor(if (নিরাপত্তাManager.hasPin(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         patternStatusText.text = if (PatternManager.isPatternSet(this)) "✅ Pattern Set আছে" else "❌ Pattern Set নেই"
-        patternStatusText.setTextরঙ(if (PatternManager.isPatternSet(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        patternStatusText.setTextColor(if (PatternManager.isPatternSet(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         voiceStatusText.text = if (নিরাপত্তাManager.hasVoicePassphrase(this)) "✅ Voice passphrase set" else "❌ নাt set"
-        voiceStatusText.setTextরঙ(if (নিরাপত্তাManager.hasVoicePassphrase(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
+        voiceStatusText.setTextColor(if (নিরাপত্তাManager.hasVoicePassphrase(this)) 0xFF00E676.toInt() else 0xFF888888.toInt())
 
         // Check বায়োমেট্রিক hardware
         val biometricManager = BiometricManager.from(this)
@@ -123,10 +123,10 @@ class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToS
         val pm = নিরাপত্তাManager.isPrivateModeসক্রিয়(this)
         privateModeSwitch.isChecked = pm
         privateModeStatusText.text = if (pm) "🙈 Private Mode ON" else "👁️ Private Mode OFF"
-        privateModeStatusText.setTextরঙ(if (pm) 0xFFFFAB40.toInt() else 0xFF888888.toInt())
+        privateModeStatusText.setTextColor(if (pm) 0xFFFFAB40.toInt() else 0xFF888888.toInt())
 
         encryptionStatusText.text = "🔐 AES-256-GCM (Android Keystore) — সবসময় ON"
-        encryptionStatusText.setTextরঙ(0xFF00E676.toInt())
+        encryptionStatusText.setTextColor(0xFF00E676.toInt())
     }
 
     private fun setupListeners() {
@@ -180,12 +180,12 @@ class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToS
             if (checked) {
                 নিরাপত্তাManager.enablePrivateMode(this)
                 privateModeStatusText.text = "🙈 Private Mode ON — Chat history hidden"
-                privateModeStatusText.setTextরঙ(0xFFFFAB40.toInt())
+                privateModeStatusText.setTextColor(0xFFFFAB40.toInt())
                 speak("Private mode on. Chat history chhup jayegi.", true)
             } else {
                 নিরাপত্তাManager.disablePrivateMode(this)
                 privateModeStatusText.text = "👁️ Private Mode OFF"
-                privateModeStatusText.setTextরঙ(0xFF888888.toInt())
+                privateModeStatusText.setTextColor(0xFF888888.toInt())
                 speak("Private mode band.", true)
             }
         }
@@ -275,19 +275,19 @@ class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToS
         usageStatsBtn.text = if (usageStatsমঞ্জুর ✅) "✅ Usage Stats সবowed" else "সবow Usage Stats"
         usageStatsBtn.isEnabled = !usageStatsমঞ্জুর ✅
 
-        val overlayমঞ্জুর ✅ = Settings.canDrawওভারলেs(this)
-        overlayPermissionBtn.text = if (overlayমঞ্জুর ✅) "✅ ওভারলে সবowed" else "সবow ডিসপ্লে Over Apps"
-        overlayPermissionBtn.isEnabled = !overlayমঞ্জুর ✅
+        val overlayGranted = Settings.canDrawওভারলেs(this)
+        overlayPermissionBtn.text = if (overlayGranted) "✅ ওভারলে সবowed" else "সবow ডিসপ্লে Over Apps"
+        overlayPermissionBtn.isEnabled = !overlayGranted
     }
 
     private fun isUsageStatsEnabled(): Boolean {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = appOps.checkOpনাThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageName)
+        val mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageName)
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
-    override fun onচালিয়ে যাও() {
-        super.onচালিয়ে যাও()
+    override fun onResume() {
+        super.onResume()
         checkPermissions()
     }
 
@@ -312,7 +312,7 @@ class নিরাপত্তাSettingsActivity : AppCompatActivity(), TextToS
 
     companion object {
         fun launch(context: Context) {
-            context.startActivity(Intent(context, নিরাপত্তাSettingsActivity::class.java))
+            context.startActivity(Intent(context, SecuritySettingsActivity::class.java))
         }
     }
 }

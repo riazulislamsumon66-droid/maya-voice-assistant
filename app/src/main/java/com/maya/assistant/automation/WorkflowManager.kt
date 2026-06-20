@@ -4,17 +4,17 @@ import com.maya.assistant.models.ActionModel
 import com.maya.assistant.utils.Logger
 import kotlinx.coroutines.delay
 
-object কাজflowManager {
+object WorkflowManager {
     private val TAG = "WORKFLOW"
 
     suspend fun runSequence(actions: List<ActionModel>, delayMs: Long = 500) {
-        অটোmationStateManager.setRunning()
+        AutomationStateManager.setRunning()
         for (action in actions) {
-            if (!অটোmationStateManager.isRunning()) break
-            val success = টাস্কExecutor.execute(action)
+            if (!AutomationStateManager.isRunning()) break
+            val success = TaskExecutor.execute(action)
             Logger.d(TAG, "Action ${action.type}: $success")
             delay(delayMs)
         }
-        অটোmationStateManager.setIdle()
+        AutomationStateManager.setIdle()
     }
 }

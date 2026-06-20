@@ -20,7 +20,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val command = IntentAnalyzer.analyze(rawCommand)
             if (command.type != CommandType.CONVERSATION) {
                 val response = DynamicDecisionEngine.execute(getApplication(), command)
-                if (response.isনাtBlank()) aiResponse.postValue(response)
+                if (response.isNotBlank()) aiResponse.postValue(response)
             }
         }
     }

@@ -6,7 +6,7 @@ import okhttp3.*
 import okio.ByteString
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.সময়Unit
+import java.util.concurrent.TimeUnit
 
 class GeminiLiveClient(
     private val apiKey: String,
@@ -18,9 +18,9 @@ class GeminiLiveClient(
     private var webSocket: WebSocket? = null
 
     private val client = OkHttpClient.Builder()
-        .readTimeআউট(0, সময়Unit.MILLISECONDS)
-        .connectTimeআউট(20, সময়Unit.SECONDS)
-        .pingInterval(20, সময়Unit.SECONDS) // Connection ko zinda rakhne ke liye
+        .readTimeout(0, TimeUnit.MILLISECONDS)
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .pingInterval(20, TimeUnit.SECONDS) // Connection ko zinda rakhne ke liye
         .build()
 
     // Aapka original model name
@@ -67,7 +67,7 @@ class GeminiLiveClient(
                 callback.onError("Connection Failed: ${t.message}")
             }
 
-            override fun onOff কRowd(webSocket: WebSocket, code: Int, reason: String) {
+            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
             }
         })

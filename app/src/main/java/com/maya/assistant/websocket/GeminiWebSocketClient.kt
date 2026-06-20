@@ -7,7 +7,7 @@ import okhttp3.*
 import okio.ByteString
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.সময়Unit
+import java.util.concurrent.TimeUnit
 
 class GeminiWebSocketClient(
     private val apiKey: String,
@@ -23,9 +23,9 @@ class GeminiWebSocketClient(
     private var isSetupComplete = false
 
     private val client = OkHttpClient.Builder()
-        .readTimeআউট(0, সময়Unit.MILLISECONDS)
-        .connectTimeআউট(20, সময়Unit.SECONDS)
-        .pingInterval(25, সময়Unit.SECONDS)
+        .readTimeout(0, TimeUnit.MILLISECONDS)
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .pingInterval(25, TimeUnit.SECONDS)
         .build()
 
     private val url = "${Constants.GEMINI_WS_BASE}?key=$apiKey"
@@ -57,7 +57,7 @@ class GeminiWebSocketClient(
                 onError("Connection failed: ${t.message}")
             }
 
-            override fun onOff কRowd(ws: WebSocket, code: Int, reason: String) {
+            override fun onClosed(ws: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
                 Log.d(TAG, "WS Off কRowd: $reason")
             }

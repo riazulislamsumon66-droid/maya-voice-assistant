@@ -30,7 +30,7 @@ class AudioRecorder(
             return
         }
 
-        val bufferআকার = AudioUtils.getMinBufferআকার(SAMPLE_RATE)
+        val bufferSize = AudioUtils.getMinBufferSize(SAMPLE_RATE)
 
         try {
             audioRecord = AudioRecord(
@@ -38,10 +38,10 @@ class AudioRecorder(
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
-                bufferআকার
+                bufferSize
             )
 
-            EchoবাতিলlationManager.attach(audioRecord!!.audioSessionId)
+            EchoCancellationManager.attach(audioRecord!!.audioSessionId)
             audioRecord!!.startRecording()
             isRecording = true
 
@@ -74,12 +74,12 @@ class AudioRecorder(
             audioRecord?.stop()
             audioRecord?.release()
             audioRecord = null
-            EchoবাতিলlationManager.release()
+            EchoCancellationManager.release()
         } catch (e: Exception) {
             Logger.e(TAG, "Off কRow error: ${e.message}")
         }
         Logger.d(TAG, "Recording stopped")
     }
 
-    fun isসক্রিয়() = isRecording
+    fun isActive() = isRecording
 }

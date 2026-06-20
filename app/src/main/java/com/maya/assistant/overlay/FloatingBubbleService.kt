@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.IBinder
 
 /**
- * Alias service — actual floating bubble is handled by MayaওভারলেService.
+ * Alias service — actual floating bubble is handled by MayaOverlayService.
  * This exists for the project structure as specified in the prompt.
  */
 class FloatingBubbleService : Service() {
-    override fun onStart কRowCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        FloatingAsিস্ট্যান্টController.show(this)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        FloatingAssistantController.show(this)
         stopSelf()
         return START_NOT_STICKY
     }

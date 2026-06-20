@@ -6,10 +6,10 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 
-object ওভারলেPermissionManager {
+object OverlayPermissionManager {
 
     fun hasPermission(context: Context): Boolean =
-        Settings.canDrawওভারলেs(context)
+        Settings.canDrawOverlays(context)
 
     fun requestPermission(context: Context) {
         val intent = Intent(
