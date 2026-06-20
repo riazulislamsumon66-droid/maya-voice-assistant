@@ -8,7 +8,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager as BiometricManagerAndroidX
 import java.util.concurrent.Executor
 
 /**
@@ -35,8 +35,8 @@ object BiometricManager {
      * Check if biometric is available on device
      */
     fun isBiometricAvailable(context: Context): Boolean {
-        val biometricManager = BiometricManager.from(context)
-        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+        val biometricManager = BiometricManagerAndroidX.from(context)
+        return biometricManager.canAuthenticate() == BiometricManagerAndroidX.BIOMETRIC_SUCCESS
     }
 
     /**
