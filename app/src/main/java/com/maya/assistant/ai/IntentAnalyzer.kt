@@ -5,16 +5,29 @@ import com.maya.assistant.models.VoiceCommand
 
 object IntentAnalyzer {
 
-    private val OPEN_PATTERNS = listOf("open", "kholo", "khol", "launch", "start", "chalo", "chala", "খোলো", "খোল", "চালু", "ওপেন")
-    private val CALL_PATTERNS = listOf("call", "phone", "ring", "dial", "কল", "ফোন", "ডায়াল")
-    private val WHATSAPP_CALL = listOf("whatsapp call", "video call", "হোয়াটসঅ্যাপ কল")
-    private val MSG_PATTERNS = listOf("message", "msg", "send", "bhejo", "likho", "মেসেজ", "পাঠাও", "সেন্ড")
-    private val YOUTUBE_PATTERNS = listOf("youtube", "video play", "play on youtube", "ইউটিউব", "ভিডিও")
-    private val SPOTIFY_PATTERNS = listOf("spotify", "play music", "gaana", "song", "স্পটিফাই", "গান", "মিউজিক")
-    private val VOLUME_UP = listOf("volume up", "louder", "badhao", "tez karo", "ভলিউম বাড়াও", "জোরে")
-    private val VOLUME_DOWN = listOf("volume down", "lower", "kam karo", "dhima karo", "ভলিউম কমাও", "কম")
-    private val FLASHLIGHT_ON = listOf("flashlight on", "torch on", "light on", "ফ্ল্যাশলাইট অন", "টর্চ অন", "আলো অন")
-    private val FLASHLIGHT_OFF = listOf("flashlight off", "torch off", "light off", "ফ্ল্যাশলাইট অফ", "টর্চ অফ", "আলো অফ")
+    // English
+    private val OPEN_PATTERNS_EN = listOf("open", "launch", "start")
+    // Hindi/Hinglish
+    private val OPEN_PATTERNS_HI = listOf("kholo", "khol", "chalo", "chala", "shuru")
+    // Bangla
+    private val OPEN_PATTERNS_BN = listOf("খোলো", "খোল", "চালু", "ওপেন", "শুরু")
+    // Arabic
+    private val OPEN_PATTERNS_AR = listOf("افتح", "فتح", "شغل")
+    // French
+    private val OPEN_PATTERNS_FR = listOf("ouvre", "ouvrir", "lance", "lancer", "démarre")
+    
+    private val OPEN_PATTERNS = OPEN_PATTERNS_EN + OPEN_PATTERNS_HI + OPEN_PATTERNS_BN + OPEN_PATTERNS_AR + OPEN_PATTERNS_FR
+
+    // Call patterns
+    private val CALL_PATTERNS = listOf("call", "phone", "ring", "dial", "কল", "ফোন", "ডায়াল", "कॉल", "फोन", "اتصل", "appelle")
+    private val WHATSAPP_CALL = listOf("whatsapp call", "video call", "হোয়াটসঅ্যাপ কল", "व्हाट्सअप कॉल")
+    private val MSG_PATTERNS = listOf("message", "msg", "send", "bhejo", "likho", "মেসেজ", "পাঠাও", "সেন্ড", "मैसेज", "भेजो", "رسالة", "envoyer", "message")
+    private val YOUTUBE_PATTERNS = listOf("youtube", "video play", "play on youtube", "ইউটিউব", "ভিডিও", "यूट्यूब", "فيديو")
+    private val SPOTIFY_PATTERNS = listOf("spotify", "play music", "gaana", "song", "স্পটিফাই", "গান", "মিউজিक", "स्पॉटिफाई", "गाना", "musique", "chanson")
+    private val VOLUME_UP = listOf("volume up", "louder", "badhao", "tez karo", "ভলিউম বাড়াও", "জোরে", "जोरे", "بصوت عال", "plus fort")
+    private val VOLUME_DOWN = listOf("volume down", "lower", "kam karo", "dhima karo", "ভলিউম কমাও", "কম", "कम", "هادئ", "moins fort")
+    private val FLASHLIGHT_ON = listOf("flashlight on", "torch on", "light on", "ফ্ল্যাশলাইট অন", "টর্চ অন", "আলো অন", "टॉर्च ऑन", "كشاف تشغيل", "lampe allumée")
+    private val FLASHLIGHT_OFF = listOf("flashlight off", "torch off", "light off", "ফ্ল্যাশলাইট অফ", "টর্চ অফ", "আলো অফ", "टॉर्च ऑफ", "كشاف إيقاف", "lampe éteinte")
 
     fun analyze(text: String): VoiceCommand {
         val lower = text.lowercase().trim()
@@ -48,7 +61,7 @@ object IntentAnalyzer {
             }
 
             MSG_PATTERNS.any { lower.contains(it) } -> {
-                val parts = lower.split(" to ", " ko ")
+                val parts = lower.split(" to ", " ko ", " ke ", " কে ")
                 val name = if (parts.size > 1) parts[1].split(" ")[0] else ""
                 VoiceCommand(text, CommandType.WHATSAPP_MSG, mapOf("name" to name, "message" to text))
             }

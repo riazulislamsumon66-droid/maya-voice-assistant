@@ -17,6 +17,7 @@ object Constants {
     const val KEY_PRIME_NUMBER = "prime_number"
     const val KEY_CALL_ANNOUNCE = "call_announce"
     const val KEY_WAKE_WORD = "wake_word"
+    const val KEY_LANGUAGE = "language"
 
     // নাtifications
     const val NOTIF_CHANNEL_OVERLAY = "maya_overlay_channel"

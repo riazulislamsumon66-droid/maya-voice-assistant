@@ -45,6 +45,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var grantPermissionsBtn: Button
     private lateinit var setDefaultAssistantBtn: Button
     private lateinit var permissionsStatusText: TextView
+    private lateinit var languageGroup: RadioGroup
 
     private lateinit var devicePolicyManager: DevicePolicyManager
     private lateinit var componentName: ComponentName
@@ -105,6 +106,7 @@ class SettingsActivity : AppCompatActivity() {
         grantPermissionsBtn = findViewById(R.id.grantPermissionsBtn)
         setDefaultAssistantBtn = findViewById(R.id.setDefaultAssistantBtn)
         permissionsStatusText = findViewById(R.id.permissionsStatusText)
+        languageGroup = findViewById(R.id.languageGroup)
     }
 
     private fun loadPreferences() {
@@ -132,6 +134,16 @@ class SettingsActivity : AppCompatActivity() {
         val announceEnabled = prefs.getBoolean("call_announce_enabled", true)
         callAnnounceSwitch.isChecked = announceEnabled
         updateCallAnnounceStatus(announceEnabled)
+        
+        // Language selection
+        when (prefs.getString("language", "bangla")) {
+            "bangla" -> findViewById<RadioButton>(R.id.langBnRadio).isChecked = true
+            "hindi" -> findViewById<RadioButton>(R.id.langHiRadio).isChecked = true
+            "english" -> findViewById<RadioButton>(R.id.langEnRadio).isChecked = true
+            "arabic" -> findViewById<RadioButton>(R.id.langArRadio).isChecked = true
+            "french" -> findViewById<RadioButton>(R.id.langFrRadio).isChecked = true
+            else -> findViewById<RadioButton>(R.id.langBnRadio).isChecked = true
+        }
     }
 
     private fun setupListeners() {
@@ -301,6 +313,16 @@ class SettingsActivity : AppCompatActivity() {
 
         prefs.putBoolean("live_mode_enabled", liveModeSwitch.isChecked)
         prefs.putBoolean("call_announce_enabled", callAnnounceSwitch.isChecked)
+        
+        val language = when (languageGroup.checkedRadioButtonId) {
+            R.id.langBnRadio -> "bangla"
+            R.id.langHiRadio -> "hindi"
+            R.id.langEnRadio -> "english"
+            R.id.langArRadio -> "arabic"
+            R.id.langFrRadio -> "french"
+            else -> "bangla"
+        }
+        prefs.putString("language", language)
 
         prefs.apply()
         Toast.makeText(this, "Settings Save dod! MAYA updated. ✅", Toast.LENGTH_SHORT).show()

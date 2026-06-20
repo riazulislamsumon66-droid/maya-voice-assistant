@@ -106,14 +106,14 @@ class CallMonitorService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun resolveCallerName(number: String?): String {
-        if (number.isNullOrEmpty()) return "অজানা কলer"
+        if (number.isNullOrEmpty()) return "অজানা কলার"
 
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_CONTACTS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return "অজানা কলer"
+            return "অজানা কলার"
         }
 
         return try {
@@ -130,15 +130,15 @@ class CallMonitorService : Service(), TextToSpeech.OnInitListener {
                 null
             )?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    cursor.getString(0) ?: "অজানা কলer"
+                    cursor.getString(0) ?: "অজানা কলার"
                 } else {
-                    "অজানা কলer"
+                    "অজানা কলার"
                 }
-            } ?: "অজানা কলer"
+            } ?: "অজানা কলার"
 
         } catch (e: Exception) {
             Log.e(TAG, e.message ?: "")
-            "অজানা কলer"
+            "অজানা কলার"
         }
     }
 

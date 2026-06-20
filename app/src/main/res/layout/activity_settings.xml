@@ -175,6 +175,84 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Language Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#111"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🌐 ভাষা / Language"
+                    android:textColor="#FF6D6D"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="14dp" />
+
+                <RadioGroup
+                    android:id="@+id/languageGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/langBnRadio"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="🇧🇩 বাংলা (Bangla)"
+                        android:textColor="#CCC"
+                        android:textSize="13sp"
+                        android:buttonTint="#FF1744" />
+
+                    <RadioButton
+                        android:id="@+id/langHiRadio"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="🇮🇳 हिन्दी (Hindi)"
+                        android:textColor="#CCC"
+                        android:textSize="13sp"
+                        android:buttonTint="#FF1744" />
+
+                    <RadioButton
+                        android:id="@+id/langEnRadio"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="🇺🇸 English"
+                        android:textColor="#CCC"
+                        android:textSize="13sp"
+                        android:buttonTint="#FF1744" />
+
+                    <RadioButton
+                        android:id="@+id/langArRadio"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="🇸🇦 العربية (Arabic)"
+                        android:textColor="#CCC"
+                        android:textSize="13sp"
+                        android:buttonTint="#FF1744" />
+
+                    <RadioButton
+                        android:id="@+id/langFrRadio"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="🇫🇷 Français (French)"
+                        android:textColor="#CCC"
+                        android:textSize="13sp"
+                        android:buttonTint="#FF1744" />
+                </RadioGroup>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- User Name Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
