@@ -33,7 +33,7 @@ class OrbAnimationView @JvmOverloads constructor(
         duration = 4000
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpDateListener {
+        addUpdateListener {
             rotationAngle = it.animatedValue as Float
             invalidate()
         }
@@ -43,7 +43,7 @@ class OrbAnimationView @JvmOverloads constructor(
         duration = 1500
         repeatCount = ValueAnimator.INFINITE
         interpolator = android.view.animation.AccelerateDecelerateInterpolator()
-        addUpDateListener {
+        addUpdateListener {
             pulseScale = it.animatedValue as Float
             invalidate()
         }
@@ -52,7 +52,7 @@ class OrbAnimationView @JvmOverloads constructor(
     private val glowAnimator = ValueAnimator.ofInt(120, 220, 120).apply {
         duration = 2000
         repeatCount = ValueAnimator.INFINITE
-        addUpDateListener {
+        addUpdateListener {
             glowAlpha = it.animatedValue as Int
             invalidate()
         }
@@ -62,7 +62,7 @@ class OrbAnimationView @JvmOverloads constructor(
         duration = 1200
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpDateListener {
+        addUpdateListener {
             waveOffset = it.animatedValue as Float
             invalidate()
         }
@@ -72,7 +72,7 @@ class OrbAnimationView @JvmOverloads constructor(
         duration = 1000
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpDateListener {
+        addUpdateListener {
             thinkingAngle = it.animatedValue as Float
             invalidate()
         }
@@ -188,7 +188,7 @@ class OrbAnimationView @JvmOverloads constructor(
 
         // Thinking… indicator
         if (isThinking) {
-            drawThinking…Arc(canvas, cx, cy, baseRadius)
+            drawThinkingArc(canvas, cx, cy, baseRadius)
         }
 
         // Particles
@@ -292,7 +292,7 @@ class OrbAnimationView @JvmOverloads constructor(
         }
     }
 
-    private fun drawThinking…Arc(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+    private fun drawThinkingArc(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         val arcRadius = radius + 40f
         val oval = RectF(cx - arcRadius, cy - arcRadius, cx + arcRadius, cy + arcRadius)
         ringPaint.color = Color.parseColor("#40C4FF")
@@ -330,7 +330,7 @@ class OrbAnimationView @JvmOverloads constructor(
     private fun Float.toRadians() = this * (Math.PI / 180f).toFloat()
 
     // ── Convenience state methods ──────────────────────────────
-    fun setListening…() {
+    fun setListening() {
         setActive(true); setSpeaking(false); setThinking(false); setPulsating(false)
     }
     fun setSpeaking() {
