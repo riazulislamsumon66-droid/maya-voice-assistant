@@ -145,6 +145,42 @@ class ForegroundVoiceService : Service() {
         geminiClient?.sendTextMessage(text)
     }
 
+    // Direct action execution — bypasses Gemini for known commands
+    fun executeDirectAction(userText: String) {
+        val lower = userText.lowercase().trim()
+        
+        // Direct app open detection
+        val openPatterns = listOf("open", "kholo", "khol", "launch", "start", "খোলো", "খোল", "চালু", "ওপেন")
+        for (pattern in openPatterns) {
+            if (lower.contains(pattern)) {
+                val appName = lower.substringAfter(pattern).trim()
+                if (appName.isNotEmpty()) {
+                    AppLauncher.launch(this@ForegroundVoiceService, appName)
+                    Log.d(TAG, "DIRECT OPEN: $appName")
+                    return
+                }
+            }
+        }
+        
+        // Direct volume control
+        if (lower.contains("volume up") || lower.contains("ভলিউম বাড়াও") || lower.contains("জোরে")) {
+            val am = getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
+            am?.adjustVolume(android.media.AudioManager.ADJUST_RAISE, android.media.AudioManager.FLAG_SHOW_UI)
+            Log.d(TAG, "DIRECT VOLUME UP")
+            return
+        }
+        
+        if (lower.contains("volume down") || lower.contains("ভলিউম কমাও") || lower.contains("কম")) {
+            val am = getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
+            am?.adjustVolume(android.media.AudioManager.ADJUST_LOWER, android.media.AudioManager.FLAG_SHOW_UI)
+            Log.d(TAG, "DIRECT VOLUME DOWN")
+            return
+        }
+        
+        // Go through Gemini if no direct match
+        sendTextToGemini(userText)
+    }
+
     fun reconnectGemini() {
         val apiKey = prefs().getString(Constants.KEY_API_KEY, "") ?: ""
         if (apiKey.isNotEmpty()) {

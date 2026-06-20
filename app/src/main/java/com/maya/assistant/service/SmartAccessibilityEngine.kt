@@ -26,7 +26,15 @@ object SmartAccessibilityEngine {
 
         val cmd = cleanCommand(rawCommand)
 
-        Log.d(TAG, "EXECUTE -> $cmd")
+        Log.d(TAG, "EXECUTE -> $cmd | service=${service != null} | isConnected=${AccessibilityHelperService.isConnected}")
+
+        // If accessibility service is not connected, try direct action
+        if (!AccessibilityHelperService.isConnected) {
+            Log.w(TAG, "⚠️ Accessibility NOT connected — trying direct action")
+            val directResult = tryDirectAction(cmd)
+            return if (directResult) Result(true, "Direct action executed")
+            else Result(false, "Accessibility service not connected and direct action failed")
+        }
 
         val success = when {
 
@@ -60,6 +68,32 @@ object SmartAccessibilityEngine {
             success,
             if (success) "হয়ে গেছে" else "Failed"
         )
+    }
+
+    // Direct action without accessibility service
+    private fun tryDirectAction(cmd: String): Boolean {
+        val lower = cmd.lowercase()
+        
+        // Direct app open
+        if (lower.contains("open") || lower.contains("kholo") || lower.contains("খোলো")) {
+            val appName = lower.substringAfter("open")
+                .substringAfter("kholo")
+                .substringAfter("খোলো")
+                .trim()
+            if (appName.isNotEmpty()) {
+                try {
+                    val intent = service?.packageManager?.getLaunchIntentForPackage(appName)
+                    if (intent != null) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        service?.startActivity(intent)
+                        return true
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Direct open failed: ${e.message}")
+                }
+            }
+        }
+        return false
     }
 
     private fun cleanCommand(text: String): String {

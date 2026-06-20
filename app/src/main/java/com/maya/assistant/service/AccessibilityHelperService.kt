@@ -17,6 +17,8 @@ class AccessibilityHelperService : AccessibilityService() {
 
         var instance: AccessibilityHelperService? = null
         var currentRoot: AccessibilityNodeInfo? = null
+        var isConnected = false
+            private set
 
         fun isEnabled(context: Context): Boolean {
             val expectedComponentName =
@@ -61,10 +63,10 @@ class AccessibilityHelperService : AccessibilityService() {
         super.onServiceConnected()
 
         instance = this
+        isConnected = true
         SmartAccessibilityEngine.service = this
 
         serviceInfo = AccessibilityServiceInfo().apply {
-
             eventTypes =
                 AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                         AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
@@ -79,7 +81,8 @@ class AccessibilityHelperService : AccessibilityService() {
             flags =
                 AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
                         AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
-                        AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+                        AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
+                        AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE
 
             notificationTimeout = 50
         }
@@ -87,14 +90,13 @@ class AccessibilityHelperService : AccessibilityService() {
         currentRoot = rootInActiveWindow
 
         Log.d(TAG, "==============================")
-        Log.d(TAG, "MAYA ACCESSIBILITY CONNECTED")
+        Log.d(TAG, "MAYA ACCESSIBILITY CONNECTED ✅")
         Log.d(TAG, "==============================")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
         currentRoot = rootInActiveWindow
-        // AccessibilityEventManager.onEvent(event) — removed, not needed
         Log.d(TAG, "EVENT -> ${event.packageName} | ${event.className}")
     }
 
@@ -106,6 +108,7 @@ class AccessibilityHelperService : AccessibilityService() {
         super.onDestroy()
 
         instance = null
+        isConnected = false
         currentRoot = null
         SmartAccessibilityEngine.service = null
 
