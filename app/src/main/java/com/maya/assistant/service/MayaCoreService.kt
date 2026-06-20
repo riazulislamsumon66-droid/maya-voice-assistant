@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import com.maya.assistant.R
 import com.maya.assistant.ui.main.MainActivity
 import kotlinx.coroutines.*
+import androidx.lifecycle.LifecycleService
 
 /**
  * MayaCoreService — Always-on background service
@@ -26,7 +27,7 @@ import kotlinx.coroutines.*
  * 3. Voice authentication (only Jaan's voice)
  * 4. Command execution only when authenticated
  */
-class MayaCoreService : Service() {
+class MayaCoreService : LifecycleService() {
 
     companion object {
         private const val TAG = "MayaCoreService"
@@ -51,7 +52,7 @@ class MayaCoreService : Service() {
         var instance: MayaCoreService? = null
             private set
 
-        fun canExecuteCommandsInstance(): Boolean {
+        fun canExecuteCommands(): Boolean {
             return instance?.canExecuteCommandsInstance() ?: true
         }
     }
@@ -320,7 +321,7 @@ class MayaCoreService : Service() {
         instance = null
         hotwordDetector?.stop()
         faceDetector?.stop()
-        voiceAuthManager?.stop()
+        // voiceAuthManager doesn't have a stop method
         serviceScope.cancel()
         Log.d(TAG, "MayaCoreService destroyed")
     }

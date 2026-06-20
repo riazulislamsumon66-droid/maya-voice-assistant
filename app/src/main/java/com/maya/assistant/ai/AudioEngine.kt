@@ -93,8 +93,9 @@ class AudioEngine(private val context: Context) {
         )
 
         try {
+            @Suppress("DEPRECATION")
             audioTrack = AudioTrack(
-                AudioManager.USAGE_MEDIA,
+                AudioManager.STREAM_MUSIC,
                 SPEAKER_SAMPLE_RATE,
                 CHANNEL_CONFIG_OUT,
                 AUDIO_FORMAT,

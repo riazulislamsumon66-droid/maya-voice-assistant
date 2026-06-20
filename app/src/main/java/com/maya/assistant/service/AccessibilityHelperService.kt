@@ -356,7 +356,7 @@ class AccessibilityHelperService : AccessibilityService() {
             showAccessibilityError()
             return
         }
-        performGlobalAction(AccessibilityService.ACTION_SCROLL_FORWARD)
+        performGlobalAction(4096) // ACTION_SCROLL_FORWARD
     }
 
     fun scrollUp() {
@@ -364,7 +364,7 @@ class AccessibilityHelperService : AccessibilityService() {
             showAccessibilityError()
             return
         }
-        performGlobalAction(AccessibilityService.ACTION_SCROLL_BACKWARD)
+        performGlobalAction(8192) // ACTION_SCROLL_BACKWARD
     }
 
     /**
