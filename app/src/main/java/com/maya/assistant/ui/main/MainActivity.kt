@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
     private fun startVoiceService() {
         val apiKey = prefs().getString(Constants.KEY_API_KEY, "") ?: ""
         if (apiKey.isEmpty()) {
-            addBotMessage("⚠️ API Key required. Please go to Settings → Enter Gemini API Key.")
+        addBotMessage(getString(R.string.api_key_required))
             return
         }
         ContextCompat.startForegroundService(this, Intent(this, ForegroundVoiceService::class.java))
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAccessibility() {
         if (!AccessibilityHelperService.isEnabled(this)) {
-            addBotMessage("⚠️ Enable Accessibility Service for app control. Settings → Accessibility.")
+            addBotMessage(getString(R.string.enable_accessibility))
         }
     }
 

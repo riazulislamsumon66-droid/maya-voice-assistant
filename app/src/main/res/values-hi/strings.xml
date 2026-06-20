@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MAYA</string>
+    <string name="app_tagline">AI सहायक</string>
+    <string name="system_ready">सिस्टम तैयार</string>
+    <string name="listening">सुन रहा है…</string>
+    <string name="thinking">सोच रहा है…</string>
+    <string name="speaking">बोल रहा है…</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="api_key_hint">Gemini API Key दर्ज करें</string>
+    <string name="save">सेटिंग्स सेव करें</string>
+    <string name="accessibility_enabled">एक्सेसिबिलिटी: सक्रिय ✅</string>
+    <string name="accessibility_disabled">एक्सेसिबिलिटी: निष्क्रिय ⚠️</string>
+    <string name="long_press_stop">रीकनेक्ट के लिए पकड़े रखें</string>
+    <string name="maya_full">M · A · Y · A</string>
+
+    <!-- Hindi -->
+    <string name="welcome_message">नमस्ते! मैं MAYA, आपकी व्यक्तिगत AI सहायक। मैं कैसे मदद कर सकती हूँ?</string>
+    <string name="tap_to_speak">बोलने के लिए टैप करें 💬</string>
+    <string name="listening_text">सुन रहा हूँ…</string>
+    <string name="thinking_text">सोच रहा हूँ…</string>
+    <string name="speaking_text">बोल रहा हूँ…</string>
+    <string name="connecting_text">कनेक्ट हो रहा है…</string>
+    <string name="disconnected_text">डिस्कनेक्ट हो गया</string>
+    <string name="error_text">त्रुटि हुई</string>
+    <string name="permission_required">अनुमति आवश्यक</string>
+    <string name="microphone_permission">वॉइस कमांड के लिए माइक्रोफोन अनुमति चाहिए</string>
+    <string name="camera_permission">फेस डिटेक्शन के लिए कैमरा अनुमति चाहिए</string>
+    <string name="contacts_permission">कॉल करने के लिए कॉन्टैक्ट अनुमति चाहिए</string>
+    <string name="accessibility_permission">स्क्रीन पढ़ने के लिए एक्सेसिबिलिटी अनुमति चाहिए</string>
+    <string name="overlay_permission">फ्लोटिंग बबल के लिए ओवरले अनुमति चाहिए</string>
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="api_key_title">Gemini API Key</string>
+    <string name="api_key_summary">अपना Gemini API key जोड़ें</string>
+    <string name="personality_mode">पर्सनैलिटी मोड</string>
+    <string name="voice_enrollment">वॉइस एनरोलमेंट</string>
+    <string name="voice_enrollment_summary">अपनी वॉइस प्रोफाइल रिकॉर्ड करने के लिए टैप करें</string>
+    <string name="voice_enrolled">✅ वॉइस एनरोल हो गया</string>
+    <string name="voice_not_enrolled">⚠️ वॉइस एनरोल नहीं हुआ</string>
+    <string name="face_enrollment">फेस एनरोलमेंट</string>
+    <string name="face_enrolled">✅ फेस एनरोल हो गया</string>
+    <string name="face_not_enrolled">⚠️ फेस एनरोल नहीं हुआ</string>
+    <string name="test_voice">वॉइस रिकग्निशन टेस्ट करें</string>
+    <string name="save_settings">सेटिंग्स सेव करें</string>
+    <string name="saved">सेटिंग्स सेव हो गई!</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="api_key_required">⚠️ API Key चाहिए। सेटिंग्स में जाएं → Gemini API Key दर्ज करें।</string>
+    <string name="enable_accessibility">⚠️ एक्सेसिबिलिटी सर्विस चालू करें। सेटिंग्स → एक्सेसिबिलिटी।</string>
+    <string name="reconnecting">रीकनेक्ट हो रहा है…</string>
+    <string name="hey_maya">Hey MAYA</string>
+</resources>

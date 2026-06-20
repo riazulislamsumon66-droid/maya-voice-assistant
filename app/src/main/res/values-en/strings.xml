@@ -14,7 +14,7 @@
     <string name="long_press_stop">Hold to reconnect</string>
     <string name="maya_full">M · A · Y · A</string>
 
-    <!-- MUST be translated -->
+    <!-- English -->
     <string name="welcome_message">Hi! I am MAYA, your personal AI assistant. How can I help you?</string>
     <string name="tap_to_speak">Tap to speak 💬</string>
     <string name="listening_text">Listening…</string>
