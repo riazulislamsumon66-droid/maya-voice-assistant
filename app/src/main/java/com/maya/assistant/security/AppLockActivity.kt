@@ -53,7 +53,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     private var tts: TextToSpeech? = null
     private var geminiClient: GeminiLiveClient? = null
     private var liveAudioManager: LiveAudioManager? = null
-    private var isGeminiConnected ✅ = false
+    private var isGeminiConnected = false
     private var isTtsReady = false
     private var speechRecognizer: SpeechRecognizer? = null
     private val handler = Handler(Looper.getMainLooper())
@@ -122,9 +122,9 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             tts?.language = Locale("bn", "BD")
             // Fallback in case WebSocket doesn't connect quickly
             handler.postDelayed({ 
-                if (!isGeminiConnected ✅) {
+                if (!isGeminiConnected) {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
-                    val greeting = if (mode == "gf") "আগে unlock কRow জান, তারপর use করতে দিবো।" else "আগে unlock কRow, তারপর continue কRow।"
+                    val greeting = if (mode == "gf") "আগে unlock do জান, তারপর use করতে দিবো।" else "আগে unlock do, তারপর continue do।"
                     speak(greeting, true) 
                 }
             }, 3000)
@@ -166,10 +166,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         tabVoice.visibility = if (hasVoice) View.VISIBLE else View.GONE
         tabFinger.visibility = if (hasFinger) View.VISIBLE else View.GONE
 
-        tabPin.setEnabledClickListener     { switchTab(Tab.PIN) }
-        tabPattern.setEnabledClickListener { switchTab(Tab.PATTERN) }
-        tabVoice.setEnabledClickListener   { switchTab(Tab.VOICE) }
-        tabFinger.setEnabledClickListener  { switchTab(Tab.FINGER) }
+        tabPin.setOnClickListener     { switchTab(Tab.PIN) }
+        tabPattern.setOnClickListener { switchTab(Tab.PATTERN) }
+        tabVoice.setOnClickListener   { switchTab(Tab.VOICE) }
+        tabFinger.setOnClickListener  { switchTab(Tab.FINGER) }
     }
 
     private fun switchTab(tab: Tab) {
@@ -191,8 +191,8 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         val map = mapOf(R.id.btn0 to "0", R.id.btn1 to "1", R.id.btn2 to "2",
             R.id.btn3 to "3", R.id.btn4 to "4", R.id.btn5 to "5",
             R.id.btn6 to "6", R.id.btn7 to "7", R.id.btn8 to "8", R.id.btn9 to "9")
-        map.forEach { (id, d) -> findViewById<Button>(id)?.setEnabledClickListener { appendPin(d) } }
-        findViewById<ImageButton>(R.id.backspaceBtn)?.setEnabledClickListener { backspacePin() }
+        map.forEach { (id, d) -> findViewById<Button>(id)?.setOnClickListener { appendPin(d) } }
+        findViewById<ImageButton>(R.id.backspaceBtn)?.setOnClickListener { backspacePin() }
     }
 
     private fun appendPin(d: String) {
@@ -253,8 +253,8 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             PatternManager.PatternResult.NOT_SET -> onSuccess()
             PatternManager.PatternResult.TOO_SHORT -> {
                 patternLockView.showError()
-                patternInstructionText.text = "Onেক ছোট — কমপক্ষে 4টা dots connect কRow"
-                speak("কমপক্ষে 4টা dots connect কRow", true)
+                patternInstructionText.text = "Onেক ছোট — কমপক্ষে 4টা dots connect do"
+                speak("কমপক্ষে 4টা dots connect do", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 900)
             }
             is PatternManager.PatternResult.WRONG -> {
@@ -276,10 +276,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private fun setupVoice() {
         val has = SecurityManager.hasVoicePassphrase(this)
-        voiceInstructionText.text = if (has) "মাইক ট্যাপ কRow এবং passphrase বলো" else "Voice passphrase Set করা হয়নি"
+        voiceInstructionText.text = if (has) "মাইক ট্যাপ do এবং passphrase বলো" else "Voice passphrase Set করা হয়নি"
         voiceBtn.alpha = if (has) 1f else 0.4f
         voiceBtn.isEnabled = has
-        voiceBtn.setEnabledClickListener { if (has) startVoiceListen() }
+        voiceBtn.setOnClickListener { if (has) startVoiceListen() }
     }
 
     private fun setupFinger() {
@@ -287,7 +287,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         val canAuth = biometricManager.canVerify(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
         
         if (canAuth == BiometricManager.BIOMETRIC_SUCCESS || SecurityManager.isBiometricEnabled(this)) {
-            fingerBtn.setEnabledClickListener { launchBiometric(false) }
+            fingerBtn.setOnClickListener { launchBiometric(false) }
             tabFinger.visibility = View.VISIBLE
         } else {
             tabFinger.visibility = View.GONE
@@ -318,13 +318,13 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("MAYA Unlock")
-            .setSubtitle("তোমার identity confirm কRow")
+            .setSubtitle("তোমার identity confirm do")
             .apply {
                 if (SecurityManager.isDeviceLockEnabled(this@AppLockActivity) || allowDeviceCredential) {
                     setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 } else {
                     setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                    setNegativeButtonText("Pattern/PIN ব্যবহার কRow")
+                    setNegativeButtonText("Pattern/PIN ব্যবহার do")
                 }
             }
             .build()
@@ -348,13 +348,13 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
                     voiceStatusText.text = "❌ Passphrase মিলেনি"
                     shakeView(voiceBtn)
                     speakWrong(1, false, "voice")
-                    handler.postDelayed({ voiceStatusText.text = "আবার try করতে মাইক ট্যাপ কRow" }, 2000)
+                    handler.postDelayed({ voiceStatusText.text = "আবার try করতে মাইক ট্যাপ do" }, 2000)
                 }
             }
             override fun onError(e: Int) {
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
-                voiceStatusText.text = "শুনতে পাচ্ছি না — আবার try করতে ট্যাপ কRow"
-                speak("বুঝতে পাচ্ছি না, আবার try কRow", true)
+                voiceStatusText.text = "শুনতে পাচ্ছি না — আবার try করতে ট্যাপ do"
+                speak("বুঝতে পাচ্ছি না, আবার try do", true)
             }
             override fun onReadyForSpeech(p: Bundle?) { voiceStatusText.text = "passphrase বলো..." }
             override fun onBeginningOfSpeech() {}
@@ -364,7 +364,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             override fun onPartialResults(p: Bundle?) {}
             override fun onEvent(t: Int, b: Bundle?) {}
         })
-        speechRecognizer?.startListening…(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        speechRecognizer?.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, "bn-BD")
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
@@ -399,7 +399,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
                     speak("এখন আবার try করতে পাRow", true)
                     return
                 }
-                lockoutTimerText.text = "পর আবার try কRow ${rem}s"
+                lockoutTimerText.text = "পর আবার try do ${rem}s"
                 rem--
                 handler.postDelayed(this, 1000)
             }
@@ -423,9 +423,9 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
                 else  -> "Onেক ভুল। ৩০ সেকেন্ড রুকো।"
             }
             type == "voice" -> when (mode) {
-                "gf"  -> "এই passphrase ছিল না জান! সঠিক বলে try কRow।"
-                "professional" -> "Voice passphrase মিলেনি। আবার try কRow।"
-                else  -> "ভুল passphrase। আবার try কRow।"
+                "gf"  -> "এই passphrase ছিল না জান! সঠিক বলে try do।"
+                "professional" -> "Voice passphrase মিলেনি। আবার try do।"
+                else  -> "ভুল passphrase। আবার try do।"
             }
             attempts == 1 -> when (mode) {
                 "gf"  -> "আরে ভুল! মন দিয়ে দাও, $rem mauke bache hain."
@@ -437,7 +437,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
                 "professional" -> "দ্বিতীয় Failedতা। Lockout এর আগে আরেকটা চেষ্টা।"
                 else  -> "আবার ভুল! আরেকটা সুযোগ বাKey!"
             }
-            else -> "ভুল! আবার try কRow।"
+            else -> "ভুল! আবার try do।"
         }
         speak(msg, true)
     }
@@ -458,17 +458,17 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             override fun onAudioReceived(data: ByteArray) { liveAudioManager?.playChunk(data) }
             override fun onTextReceived(text: String) {}
             override fun onConnected() { 
-                isGeminiConnected ✅ = true 
+                isGeminiConnected = true 
                 Log.d("MAYA_LOCK", "Gemini WebSocket Connected")
                 runOnUiThread {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
-                    val greeting = if (mode == "gf") "আগে unlock কRow জান, তারপর use করতে দিবো।" else "আগে unlock কRow, তারপর continue কRow।"
+                    val greeting = if (mode == "gf") "আগে unlock do জান, তারপর use করতে দিবো।" else "আগে unlock do, তারপর continue do।"
                     speak(greeting, true)
                 }
             }
             override fun onTurnComplete() {}
             override fun onError(msg: String) { 
-                isGeminiConnected ✅ = false 
+                isGeminiConnected = false 
                 Log.e("MAYA_LOCK", "Gemini WebSocket Error: $msg")
             }
         })
@@ -476,7 +476,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     private fun speak(text: String, hindi: Boolean) {
-        if (isGeminiConnected ✅) {
+        if (isGeminiConnected) {
             geminiClient?.sendTextMessage(text)
         } else if (isTtsReady) {
             tts?.language = if (hindi) Locale("bn", "BD") else Locale.ENGLISH
@@ -495,7 +495,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     override fun onBackPressed() { 
-        speak("আগে unlock কRow!", true)
+        speak("আগে unlock do!", true)
         // If they try to back out, go to home screen so they can't access the app
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_HOME)

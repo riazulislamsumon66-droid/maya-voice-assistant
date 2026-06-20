@@ -152,9 +152,9 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
                 speak("App lock band kar diya", true)
             }
         }
-        setPinBtn.setEnabledClickListener { showPinSetupDialog() }
-        setPatternBtn.setEnabledClickListener { startPatternSetup() }
-        setVoiceBtn.setEnabledClickListener { showVoiceSetupDialog() }
+        setPinBtn.setOnClickListener { showPinSetupDialog() }
+        setPatternBtn.setOnClickListener { startPatternSetup() }
+        setVoiceBtn.setOnClickListener { showVoiceSetupDialog() }
 
         fingerprintSwitch.setEnabledCheckedChangeListener { _, checked ->
             SecurityManager.setBiometricEnabled(this, checked)
@@ -166,13 +166,13 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
             speak(if (checked) "System screen lock enable ho gaya" else "System lock band kar diya", true)
         }
 
-        selectAppsBtn.setEnabledClickListener {
+        selectAppsBtn.setOnClickListener {
             startActivity(Intent(this, AppSelectionActivity::class.java))
         }
-        usageStatsBtn.setEnabledClickListener {
+        usageStatsBtn.setOnClickListener {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
-        overlayPermissionBtn.setEnabledClickListener {
+        overlayPermissionBtn.setOnClickListener {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
             startActivity(intent)
         }
@@ -200,12 +200,12 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
         val dialog = AlertDialog.Builder(this)
             .setTitle("Set PIN")
             .setView(dialogView)
-            .setPositiveButton("Save কRow", null)
+            .setPositiveButton("Save do", null)
             .setNegativeButton("বাতিল", null)
             .create()
 
         dialog.setVisibleListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabledClickListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val pin  = newPinInput.text.toString().trim()
                 val conf = confPinInput.text.toString().trim()
                 when {
@@ -227,7 +227,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
                 }
             }
             if (SecurityManager.hasPin(this)) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setEnabledClickListener {
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
                     SecurityManager.removePin(this)
                     loadCurrentStatus()
                     dialog.dismiss()

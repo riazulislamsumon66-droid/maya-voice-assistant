@@ -28,7 +28,7 @@ class WaveformView @JvmOverloads constructor(
         duration = 800
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpDateListener {
+        addUpdateListener {
             phase = it.animatedValue as Float
             invalidate()
         }

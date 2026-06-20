@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAccessibility() {
         if (!AccessibilityHelperService.isEnabled(this)) {
-            addBotMessage("⚠️ Accessibility Service Enabled কRow for app control. Settings → Accessibility.")
+            addBotMessage("⚠️ Accessibility Service Enabled do for app control. Settings → Accessibility.")
         }
     }
 

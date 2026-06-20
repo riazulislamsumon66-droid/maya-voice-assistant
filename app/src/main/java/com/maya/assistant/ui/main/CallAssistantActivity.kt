@@ -47,14 +47,14 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     // State management — FIXED: Proper flags
     private var isDecisionMade = false
-    private var isListening… = false
+    private var isListening = false
     private var announcementPlayed = false
-    private var isSpeaking… = false
+    private var isSpeaking = false
     private var isCallAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
     private lateinit var liveAudioManager: LiveAudioManager
-    private var isLiveConnected ✅ = false
+    private var isLiveConnected = false
 
     private val TAG = "MAYA_CALL_UI"
 
@@ -166,7 +166,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      */
     private fun startAnnouncement() {
         if (isDecisionMade || announcementPlayed) {
-            if (!isDecisionMade) startListening…()
+            if (!isDecisionMade) startListening()
             return
         }
 
@@ -183,7 +183,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // WebSocket audio duration estimate
         val estimatedDuration = (msg.length * 80L).coerceIn(3000L, 8000L)
         handler.postDelayed({
-            if (!isDecisionMade && !isSpeaking…) startListening…()
+            if (!isDecisionMade && !isSpeaking) startListening()
         }, estimatedDuration)
     }
 
@@ -257,9 +257,9 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         liveClient = GeminiLiveClient(apiKey, prompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) {
-                isSpeaking… = true
+                isSpeaking = true
                 liveAudioManager.playChunk(data)
-                runEnabledUiThread {
+                runOnUiThread {
                     statusText.text = "Speaking…... 💬"
                     waveformView?.startAnimation()
                 }
@@ -269,23 +269,23 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 Log.d(TAG, "Gemini Text: $text")
             }
 
-            override fun onConnected ✅() {
-                isLiveConnected ✅ = true
+            override fun onConnected() {
+                isLiveConnected = true
                 Log.d(TAG, "Gemini Live Connected ✅ ✅")
-                // Start কRow announcement once connected
+                // Start do announcement once connected
                 handler.postDelayed({ startAnnouncement() }, 500)
             }
 
             override fun onTurnComplete() {
-                isSpeaking… = false
-                runEnabledUiThread {
+                isSpeaking = false
+                runOnUiThread {
                     waveformView?.stopAnimation()
-                    if (!isDecisionMade) startListening…()
+                    if (!isDecisionMade) startListening()
                 }
             }
 
             override fun onError(msg: String) {
-                isLiveConnected ✅ = false
+                isLiveConnected = false
                 Log.e(TAG, "Gemini Error: $msg")
                 // Fallback to TTS
                 handler.postDelayed({
@@ -300,8 +300,8 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      * ✅ NEW: Speak via WebSocket (natural voice)
      */
     private fun speakViaWebSocket(text: String) {
-        if (isLiveConnected ✅) {
-            isSpeaking… = true
+        if (isLiveConnected) {
+            isSpeaking = true
             liveClient.sendTextMessage(text)
             Log.d(TAG, "Speaking… via WebSocket: $text")
             return
@@ -318,12 +318,12 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         Log.d(TAG, "Robotic TTS skipped for: $text")
     }
 
-    private fun startListening…() {
-        if (isDecisionMade || isListening… || isSpeaking…) return
-        isListening… = true
+    private fun startListening() {
+        if (isDecisionMade || isListening || isSpeaking) return
+        isListening = true
 
         statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
-        Log.d(TAG, "Start কRowing voice recognition")
+        Log.d(TAG, "Start doing voice recognition")
 
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
             Log.e(TAG, "Speech recognition not available")
@@ -336,7 +336,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
 
             override fun onResults(results: Bundle?) {
-                isListening… = false
+                isListening = false
                 val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 val spoken = texts?.firstOrNull()?.lowercase()?.trim() ?: ""
                 Log.d(TAG, "ব্যবহারকারী said: '$spoken'")
@@ -349,7 +349,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
 
             override fun onError(errorCode: Int) {
-                isListening… = false
+                isListening = false
                 val errorMsg = when (errorCode) {
                     SpeechRecognizer.ERROR_NO_MATCH -> "NO_MATCH"
                     SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "TIMEOUT"
@@ -359,7 +359,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 Log.w(TAG, "Speech error: $errorMsg")
 
                 if (!isDecisionMade) {
-                    handler.postDelayed({ if (!isDecisionMade) startListening…() }, 1500)
+                    handler.postDelayed({ if (!isDecisionMade) startListening() }, 1500)
                 }
             }
 
@@ -392,7 +392,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000)
         }
-        speechRecognizer?.startListening…(intent)
+        speechRecognizer?.startListening(intent)
     }
 
     /**
@@ -480,10 +480,10 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             isReject -> performReject()
             else -> {
                 // ✅ ENHANCED: If not answer/reject, let Gemini handle the query naturally
-                if (isLiveConnected ✅) {
+                if (isLiveConnected) {
                     Log.d(TAG, "Passing unrecognized command to Gemini: $spoken")
-                    isSpeaking… = true
-                    runEnabledUiThread { statusText.text = "Thinking…... 🤔" }
+                    isSpeaking = true
+                    runOnUiThread { statusText.text = "Thinking…... 🤔" }
                     liveClient.sendTextMessage(spoken)
                 } else {
                     val confusion = when (personality) {
@@ -504,7 +504,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if (isDecisionMade) return
         isDecisionMade = true
         isCallAnswered = true
-        stopListening…()
+        stopListening()
 
         val confirmMsg = when (personality) {
             "gf"  -> "Ji $userName, call utha rahi hoon! 📞"
@@ -612,7 +612,7 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun performReject() {
         if (isDecisionMade) return
         isDecisionMade = true
-        stopListening…()
+        stopListening()
 
         val confirmMsg = when (personality) {
             "gf"  -> "Theek hai $userName, call reject kar diya. ❌"
@@ -720,8 +720,8 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         startAnnouncement()
     }
 
-    private fun stopListening…() {
-        isListening… = false
+    private fun stopListening() {
+        isListening = false
         try {
             speechRecognizer?.cancel()
         } catch (_: Exception) {}
@@ -749,11 +749,11 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             try { speechRecognizer?.cancel() } catch (_: Exception) {}
             try { speechRecognizer?.destroy() } catch (_: Exception) {}
 
-            // ✅ FIXED: Reset কRow state properly
+            // ✅ FIXED: Reset do state properly
             isDecisionMade = false
-            isListening… = false
+            isListening = false
             announcementPlayed = false
-            isSpeaking… = false
+            isSpeaking = false
 
             finish()
         }
@@ -781,11 +781,11 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         liveAudioManager.stop()
         speechRecognizer?.destroy()
 
-        // ✅ FIXED: Reset কRow all states on destroy
+        // ✅ FIXED: Reset do all states on destroy
         isDecisionMade = false
-        isListening… = false
+        isListening = false
         announcementPlayed = false
-        isSpeaking… = false
+        isSpeaking = false
         isCallAnswered = false
 
         Log.d(TAG, "কলAsিস্ট্যান্টActivity destroyed")

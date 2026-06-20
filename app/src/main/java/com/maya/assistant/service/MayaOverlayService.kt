@@ -71,7 +71,7 @@ class MayaOverlayService : Service() {
         windowManager?.addView(overlayView, params)
         isVisible = true
 
-        // Start কRow orb animation
+        // Start do orb animation
         setupOverlayInteraction()
         startOrbPulse()
 
@@ -88,9 +88,9 @@ class MayaOverlayService : Service() {
             val closeBtn = findViewById<ImageView>(R.id.closeOverlayBtn)
             val mayaLabel = findViewById<TextView>(R.id.respondingLabel)
 
-            closeBtn?.setEnabledClickListener { hideOverlay() }
+            closeBtn?.setOnClickListener { hideOverlay() }
 
-            orbContainer?.setEnabledClickListener {
+            orbContainer?.setOnClickListener {
                 val intent = Intent(this@MayaOverlayService, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 }

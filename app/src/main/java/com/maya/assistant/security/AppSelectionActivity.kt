@@ -112,7 +112,7 @@ class AppSelectionActivity : AppCompatActivity() {
                 updateLock(app, isChecked)
             }
 
-            holder.itemView.setEnabledClickListener {
+            holder.itemView.setOnClickListener {
                 holder.checkbox.isChecked = !holder.checkbox.isChecked
             }
         }

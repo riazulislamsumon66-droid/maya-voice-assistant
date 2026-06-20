@@ -49,8 +49,8 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
             override fun onPatternCleared() {}
         }
 
-        retryBtn.setEnabledClickListener { resetSetup() }
-        cancelBtn.setEnabledClickListener { finish() }
+        retryBtn.setOnClickListener { resetSetup() }
+        cancelBtn.setOnClickListener { finish() }
     }
 
     private fun handlePattern(pattern: List<Int>) {
@@ -58,25 +58,25 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
             // First time drawing
             if (pattern.size < PatternLockView.MIN_PATTERN_LENGTH) {
                 patternLockView.showError()
-                instructionText.text = "Bohat chota hai! কমপক্ষে 4টা dots connect কRow"
-                speak("কমপক্ষে 4টা dots connect কRow", true)
+                instructionText.text = "Bohat chota hai! কমপক্ষে 4টা dots connect do"
+                speak("কমপক্ষে 4টা dots connect do", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
                 return
             }
 
             firstPattern = pattern
             patternLockView.showSuccess()
-            speak("এখন আবার এঁকে confirm কRow", true)
+            speak("এখন আবার এঁকে confirm do", true)
             
             handler.postDelayed({
                 isConfirming = true
-                instructionText.text = "নিশ্চিত কRow karne ke liye dobara draw karo"
+                instructionText.text = "নিশ্চিত do karne ke liye dobara draw karo"
                 patternLockView.clearPattern()
                 retryBtn.visibility = View.VISIBLE
             }, 700)
             
         } else {
-            // নিশ্চিত কRowing the pattern
+            // নিশ্চিত doing the pattern
             val first = firstPattern ?: return
             if (pattern.joinToString("-") == first.joinToString("-")) {
                 // Success!
@@ -94,7 +94,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
             } else {
                 // Mismatch
                 patternLockView.showError()
-                instructionText.text = "Pattern match nahi hua! আবার চেষ্টা কRow"
+                instructionText.text = "Pattern match nahi hua! আবার চেষ্টা do"
                 speak("Pattern match nahi hua! Dobara try karo", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
             }

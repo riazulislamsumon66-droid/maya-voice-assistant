@@ -48,7 +48,7 @@ object BiometricManager {
     }
 
     /**
-     * Enabled কRow/disable biometric
+     * Enabled do/disable biometric
      */
     fun setBiometricEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -103,9 +103,9 @@ object BiometricManager {
         // Create PromptInfo using the builder
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("MAYA নিরাপত্তা")
-            .setSubtitle("যাচাই কRow your identity")
+            .setSubtitle("যাচাই do your identity")
             .setDescription("আঙুল sensor এ রাখো")
-            .setNegativeButtonText("PIN ব্যবহার কRow")
+            .setNegativeButtonText("PIN ব্যবহার do")
             .build()
 
         // Get activity from context
@@ -127,7 +127,7 @@ object BiometricManager {
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
                     Log.w(TAG, "বায়োমেট্রিক authentication failed")
-                    onError("Fingerprint not recognized. আবার চেষ্টা কRow.")
+                    onError("Fingerprint not recognized. আবার চেষ্টা do.")
                 }
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -160,7 +160,7 @@ object BiometricManager {
     }
 
     /**
-     * Reset কRow authentication state
+     * Reset do authentication state
      */
     fun resetAuth() {
         isVerified = false
@@ -168,7 +168,7 @@ object BiometricManager {
     }
 
     /**
-     * Save কRow authentication time
+     * Save do authentication time
      */
     private fun saveAuthTime(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -198,7 +198,7 @@ object BiometricManager {
     }
 
     /**
-     * যাচাই কRow PIN
+     * যাচাই do PIN
      */
     fun verifyPin(context: Context, pin: String): Boolean {
         val storedHash = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

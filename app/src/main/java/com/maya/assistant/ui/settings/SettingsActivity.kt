@@ -135,9 +135,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        saveBtn.setEnabledClickListener { savePreferences() }
+        saveBtn.setOnClickListener { savePreferences() }
 
-        pickContactBtn.setEnabledClickListener {
+        pickContactBtn.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
             contactPickerLauncher.launch(intent)
         }
@@ -303,7 +303,7 @@ class SettingsActivity : AppCompatActivity() {
         prefs.putBoolean("call_announce_enabled", callAnnounceSwitch.isChecked)
 
         prefs.apply()
-        Toast.makeText(this, "Settings Save কRowd! MAYA updated. ✅", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Settings Save dod! MAYA updated. ✅", Toast.LENGTH_SHORT).show()
         finish()
     }
 

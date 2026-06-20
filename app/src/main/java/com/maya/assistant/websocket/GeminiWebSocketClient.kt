@@ -59,7 +59,7 @@ class GeminiWebSocketClient(
 
             override fun onClosed(ws: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
-                Log.d(TAG, "WS Off কRowd: $reason")
+                Log.d(TAG, "WS Off dod: $reason")
             }
         })
     }
