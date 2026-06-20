@@ -125,7 +125,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
         privateModeStatusText.text = if (pm) "🙈 Private Mode ON" else "👁️ Private Mode OFF"
         privateModeStatusText.setTextColor(if (pm) 0xFFFFAB40.toInt() else 0xFF888888.toInt())
 
-        encryptionStatusText.text = "🔐 AES-256-GCM (Android Keystore) — Always ON"
+        encryptionStatusText.text = "🔐 AES-256-GCM (Android Keystore) — সবসময় চালু"
         encryptionStatusText.setTextColor(0xFF00E676.toInt())
     }
 
@@ -134,8 +134,8 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
             if (checked) {
                 if (!SecurityManager.hasPin(this) && !PatternManager.isPatternSet(this)) {
                     appLockSwitch.isChecked = false
-                    toast("Pehle PIN ya Pattern set karo")
-                    speak("Pehle PIN ya pattern set karo tab lock enable hoga", true)
+                    toast("আগে PIN অথবা Pattern সেট করো")
+                    speak("আগে PIN অথবা pattern সেট করো, তারপর lock enable হবে", true)
                     return@setOnCheckedChangeListener
                 }
                 SecurityManager.setAppLockEnabled(this, true)
@@ -143,13 +143,13 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
                     PatternManager.enablePatternLock(this)
                 }
                 loadCurrentStatus()
-                speak("App lock on ho gaya!", true)
+                speak("App lock চালু করে দিলাম!", true)
             } else {
                 SecurityManager.setAppLockEnabled(this, false)
                 PatternManager.disablePatternLock(this)
                 loadCurrentStatus()
                 AppLockActivity.isUnlockedThisSession = true
-                speak("App lock band kar diya", true)
+                speak("App lock বন্ধ করে দিলাম", true)
             }
         }
         setPinBtn.setOnClickListener { showPinSetupDialog() }
@@ -158,12 +158,12 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
 
         fingerprintSwitch.setOnCheckedChangeListener { _, checked ->
             SecurityManager.setBiometricEnabled(this, checked)
-            speak(if (checked) "Fingerprint unlock enable ho gaya" else "Fingerprint unlock band kar diya", true)
+            speak(if (checked) "Fingerprint unlock চালু করে দিলাম" else "Fingerprint unlock বন্ধ করে দিলাম", true)
         }
 
         deviceLockSwitch.setOnCheckedChangeListener { _, checked ->
             SecurityManager.setDeviceLockEnabled(this, checked)
-            speak(if (checked) "System screen lock enable ho gaya" else "System lock band kar diya", true)
+            speak(if (checked) "System screen lock চালু করে দিলাম" else "System lock বন্ধ করে দিলাম", true)
         }
 
         selectAppsBtn.setOnClickListener {
@@ -179,14 +179,14 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
         privateModeSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
                 SecurityManager.enablePrivateMode(this)
-                privateModeStatusText.text = "🙈 Private Mode ON — Chat history hidden"
+                privateModeStatusText.text = "🙈 Private Mode ON — Chat history লুকানো আছে"
                 privateModeStatusText.setTextColor(0xFFFFAB40.toInt())
-                speak("Private mode on. Chat history chhup jayegi.", true)
+                speak("Private mode চালু। Chat history লুকিয়ে যাবে।", true)
             } else {
                 SecurityManager.disablePrivateMode(this)
                 privateModeStatusText.text = "👁️ Private Mode OFF"
                 privateModeStatusText.setTextColor(0xFF888888.toInt())
-                speak("Private mode band.", true)
+                speak("Private mode বন্ধ।", true)
             }
         }
     }
@@ -198,10 +198,10 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
         val errorText    = dialogView.findViewById<TextView>(R.id.pinErrorText)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Set PIN")
+            .setTitle("PIN সেট করো")
             .setView(dialogView)
-            .setPositiveButton("Save", null)
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton("সেভ করো", null)
+            .setNegativeButton("বাতিল", null)
             .create()
 
         dialog.setOnShowListener {
@@ -210,18 +210,18 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
                 val conf = confPinInput.text.toString().trim()
                 when {
                     pin.length != 4 -> {
-                        errorText.text = "PIN must be exactly 4 digits"
+                        errorText.text = "PIN ঠিক ৪ ডিজিট হতে হবে"
                         errorText.visibility = View.VISIBLE
                     }
                     pin != conf -> {
-                        errorText.text = "PINs do not match"
+                        errorText.text = "PIN মিলছে না"
                         errorText.visibility = View.VISIBLE
                     }
                     else -> {
                         SecurityManager.setPin(this, pin)
                         SecurityManager.setAppLockEnabled(this, true)
                         loadCurrentStatus()
-                        speak("PIN set ho gaya!", true)
+                        speak("PIN সেট হয়ে গেছে!", true)
                         dialog.dismiss()
                     }
                 }

@@ -48,4 +48,19 @@
     <string name="enable_accessibility">⚠️ অ্যাক্সেসিবিলিটি সার্ভিস চালু করুন। সেটিংস → অ্যাক্সেসিবিলিটি।</string>
     <string name="reconnecting">পুনরায় সংযুক্ত হচ্ছে…</string>
     <string name="hey_maya">Hey MAYA</string>
+    <string name="device_locked">Device লক আছে</string>
+    <string name="pin">PIN</string>
+    <string name="pattern">Pattern</string>
+    <string name="voice">ভয়েস</string>
+    <string name="finger">আঙুল</string>
+    <string name="enter_pin">PIN দিন</string>
+    <string name="draw_pattern">তোমার unlock pattern এঁকো</string>
+    <string name="tap_mic_passphrase">মাইক ট্যাপ করো এবং passphrase বলো</string>
+    <string name="fingerprint_auth">Fingerprint দিয়ে ভেরিফাই করো</string>
+    <string name="too_many_attempts">অনেক বেশি চেষ্টা করেছো</string>
+    <string name="please_wait">অনুগ্রহ করে অপেক্ষা করো…</string>
+    <string name="select_apps_lock">কোন Apps লক করতে চাও সিলেক্ট করো</string>
+    <string name="caller_name">কলারের নাম</string>
+    <string name="incoming_call">কল আসছে…</string>
+    <string name="say_answer_reject">বলো \'উঠাও\' বা \'রিজেক্ট\'</string>
 </resources>

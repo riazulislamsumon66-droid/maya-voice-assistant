@@ -3,6 +3,7 @@ package com.maya.assistant.ai
 object AIResponseManager {
 
     private val THINKING_FILTERS = listOf(
+        // English filters
         "Responding to the Greeting",
         "I've registered the Hindi greeting.",
         "Now, I'm formulating",
@@ -10,7 +11,14 @@ object AIResponseManager {
         "adhering to appropriate cultural etiquette.",
         "Formulating",
         "Let me think",
-        "Processing"
+        "Processing",
+        "Responding to",
+        "I've registered",
+        // Bangla filters (বাংলা)
+        "উত্তর দিচ্ছি",
+        "ভাবছি",
+        "প্রসেসিং",
+        "বিশ্লেষণ করছি"
     )
 
     fun clean(raw: String): String {

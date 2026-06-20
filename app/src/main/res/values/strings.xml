@@ -48,4 +48,19 @@
     <string name="enable_accessibility">⚠️ Enable Accessibility Service for app control. Settings → Accessibility.</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="hey_maya">Hey MAYA</string>
+    <string name="device_locked">Device Locked</string>
+    <string name="pin">PIN</string>
+    <string name="pattern">Pattern</string>
+    <string name="voice">Voice</string>
+    <string name="finger">Finger</string>
+    <string name="enter_pin">Enter PIN</string>
+    <string name="draw_pattern">Draw your unlock pattern</string>
+    <string name="tap_mic_passphrase">Tap mic &amp; say your passphrase</string>
+    <string name="fingerprint_auth">Authenticate with Fingerprint</string>
+    <string name="too_many_attempts">Too many attempts</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="select_apps_lock">Select Apps to Lock</string>
+    <string name="caller_name">Caller Name</string>
+    <string name="incoming_call">Incoming Call…</string>
+    <string name="say_answer_reject">Say \'উঠাও\' or \'রিজেক্ট\'</string>
 </resources>

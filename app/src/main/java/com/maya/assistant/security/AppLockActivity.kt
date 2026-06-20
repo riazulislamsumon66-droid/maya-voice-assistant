@@ -124,7 +124,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             handler.postDelayed({ 
                 if (!isGeminiConnected) {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
-                    val greeting = if (mode == "gf") "Pehle unlock karo jaan, phir use karne dungi." else "Please unlock to continue."
+                    val greeting = if (mode == "gf") "আগে unlock করো জান, তারপর use করতে দিবো।" else "Please unlock to continue."
                     speak(greeting, true) 
                 }
             }, 3000)
@@ -229,21 +229,21 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         pinAttemptsText.text = "Wrong: ${r.attempts}/3"
         pinAttemptsText.setTextColor(if (r.attempts >= 2) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
         shakeView(pinDisplay)
-        pinStatusText.text = if (r.lockedOut) "🔒 Locked 30s" else "❌ Wrong PIN"
+        pinStatusText.text = if (r.lockedOut) "🔒 ৩০ সেকেন্ড লক" else "❌ ভুল PIN"
         pinStatusText.setTextColor(0xFFFF1744.toInt())
         if (r.lockedOut) startLockout(30)
-        else handler.postDelayed({ pinStatusText.text = "Enter PIN"; pinStatusText.setTextColor(0xFFFFFFFF.toInt()) }, 1500)
+        else handler.postDelayed({ pinStatusText.text = "PIN দিন"; pinStatusText.setTextColor(0xFFFFFFFF.toInt()) }, 1500)
         speakWrong(r.attempts, r.lockedOut, "pin")
     }
 
     private fun setupPattern() {
-        patternInstructionText.text = "Draw your unlock pattern"
+        patternInstructionText.text = "তোমার unlock pattern এঁকো"
         patternLockView.listener = object : PatternLockView.PatternListener {
-            override fun onPatternStarted() { patternInstructionText.text = "Keep drawing..." }
+            override fun onPatternStarted() { patternInstructionText.text = "আরো টানো..." }
             override fun onPatternComplete(pattern: List<Int>) {
                 handler.postDelayed({ verifyPattern(pattern) }, 150)
             }
-            override fun onPatternCleared() { patternInstructionText.text = "Draw your unlock pattern" }
+            override fun onPatternCleared() { patternInstructionText.text = "তোমার unlock pattern এঁকো" }
         }
     }
 
@@ -253,18 +253,18 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             PatternManager.PatternResult.NOT_SET -> onSuccess()
             PatternManager.PatternResult.TOO_SHORT -> {
                 patternLockView.showError()
-                patternInstructionText.text = "Too short — connect at least 4 dots"
-                speak("Kam se kam 4 dots connect karo", true)
+                patternInstructionText.text = "খুব ছোট — কমপক্ষে ৪টা dot যোগ করো"
+                speak("কমপক্ষে ৪টা dot যোগ করো", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 900)
             }
             is PatternManager.PatternResult.WRONG -> {
                 patternLockView.showError()
                 val rem = PatternManager.getRemainingAttempts(this)
-                patternAttemptsText.text = "Wrong — $rem attempts left"
+                patternAttemptsText.text = "ভুল — $rem বার বাকি আছে"
                 patternAttemptsText.setTextColor(if (r.attempts >= 3) 0xFFFF1744.toInt() else 0xFFFFAB40.toInt())
                 if (r.lockedOut) startLockout(30)
                 else handler.postDelayed({ patternLockView.clearPattern()
-                    patternInstructionText.text = "Draw your unlock pattern" }, 900)
+                    patternInstructionText.text = "তোমার unlock pattern এঁকো" }, 900)
                 speakWrong(r.attempts, r.lockedOut, "pattern")
             }
             is PatternManager.PatternResult.LOCKED_OUT -> {
@@ -276,7 +276,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun setupVoice() {
         val has = SecurityManager.hasVoicePassphrase(this)
-        voiceInstructionText.text = if (has) "Tap mic & say your passphrase" else "Voice passphrase not configured"
+        voiceInstructionText.text = if (has) "মাইক ট্যাপ করো এবং তোমার passphrase বলো" else "Voice passphrase সেট করা নেই"
         voiceBtn.alpha = if (has) 1f else 0.4f
         voiceBtn.isEnabled = has
         voiceBtn.setOnClickListener { if (has) startVoiceListen() }
@@ -300,7 +300,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                fingerStatusText.text = "✅ Success!"
+                fingerStatusText.text = "✅ সফল!"
                 onSuccess()
             }
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -312,7 +312,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
-                fingerStatusText.text = "❌ Authentication failed"
+                fingerStatusText.text = "❌ ফেল হয়েছে"
             }
         })
 
@@ -333,7 +333,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun startVoiceListen() {
-        voiceStatusText.text = "🎙️ Listening for passphrase..."
+        voiceStatusText.text = "🎙️ passphrase শুনছি..."
         voiceBtn.setImageResource(R.drawable.ic_mic_on)
         speechRecognizer?.destroy()
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
@@ -342,10 +342,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 val spoken = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
                 if (SecurityManager.verifyVoicePassphrase(this@AppLockActivity, spoken)) {
-                    voiceStatusText.text = "✅ Verified!"
+                    voiceStatusText.text = "✅ ভেরিফাই হয়েছে!"
                     onSuccess()
                 } else {
-                    voiceStatusText.text = "❌ Passphrase did not match"
+                    voiceStatusText.text = "❌ passphrase মিলছে না"
                     shakeView(voiceBtn)
                     speakWrong(1, false, "voice")
                     handler.postDelayed({ voiceStatusText.text = "Tap mic to try again" }, 2000)
@@ -353,14 +353,14 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
             override fun onError(e: Int) {
                 voiceBtn.setImageResource(R.drawable.ic_mic_off)
-                voiceStatusText.text = "Could not hear — tap to retry"
-                speak("Samajh nahi aaya, dobara try karo", true)
+                voiceStatusText.text = "শুনতে পাচ্ছি না — আবার ট্যাপ করো"
+                speak("বুঝলাম না, আবার try করো", true)
             }
-            override fun onReadyForSpeech(p: Bundle?) { voiceStatusText.text = "Say your passphrase..." }
+            override fun onReadyForSpeech(p: Bundle?) { voiceStatusText.text = "তোমার passphrase বলো..." }
             override fun onBeginningOfSpeech() {}
             override fun onRmsChanged(r: Float) {}
             override fun onBufferReceived(b: ByteArray?) {}
-            override fun onEndOfSpeech() { voiceStatusText.text = "Processing..." }
+            override fun onEndOfSpeech() { voiceStatusText.text = "প্রসেস করছি..." }
             override fun onPartialResults(p: Bundle?) {}
             override fun onEvent(t: Int, b: Bundle?) {}
         })
@@ -374,12 +374,12 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun onSuccess() {
         isUnlockedThisSession = true
         val prefs = getSharedPreferences("maya_prefs", MODE_PRIVATE)
-        val name  = prefs.getString("user_name", "Jaan") ?: "Jaan"
+        val name  = prefs.getString("user_name", "জান") ?: "জান"
         val mode  = prefs.getString("personality_mode", "gf") ?: "gf"
         val msg = when (mode) {
-            "gf"           -> "Lock khul gaya! Aa gaye $name! Welcome back!"
-            "professional" -> "Lock khul gaya. Welcome back $name."
-            else           -> "Lock khul gaya! Unlock successful."
+            "gf"           -> "Lock খুলে গেছে! এসে গেছো $name! Welcome back!"
+            "professional" -> "Lock খুলে গেছে। Welcome back $name."
+            else           -> "Lock খুলে গেছে! Unlock successful."
         }
         speak(msg, true)
         handler.postDelayed({ 
@@ -396,10 +396,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 if (rem <= 0) {
                     lockoutOverlay.visibility = View.GONE
                     PatternManager.resetAttempts(this@AppLockActivity)
-                    speak("Ab try kar sakte ho", true)
+                    speak("এখন try করতে পারবে", true)
                     return
                 }
-                lockoutTimerText.text = "Try again in ${rem}s"
+                lockoutTimerText.text = "${rem} সেকেন্ড পর আবার try করো"
                 rem--
                 handler.postDelayed(this, 1000)
             }
@@ -418,26 +418,26 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val rem = 3 - attempts
         val msg = when {
             lockedOut -> when (mode) {
-                "gf"  -> "Yaar! Teen baar galat? Ruk ja, 30 second ke liye lock kar diya!"
-                "professional" -> "Too many failed attempts. Locked for 30 seconds."
-                else  -> "Bahut galat attempts. 30 second ruko."
+                "gf"  -> "ইশ! তিনবার ভুল? ৩০ সেকেন্ডের জন্য লক করে দিলাম!"
+                "professional" -> "অনেক বেশি ভুল। ৩০ সেকেন্ড লক করা হয়েছে।"
+                else  -> "অনেক বেশি ভুল। ৩০ সেকেন্ড রুকো।"
             }
             type == "voice" -> when (mode) {
-                "gf"  -> "Yeh passphrase nahi tha jaan! Sahi bolke try karo."
-                "professional" -> "Voice passphrase mismatch. Please try again."
-                else  -> "Galat passphrase. Dobara try karo."
+                "gf"  -> "এই passphrase না জান! ঠিক করে বলো।"
+                "professional" -> "Voice passphrase মিলছে না। আবার try করো।"
+                else  -> "ভুল passphrase। আবার try করো।"
             }
             attempts == 1 -> when (mode) {
-                "gf"  -> "Arre galat hai! Dhyan se daalo, $rem mauke bache hain."
-                "professional" -> "Incorrect. $rem attempts remaining."
-                else  -> "Galat! $rem baar aur try kar sakte ho."
+                "gf"  -> "আরে ভুল! মন দিয়ে দাও, $rem বার বাকি আছে।"
+                "professional" -> "ভুল। $rem বার বাকি আছে।"
+                else  -> "ভুল! $rem বার আর try করতে পারবে।"
             }
             attempts == 2 -> when (mode) {
-                "gf"  -> "Phir galat?! Ek aur galat aur lock ho jayega! Soch ke!"
-                "professional" -> "Second failure. One attempt remaining before lockout."
-                else  -> "Dobara galat! Ek mauka bacha hai!"
+                "gf"  -> "আবার ভুল?! আরেকটা ভুল হলে লক হয়ে যাবে! ভাবকে!"
+                "professional" -> "দ্বিতীয় ভুল। লকআউটের আগে আর একটাই বাকি।"
+                else  -> "আবার ভুল! আর একটাই বাকি!"
             }
-            else -> "Galat! Dobara try karo."
+            else -> "ভুল! আবার try করো."
         }
         speak(msg, true)
     }
@@ -495,7 +495,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     override fun onBackPressed() { 
-        speak("Pehle unlock karo!", true)
+        speak("আগে unlock করো!", true)
         // If they try to back out, go to home screen so they can't access the app
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_HOME)

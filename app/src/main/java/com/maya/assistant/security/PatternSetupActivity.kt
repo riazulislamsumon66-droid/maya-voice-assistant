@@ -39,7 +39,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         patternLockView.listener = object : PatternLockView.PatternListener {
             override fun onPatternStarted() {
-                instructionText.text = if (isConfirming) "Dobara draw karo..." else "Connect karte jao..."
+                instructionText.text = if (isConfirming) "আবার এঁকো..." else "যোগ করতে থাকো..."
             }
 
             override fun onPatternComplete(pattern: List<Int>) {
@@ -55,47 +55,43 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun handlePattern(pattern: List<Int>) {
         if (!isConfirming) {
-            // First time drawing
             if (pattern.size < PatternLockView.MIN_PATTERN_LENGTH) {
                 patternLockView.showError()
-                instructionText.text = "Bohat chota hai! Kam se kam 4 dots connect karo"
-                speak("Kam se kam 4 dots connect karo", true)
+                instructionText.text = "খুব ছোট! কমপক্ষে ৪টা dot যোগ করো"
+                speak("কমপক্ষে ৪টা dot যোগ করো", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
                 return
             }
 
             firstPattern = pattern
             patternLockView.showSuccess()
-            speak("Ab dobara draw karke confirm karo", true)
+            speak("এখন আবার এঁকে confirm করো", true)
             
             handler.postDelayed({
                 isConfirming = true
-                instructionText.text = "Confirm karne ke liye dobara draw karo"
+                instructionText.text = "Confirm করতে আবার এঁকো"
                 patternLockView.clearPattern()
                 retryBtn.visibility = View.VISIBLE
             }, 700)
             
         } else {
-            // Confirming the pattern
             val first = firstPattern ?: return
             if (pattern.joinToString("-") == first.joinToString("-")) {
-                // Success!
                 PatternManager.savePattern(this, pattern)
                 PatternManager.enablePatternLock(this)
                 SecurityManager.setAppLockEnabled(this, true)
                 patternLockView.showSuccess()
-                instructionText.text = "Pattern set ho gaya!"
-                speak("Pattern set ho gaya! Ab aapka app safe hai.", true)
+                instructionText.text = "Pattern সেট হয়ে গেছে!"
+                speak("Pattern সেট হয়ে গেছে! এখন তোমার app safe।", true)
                 
                 handler.postDelayed({
                     setResult(RESULT_OK)
                     finish()
                 }, 1500)
             } else {
-                // Mismatch
                 patternLockView.showError()
-                instructionText.text = "Pattern match nahi hua! Try again"
-                speak("Pattern match nahi hua! Dobara try karo", true)
+                instructionText.text = "Pattern মিলছে না! আবার try করো"
+                speak("Pattern মিলছে না! আবার try করো", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
             }
         }
@@ -106,13 +102,13 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         isConfirming = false
         patternLockView.clearPattern()
         retryBtn.visibility = View.INVISIBLE
-        instructionText.text = "Naya pattern draw karo"
-        speak("Thik hai, naya pattern draw karo", true)
+        instructionText.text = "নতুন pattern এঁকো"
+        speak("ঠিক আছে, নতুন pattern এঁকো", true)
     }
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            tts?.language = Locale("hi", "IN")
+            tts?.language = Locale("bn", "BD")
         }
     }
 

@@ -16,51 +16,51 @@ object DynamicDecisionEngine {
         return when (command.type) {
             CommandType.OPEN_APP -> {
                 val app = command.args["app"] ?: ""
-                if (AppLauncher.launch(context, app)) "Opening $app"
-                else "App not found: $app"
+                if (AppLauncher.launch(context, app)) "$app খুলছি"
+                else "$app পাওয়া যায়নি"
             }
 
             CommandType.VOLUME_UP -> {
                 SmartAccessibilityEngine.execute("VOLUME_UP")
-                "Volume badha diya"
+                "Volume বাড়িয়ে দিলাম"
             }
 
             CommandType.VOLUME_DOWN -> {
                 SmartAccessibilityEngine.execute("VOLUME_DOWN")
-                "Volume kam kiya"
+                "Volume কমিয়ে দিলাম"
             }
 
             CommandType.FLASHLIGHT_ON -> {
                 toggleFlashlight(context, true)
-                "Torch on kar diya"
+                "টর্চ চালু করে দিলাম"
             }
 
             CommandType.FLASHLIGHT_OFF -> {
                 toggleFlashlight(context, false)
-                "Torch off kar diya"
+                "টর্চ বন্ধ করে দিলাম"
             }
 
             CommandType.WHATSAPP_CALL -> {
                 SmartAccessibilityEngine.execute("WHATSAPP_CALL ${command.args["name"] ?: ""}")
-                "WhatsApp call kar rahi hoon"
+                "WhatsApp call করছি"
             }
 
             CommandType.WHATSAPP_MSG -> {
                 val name = command.args["name"] ?: ""
                 val msg = command.args["message"] ?: ""
                 SmartAccessibilityEngine.execute("WHATSAPP_MSG $name $msg")
-                "Message bhej rahi hoon"
+                "মেসেজ পাঠাচ্ছি"
             }
 
             CommandType.YOUTUBE_PLAY -> {
                 val query = command.args["query"] ?: ""
                 SmartAccessibilityEngine.execute("YOUTUBE_PLAY $query")
-                "YouTube play kar rahi hoon"
+                "YouTube এ চালাচ্ছি"
             }
 
             CommandType.CALL -> {
                 SmartAccessibilityEngine.execute("CALL ${command.args["name"] ?: ""}")
-                "Call kar rahi hoon"
+                "কল করছি"
             }
 
             else -> ""
