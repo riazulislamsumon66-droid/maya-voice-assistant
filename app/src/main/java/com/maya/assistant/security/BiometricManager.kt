@@ -36,13 +36,13 @@ object BiometricManager {
      */
     fun isবায়োমেট্রিকপাওয়া যাচ্ছে(context: Context): Boolean {
         val biometricManager = BiometricManager.from(context)
-        return biometricManager.canভেরিফাই কRow() == BiometricManager.BIOMETRIC_SUCCESS
+        return biometricManager.canVerify() == BiometricManager.BIOMETRIC_SUCCESS
     }
 
     /**
      * Check if user has enabled biometric in settings
      */
-    fun isবায়োমেট্রিকEnabled(context: Context): Boolean {
+    fun isBiometricEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false)
     }
@@ -73,7 +73,7 @@ object BiometricManager {
             return
         }
 
-        if (!isবায়োমেট্রিকEnabled(context)) {
+        if (!isBiometricEnabled(context)) {
             Log.d(TAG, "বায়োমেট্রিক not enabled, proceeding")
             onSuccess()
             return
@@ -101,7 +101,7 @@ object BiometricManager {
         val executor = ContextCompat.getMainExecutor(context)
 
         // Create Promptতথ্য using the builder
-        val promptতথ্য = BiometricPrompt.Promptতথ্য.Builder()
+        val promptInfo = BiometricPrompt.Promptতথ্য.Builder()
             .setTitle("MAYA নিরাপত্তা")
             .setSubtitle("যাচাই কRow your identity")
             .setDescription("আঙুল sensor এ রাখো")
@@ -115,23 +115,23 @@ object BiometricManager {
             activity,
             executor,
             object : BiometricPrompt.প্রমাণীকরণকলback() {
-                override fun onপ্রমাণীকরণSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
-                    super.onপ্রমাণীকরণSucceeded(result)
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
+                    super.onAuthenticationSucceeded(result)
                     Log.d(TAG, "✅ বায়োমেট্রিক authentication succeeded")
                     isভেরিফাই কRowd = true
-                    lastAuthসময় = System.currentসময়Millis()
+                    lastAuthসময় = System.currentTimeMillis()
                     saveAuthসময়(context)
                     onSuccess()
                 }
 
-                override fun onপ্রমাণীকরণFailed() {
-                    super.onপ্রমাণীকরণFailed()
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
                     Log.w(TAG, "বায়োমেট্রিক authentication failed")
                     onError("Fingerprint not recognized. আবার চেষ্টা কRow.")
                 }
 
-                override fun onপ্রমাণীকরণError(errorCode: Int, errString: CharSequence) {
-                    super.onপ্রমাণীকরণError(errorCode, errString)
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
                     Log.e(TAG, "বায়োমেট্রিক error: $errorCode - $errString")
                     if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
                         errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
@@ -143,7 +143,7 @@ object BiometricManager {
             }
         )
 
-        biometricPrompt.authenticate(promptতথ্য)
+        biometricPrompt.authenticate(promptInfo)
     }
 
     /**
@@ -154,7 +154,7 @@ object BiometricManager {
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val lastAuth = prefs.getLong(KEY_LAST_AUTH, 0)
-        val elapsed = System.currentসময়Millis() - lastAuth
+        val elapsed = System.currentTimeMillis() - lastAuth
 
         return elapsed < SESSION_TIMEOUT_MS
     }
@@ -173,7 +173,7 @@ object BiometricManager {
     private fun saveAuthসময়(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putLong(KEY_LAST_AUTH, System.currentসময়Millis())
+            .putLong(KEY_LAST_AUTH, System.currentTimeMillis())
             .apply()
     }
 

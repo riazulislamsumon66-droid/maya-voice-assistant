@@ -72,7 +72,7 @@ class AudioPlayer {
                 if (chunk != null) {
                     if (!wasPlaying) {
                         wasPlaying = true
-                        VoiceStateManager.setSpeaking…()
+                        VoiceStateManager.setSpeaking()
                         onPlaybackStarted?.invoke()
                     }
                     try {

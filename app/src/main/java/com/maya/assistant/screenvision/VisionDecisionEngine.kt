@@ -21,5 +21,5 @@ object VisionDecisionEngine {
 
     fun fillInputField(text: String): Boolean = TypingController.typeText(text)
 
-    fun describeCurrentScreen(): String = ScreenHierarchyParser.summarizeস্ক্রিন()
+    fun describeCurrentScreen(): String = ScreenHierarchyParser.summarizeScreen()
 }

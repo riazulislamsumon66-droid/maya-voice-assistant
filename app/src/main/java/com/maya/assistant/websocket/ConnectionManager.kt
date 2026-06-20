@@ -8,7 +8,7 @@ import com.maya.assistant.utils.Logger
 class ConnectionManager(
     private val apiKey: String,
     private val systemPrompt: String,
-    private val onConnected ✅: () -> Unit,
+    private val onConnected: () -> Unit,
     private val onAudioReceived: (ByteArray) -> Unit,
     private val onTextReceived: (String) -> Unit,
     private val onTurnComplete: () -> Unit,
@@ -27,9 +27,9 @@ class ConnectionManager(
     private fun createClient() {
         client = GeminiWebSocketClient(
             apiKey, systemPrompt,
-            onConnected ✅ = {
+            onConnected = {
                 reconnectAttempts = 0
-                onConnected ✅()
+                onConnected()
             },
             onAudioReceived = onAudioReceived,
             onTextReceived = onTextReceived,
@@ -54,5 +54,5 @@ class ConnectionManager(
         client = null
     }
 
-    fun isConnected ✅() = client?.isConnected ✅() == true
+    fun isConnected() = client?.isConnected() == true
 }

@@ -19,7 +19,7 @@ object PatternManager {
 
     fun savePattern(context: Context, pattern: List<Int>) {
         val raw = pattern.joinToString("-")
-        val encrypted = নিরাপত্তাManager.encrypt(raw)
+        val encrypted = SecurityManager.encrypt(raw)
         getPrefs(context).edit()
             .putString(KEY_PATTERN, encrypted)
             .putBoolean(KEY_PATTERN_ON, true)
@@ -41,15 +41,15 @@ object PatternManager {
 
         val prefs = getPrefs(context)
         val lockUntil = prefs.getLong(KEY_LOCKOUT_TILL, 0L)
-        if (System.currentসময়Millis() < lockUntil) {
-            val remaining = (lockUntil - System.currentসময়Millis()) / 1000
+        if (System.currentTimeMillis() < lockUntil) {
+            val remaining = (lockUntil - System.currentTimeMillis()) / 1000
             return PatternResult.LOCKED_OUT(remaining)
         }
 
         val stored = prefs.getString(KEY_PATTERN, null)
             ?: return PatternResult.NOT_SET
 
-        val decrypted = নিরাপত্তাManager.decrypt(stored)
+        val decrypted = SecurityManager.decrypt(stored)
         val inputStr   = inputPattern.joinToString("-")
 
         return if (inputStr == decrypted) {
@@ -66,7 +66,7 @@ object PatternManager {
         prefs.edit().putInt(KEY_WRONG_COUNT, attempts).apply()
 
         if (attempts >= MAX_ATTEMPTS) {
-            val lockUntil = System.currentসময়Millis() + LOCKOUT_MS
+            val lockUntil = System.currentTimeMillis() + LOCKOUT_MS
             prefs.edit().putLong(KEY_LOCKOUT_TILL, lockUntil).apply()
             return PatternResult.WRONG(attempts, lockedOut = true)
         }
@@ -101,8 +101,8 @@ object PatternManager {
 
     fun getLockoutRemaining(context: Context): Long {
         val until = getPrefs(context).getLong(KEY_LOCKOUT_TILL, 0L)
-        return if (System.currentসময়Millis() < until)
-            (until - System.currentসময়Millis()) / 1000
+        return if (System.currentTimeMillis() < until)
+            (until - System.currentTimeMillis()) / 1000
         else 0L
     }
 

@@ -20,16 +20,15 @@ class GeminiLiveClient(
     private val client = OkHttpClient.Builder()
         .readTimeout(0, TimeUnit.MILLISECONDS)
         .connectTimeout(20, TimeUnit.SECONDS)
-        .pingInterval(20, TimeUnit.SECONDS) // Connection ko zinda rakhne ke liye
+        .pingInterval(20, TimeUnit.SECONDS)
         .build()
 
-    // Aapka original model name
     private val URL = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=$apiKey"
 
     interface LiveListener {
         fun onAudioReceived(data: ByteArray)
         fun onTextReceived(text: String)
-        fun onConnected ✅()
+        fun onConnected()
         fun onTurnComplete()
         fun onError(msg: String)
     }
@@ -43,18 +42,15 @@ class GeminiLiveClient(
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d(TAG, "Connected ✅ ✅")
+                Log.d(TAG, "Connected")
                 sendSetup()
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                // Saara data JSON mein aata hai, use handle karein
                 handleResponse(text)
             }
 
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                // Gemini Live API hamesha JSON Text bhejta hai.
-                // Binary frame ki handle karne ki zaroorat nahi hai, par safety ke liye:
                 try {
                     handleResponse(bytes.utf8())
                 } catch (e: Exception) {
@@ -94,7 +90,7 @@ class GeminiLiveClient(
                 })
             }
             webSocket?.send(setupJson.toString())
-            Log.d(TAG, "Setup Sent ✅")
+            Log.d(TAG, "Setup Sent")
         } catch (e: Exception) {
             Log.e(TAG, "Setup Error: ${e.message}")
         }
@@ -125,35 +121,31 @@ class GeminiLiveClient(
             Log.d(TAG, "Raw response: ${jsonString.take(200)}...")
             val json = JSONObject(jsonString)
 
-            // Setup confirm karne ka sahi tarika
             if (json.has("setupComplete")) {
                 isSetupComplete = true
-                Log.d(TAG, "GEMINI READY ✅")
-                callback.onConnected ✅()
+                Log.d(TAG, "GEMINI READY")
+                callback.onConnected()
                 return
             }
 
-            // Handle setupComplete inside setupComplete object (sometimes nested)
             if (json.optJSONObject("setupComplete") != null) {
                 isSetupComplete = true
-                Log.d(TAG, "GEMINI READY (nested) ✅")
-                callback.onConnected ✅()
+                Log.d(TAG, "GEMINI READY (nested)")
+                callback.onConnected()
                 return
             }
 
-            // Handle serverContent
             val serverContent = json.optJSONObject("serverContent")
             if (serverContent == null) {
-                Log.d(TAG, "না serverContent in response")
+                Log.d(TAG, "No serverContent in response")
                 return
             }
 
-            // AI Response handle karein
             val modelTurn = serverContent.optJSONObject("modelTurn")
             if (modelTurn != null) {
                 val parts = modelTurn.optJSONArray("parts")
                 if (parts == null) {
-                    Log.d(TAG, "না parts in modelTurn")
+                    Log.d(TAG, "No parts in modelTurn")
                     return
                 }
 
@@ -163,7 +155,6 @@ class GeminiLiveClient(
                     val part = parts.getJSONObject(i)
                     Log.d(TAG, "Part $i: ${part.keys().asSequence().toList()}")
 
-                    // Audio Data (Awaaz)
                     if (part.has("inlineData")) {
                         val inlineData = part.getJSONObject("inlineData")
                         val mimeType = inlineData.optString("mimeType", "")
@@ -177,7 +168,6 @@ class GeminiLiveClient(
                         callback.onAudioReceived(audioBytes)
                     }
 
-                    // Text Data (Subtitles)
                     if (part.has("text")) {
                         val text = part.getString("text")
                         Log.d(TAG, "Text received: $text")
@@ -186,13 +176,11 @@ class GeminiLiveClient(
                 }
             }
 
-            // Handle turnComplete
             if (serverContent.optBoolean("turnComplete", false)) {
                 Log.d(TAG, "Turn complete")
                 callback.onTurnComplete()
             }
 
-            // Handle interruption
             if (serverContent.has("interrupted")) {
                 Log.d(TAG, "Response interrupted")
             }
@@ -205,7 +193,7 @@ class GeminiLiveClient(
     }
 
     fun disconnect() {
-        webSocket?.close(1000, "By")
+        webSocket?.close(1000, "Bye")
         isSetupComplete = false
     }
 }

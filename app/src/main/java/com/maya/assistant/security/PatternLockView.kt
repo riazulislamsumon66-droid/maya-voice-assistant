@@ -31,9 +31,9 @@ class PatternLockView @JvmOverloads constructor(
     }
 
     interface PatternListener {
-        fun onPatternStart কRowed()
+        fun onPatternStarted()
         fun onPatternComplete(pattern: List<Int>)
-        fun onPatternপরিষ্কার কRowed()
+        fun onPatternCleared()
     }
 
     var listener: PatternListener? = null
@@ -49,7 +49,7 @@ class PatternLockView @JvmOverloads constructor(
 
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STRঠিক আছেE
+        style = Paint.Style.STROKE
         strokeWidth = 10f
         strokeCap = Paint.Cap.ROUND
     }
@@ -147,7 +147,7 @@ class PatternLockView @JvmOverloads constructor(
         val dot = findNearestDot(x, y, radius) ?: return
 
         if (!selectedDots.contains(dot)) {
-            if (selectedDots.isEmpty()) listener?.onPatternStart কRowed()
+            if (selectedDots.isEmpty()) listener?.onPatternStarted()
 
             addএড়িয়ে যাওpedDot(dot)
             selectedDots.add(dot)
@@ -219,7 +219,7 @@ class PatternLockView @JvmOverloads constructor(
         clearPatternInternal()
         state = PatternState.NORMAL
         invalidate()
-        listener?.onPatternপরিষ্কার কRowed()
+        listener?.onPatternCleared()
     }
 
     private fun clearPatternInternal() {
@@ -230,6 +230,6 @@ class PatternLockView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        handler.removeকলbacksAndMessages(null)
+        handler.removeCallbacksAndMessages(null)
     }
 }

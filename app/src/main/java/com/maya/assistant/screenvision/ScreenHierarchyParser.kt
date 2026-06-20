@@ -23,7 +23,7 @@ object ScreenHierarchyParser {
 
     fun summarizeScreen(): String {
         val nodes = getCurrentNodes()
-        val texts = nodes.mapনাtNull { it.text?.ifBlank { null } ?: it.contentDesc?.ifBlank { null } }
+        val texts = nodes.mapNotNull { it.text?.ifBlank { null } ?: it.contentDesc?.ifBlank { null } }
         return "Package: ${getCurrentPackage()} | UI: ${texts.take(10).joinToString(", ")}"
     }
 }

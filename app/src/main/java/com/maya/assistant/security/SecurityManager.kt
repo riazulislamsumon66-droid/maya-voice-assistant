@@ -95,8 +95,8 @@ object SecurityManager {
 
     fun verifyPin(context: Context, inputPin: String): PinResult {
         val lockUntil = getPrefs(context).getLong(KEY_LOCKOUT_TIME, 0L)
-        if (System.currentসময়Millis() < lockUntil) {
-            val rem = (lockUntil - System.currentসময়Millis()) / 1000
+        if (System.currentTimeMillis() < lockUntil) {
+            val rem = (lockUntil - System.currentTimeMillis()) / 1000
             return PinResult.LOCKED_OUT(rem)
         }
         val stored = getPrefs(context).getString(KEY_PIN_HASH, null) ?: return PinResult.NOT_SET
@@ -114,7 +114,7 @@ object SecurityManager {
         val attempts = prefs.getInt(KEY_WRONG_ATTEMPTS, 0) + 1
         prefs.edit().putInt(KEY_WRONG_ATTEMPTS, attempts).apply()
         if (attempts >= MAX_ATTEMPTS) {
-            prefs.edit().putLong(KEY_LOCKOUT_TIME, System.currentসময়Millis() + LOCKOUT_MS).apply()
+            prefs.edit().putLong(KEY_LOCKOUT_TIME, System.currentTimeMillis() + LOCKOUT_MS).apply()
             return PinResult.WRONG(attempts, lockedOut = true)
         }
         return PinResult.WRONG(attempts, lockedOut = false)
@@ -153,8 +153,8 @@ object SecurityManager {
         if (spokenনাrm == storedPhrase) return true
         if (spokenনাrm.contains(storedPhrase)) return true
 
-        val storedWords = storedPhrase.split(" ").filter { it.isনাtEmpty() }
-        val spokenWords  = spokenনাrm.split(" ").filter { it.isনাtEmpty() }
+        val storedWords = storedPhrase.split(" ").filter { it.isNotEmpty() }
+        val spokenWords  = spokenনাrm.split(" ").filter { it.isNotEmpty() }
         if (storedWords.isEmpty()) return false
 
         val matchCount = storedWords.count { sw -> spokenWords.any { it.contains(sw) || sw.contains(it) } }
@@ -181,9 +181,9 @@ object SecurityManager {
 
     // ── BIOMETRIC ────────────────────────────────────────────────
 
-    fun isবায়োমেট্রিকEnabled(context: Context): Boolean {
+    fun isBiometricEnabled(context: Context): Boolean {
         val enabled = getPrefs(context).getBoolean(KEY_BIOMETRIC_ON, false)
-        Log.d(TAG, "isবায়োমেট্রিকEnabled: $enabled")
+        Log.d(TAG, "isBiometricEnabled: $enabled")
         return enabled
     }
     
@@ -206,7 +206,7 @@ object SecurityManager {
      */
     fun isPackageলক আছে(context: Context, packageName: String): Boolean {
         // Master check: If global app lock is off AND pattern is off, nothing is locked
-        if (!isAppLockEnabled(context) && !isবায়োমেট্রিকEnabled(context) && !isDeviceLockEnabled(context)) {
+        if (!isAppLockEnabled(context) && !isBiometricEnabled(context) && !isDeviceLockEnabled(context)) {
             return false
         }
 
@@ -241,7 +241,7 @@ object SecurityManager {
     fun getলক আছেPackages(context: Context): Set<String> {
         val stored = getPrefs(context).getString(KEY_LOCKED_PACKAGES, "") ?: ""
         return if (stored.isEmpty()) emptySet()
-               else stored.split(",").filter { it.isনাtEmpty() }.toSet()
+               else stored.split(",").filter { it.isNotEmpty() }.toSet()
     }
 
     private fun saveলক আছেPackages(context: Context, packages: Set<String>) {

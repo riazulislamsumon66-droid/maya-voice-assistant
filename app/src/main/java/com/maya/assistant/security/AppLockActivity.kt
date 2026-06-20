@@ -383,14 +383,14 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         }
         speak(msg, true)
         handler.postDelayed({ 
-            finishAndসরাওটাস্ক()
+            finishAndRemoveTaskাওটাস্ক()
         }, 1300)
     }
 
     private fun startLockout(seconds: Long) {
         lockoutOverlay.visibility = View.VISIBLE
         var rem = seconds
-        lockoutRunnable?.let { handler.removeকলbacks(it) }
+        lockoutRunnable?.let { handler.removeCallbacks(it) }
         lockoutRunnable = object : Runnable {
             override fun run() {
                 if (rem <= 0) {
@@ -457,10 +457,10 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         geminiClient = GeminiLiveClient(apiKey, systemPrompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) { liveAudioManager?.playChunk(data) }
             override fun onTextReceived(text: String) {}
-            override fun onConnected ✅() { 
+            override fun onConnected() { 
                 isGeminiConnected ✅ = true 
-                Log.d("MAYA_LOCK", "Gemini WebSocket Connected ✅ ✅")
-                runEnabledUiThread {
+                Log.d("MAYA_LOCK", "Gemini WebSocket Connected")
+                runOnUiThread {
                     val mode = getSharedPreferences("maya_prefs", MODE_PRIVATE).getString("personality_mode", "gf") ?: "gf"
                     val greeting = if (mode == "gf") "আগে unlock কRow জান, তারপর use করতে দিবো।" else "আগে unlock কRow, তারপর continue কRow।"
                     speak(greeting, true)
@@ -480,7 +480,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             geminiClient?.sendTextMessage(text)
         } else if (isTtsReady) {
             tts?.language = if (hindi) Locale("bn", "BD") else Locale.ENGLISH
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LOCK_${System.currentসময়Millis()}")
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LOCK_${System.currentTimeMillis()}")
         }
     }
 
@@ -504,7 +504,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
     }
 
     override fun onDestroy() {
-        lockoutRunnable?.let { handler.removeকলbacks(it) }
+        lockoutRunnable?.let { handler.removeCallbacks(it) }
         tts?.shutdown()
         speechRecognizer?.destroy()
         geminiClient?.disconnect()

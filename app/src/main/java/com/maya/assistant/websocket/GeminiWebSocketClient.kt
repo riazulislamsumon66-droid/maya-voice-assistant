@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 class GeminiWebSocketClient(
     private val apiKey: String,
     private val systemPrompt: String,
-    private val onConnected ✅: () -> Unit,
+    private val onConnected: () -> Unit,
     private val onAudioReceived: (ByteArray) -> Unit,
     private val onTextReceived: (String) -> Unit,
     private val onTurnComplete: () -> Unit,
@@ -39,7 +39,7 @@ class GeminiWebSocketClient(
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(ws: WebSocket, response: Response) {
-                Log.d(TAG, "Connected ✅ ✅")
+                Log.d(TAG, "Connected")
                 sendSetup(ws)
             }
 
@@ -131,7 +131,7 @@ class GeminiWebSocketClient(
             if (obj.has("setupComplete") || obj.optJSONObject("setupComplete") != null) {
                 isSetupComplete = true
                 Log.d(TAG, "Gemini Ready ✅")
-                onConnected ✅()
+                onConnected()
                 return
             }
 
@@ -169,5 +169,5 @@ class GeminiWebSocketClient(
         isSetupComplete = false
     }
 
-    fun isConnected ✅() = isSetupComplete
+    fun isConnected() = isSetupComplete
 }

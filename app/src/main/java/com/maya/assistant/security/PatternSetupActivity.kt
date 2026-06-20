@@ -38,7 +38,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
         cancelBtn = findViewById(R.id.cancelBtn)
 
         patternLockView.listener = object : PatternLockView.PatternListener {
-            override fun onPatternStart কRowed() {
+            override fun onPatternStarted() {
                 instructionText.text = if (isনিশ্চিত কRowing) "আবার এঁকো..." else "কানেক্ট করতে থাকো..."
             }
 
@@ -46,7 +46,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
                 handlePattern(pattern)
             }
 
-            override fun onPatternপরিষ্কার কRowed() {}
+            override fun onPatternCleared() {}
         }
 
         retryBtn.setEnabledClickListener { resetSetup() }
@@ -82,13 +82,13 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
                 // Success!
                 PatternManager.savePattern(this, pattern)
                 PatternManager.enablePatternLock(this)
-                নিরাপত্তাManager.setAppLockEnabled(this, true)
+                SecurityManager.setAppLockEnabled(this, true)
                 patternLockView.showSuccess()
                 instructionText.text = "Pattern Set হয়ে গেছে!"
                 speak("Pattern Set হয়ে গেছে! Ab aapka app safe hai.", true)
                 
                 handler.postDelayed({
-                    setResult(RESULT_ঠিক আছে)
+                    setResult(RESULT_OK)
                     finish()
                 }, 1500)
             } else {

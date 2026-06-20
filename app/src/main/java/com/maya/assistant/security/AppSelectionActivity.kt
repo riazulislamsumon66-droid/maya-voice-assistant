@@ -37,9 +37,9 @@ class AppSelect কRowionActivity : AppCompatActivity() {
             val apps = withContext(Dispatchers.IO) {
                 val pm = packageManager
                 val lockedApps =
-                    নিরাপত্তাManager.getলক আছেPackages(this@AppSelect কRowionActivity)
+                    SecurityManager.getলক আছেPackages(this@AppSelect কRowionActivity)
 
-                pm.getInstall কRowedApplications(PackageManager.GET_META_DATA)
+                pm.getInstalledApplications(PackageManager.GET_META_DATA)
                     .filter {
                         (it.flags and Applicationতথ্য.FLAG_SYSTEM) == 0 &&
                                 it.packageName != packageName
@@ -124,12 +124,12 @@ class AppSelect কRowionActivity : AppCompatActivity() {
             app.isলক আছে = locked
 
             if (locked) {
-                নিরাপত্তাManager.addলক আছেPackage(
+                SecurityManager.addলক আছেPackage(
                     this@AppSelect কRowionActivity,
                     app.packageName
                 )
             } else {
-                নিরাপত্তাManager.removeলক আছেPackage(
+                SecurityManager.removeলক আছেPackage(
                     this@AppSelect কRowionActivity,
                     app.packageName
                 )

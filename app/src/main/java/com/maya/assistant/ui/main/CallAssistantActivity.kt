@@ -49,7 +49,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     private var isDecisionMade = false
     private var isListening… = false
     private var announcementPlayed = false
-    private var isSpeaking… = false
+    private var isSpeaking = false
     private var isCallAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
@@ -183,7 +183,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         // WebSocket audio duration estimate
         val estimatedDuration = (msg.length * 80L).coerceIn(3000L, 8000L)
         handler.postDelayed({
-            if (!isDecisionMade && !isSpeaking…) startListening…()
+            if (!isDecisionMade && !isSpeaking) startListening…()
         }, estimatedDuration)
     }
 
@@ -257,9 +257,9 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
 
         liveClient = GeminiLiveClient(apiKey, prompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) {
-                isSpeaking… = true
+                isSpeaking = true
                 liveAudioManager.playChunk(data)
-                runEnabledUiThread {
+                runOnUiThread {
                     statusText.text = "Speaking…... 💬"
                     waveformView?.startAnimation()
                 }
@@ -269,16 +269,16 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
                 Log.d(TAG, "Gemini Text: $text")
             }
 
-            override fun onConnected ✅() {
+            override fun onConnected() {
                 isLiveConnected ✅ = true
-                Log.d(TAG, "Gemini Live Connected ✅ ✅")
+                Log.d(TAG, "Gemini Live Connected")
                 // Start কRow announcement once connected
                 handler.postDelayed({ startAnnouncement() }, 500)
             }
 
             override fun onTurnComplete() {
-                isSpeaking… = false
-                runEnabledUiThread {
+                isSpeaking = false
+                runOnUiThread {
                     waveformView?.stopAnimation()
                     if (!isDecisionMade) startListening…()
                 }
@@ -301,7 +301,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
      */
     private fun speakViaWebSocket(text: String) {
         if (isLiveConnected ✅) {
-            isSpeaking… = true
+            isSpeaking = true
             liveClient.sendTextMessage(text)
             Log.d(TAG, "Speaking… via WebSocket: $text")
             return
@@ -319,7 +319,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     }
 
     private fun startListening…() {
-        if (isDecisionMade || isListening… || isSpeaking…) return
+        if (isDecisionMade || isListening… || isSpeaking) return
         isListening… = true
 
         statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
@@ -482,8 +482,8 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
                 // ✅ ENHANCED: If not answer/reject, let Gemini handle the query naturally
                 if (isLiveConnected ✅) {
                     Log.d(TAG, "Passing unrecognized command to Gemini: $spoken")
-                    isSpeaking… = true
-                    runEnabledUiThread { statusText.text = "Thinking…... 🤔" }
+                    isSpeaking = true
+                    runOnUiThread { statusText.text = "Thinking…... 🤔" }
                     liveClient.sendTextMessage(spoken)
                 } else {
                     val confusion = when (personality) {
@@ -753,7 +753,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
             isDecisionMade = false
             isListening… = false
             announcementPlayed = false
-            isSpeaking… = false
+            isSpeaking = false
 
             finish()
         }
@@ -774,7 +774,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeকলbacksAndMessages(null)
+        handler.removeCallbacksAndMessages(null)
         try { unregisterReceiver(callStateReceiver) } catch (_: Exception) {}
         tts?.shutdown()
         if (::liveClient.isInitialized) liveClient.disconnect()
@@ -785,7 +785,7 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
         isDecisionMade = false
         isListening… = false
         announcementPlayed = false
-        isSpeaking… = false
+        isSpeaking = false
         isCallAnswered = false
 
         Log.d(TAG, "কলAsিস্ট্যান্টActivity destroyed")
