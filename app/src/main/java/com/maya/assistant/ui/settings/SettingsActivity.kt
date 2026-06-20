@@ -143,11 +143,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Original cards
-        findViewById<View>(R.id.accessibilityCard).setEnabledClickListener {
+        findViewById<View>(R.id.accessibilityCard).setOnClickListener {
             startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
 
-        findViewById<View>(R.id.deviceAdminCard).setEnabledClickListener {
+        findViewById<View>(R.id.deviceAdminCard).setOnClickListener {
             if (!devicePolicyManager.isActive(componentName)) {
                 val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                     putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
@@ -164,12 +164,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // NEW: কল announce switch
-        callAnnounceSwitch.setEnabledCheckedChangeListener { _, isChecked ->
+        callAnnounceSwitch.setOnCheckedChangeListener { _, isChecked ->
             updateCallAnnounceStatus(isChecked)
         }
 
         // NEW: Grant permissions button
-        grantPermissionsBtn.setEnabledClickListener {
+        grantPermissionsBtn.setOnClickListener {
             checkAndRequestPermissions()
         }
 

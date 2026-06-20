@@ -13,7 +13,7 @@ class AudioFocusManager(private val context: Context) {
     private var focusRequest: AudioFocusRequest? = null
 
     fun requestFocus(onGained: () -> Unit, onLost: () -> Unit) {
-        val listener = AudioManager.EnabledAudioFocusChangeListener { change ->
+        val listener = AudioManager.OnAudioFocusChangeListener { change ->
             when (change) {
                 AudioManager.AUDIOFOCUS_GAIN -> onGained()
                 AudioManager.AUDIOFOCUS_LOSS,
@@ -29,7 +29,7 @@ class AudioFocusManager(private val context: Context) {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build()
                 )
-                .setEnabledAudioFocusChangeListener(listener)
+                .setOnAudioFocusChangeListener(listener)
                 .build()
             val result = audioManager.requestAudioFocus(focusRequest!!)
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) onGained()
