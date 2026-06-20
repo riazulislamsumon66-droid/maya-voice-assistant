@@ -29,13 +29,7 @@ jobs:
         yes | sdkmanager "platforms;android-34"
         yes | sdkmanager "build-tools;34.0.0"
 
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-v3-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+    # No cache — fresh build every time to avoid stale AGP version issues
 
     - name: Create local.properties
       run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
