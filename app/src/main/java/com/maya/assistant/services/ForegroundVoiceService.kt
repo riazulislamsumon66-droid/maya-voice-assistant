@@ -99,13 +99,24 @@ class ForegroundVoiceService : Service() {
                 val clean = AIResponseManager.clean(text)
                 if (clean.isNotBlank()) {
                     ConversationMemory.addAssistant(clean)
+                    
+                    // Try structured command first
                     val cmd = AIResponseManager.extractCommand(clean)
                     if (cmd != null) {
                         scope.launch {
                             val intent = IntentAnalyzer.analyze(cmd)
                             DynamicDecisionEngine.execute(this@ForegroundVoiceService, intent)
                         }
+                    } else {
+                        // Direct natural language action detection
+                        scope.launch {
+                            val intent = IntentAnalyzer.analyze(clean)
+                            if (intent.type != CommandType.CONVERSATION) {
+                                DynamicDecisionEngine.execute(this@ForegroundVoiceService, intent)
+                            }
+                        }
                     }
+                    
                     // Broadcast to UI
                     sendBroadcast(Intent("MAYA_RESPONSE").putExtra("text", clean))
                 }
@@ -149,17 +160,33 @@ YOU ARE MAYA - My Yours Responsive Assistant.
 User's name is $userName.
 Personality: $personality.
 
-STRICT RULES:
-- Never explain or think aloud
-- Never say: "Responding to", "I've registered", "Formulating", "Interpreting", "Processing"
-- For device actions return ONLY the command:
-  OPEN_APP <name> | CALL <name> | WHATSAPP_CALL <name>
+## CRITICAL RULES:
+- For ANY device/app action, you MUST respond with ONLY the command in this exact format:
+  OPEN_APP <app_name> | CALL <name> | WHATSAPP_CALL <name>
   WHATSAPP_MSG <name> <message> | YOUTUBE_PLAY <query>
   SPOTIFY_PLAY <query> | FLASHLIGHT_ON | FLASHLIGHT_OFF
   VOLUME_UP | VOLUME_DOWN | SMS <name> <message>
-- For conversation: Reply short and natural in Banglish
+- Do NOT add any explanation, thinking, or extra text before/after the command
+- Do NOT say "Responding to", "I've registered", "Formulating", "Interpreting", "Processing"
+- For conversation only (no action needed): Reply short and natural in Banglish
 - Address user as $userName
 - Be warm, witty, and human-like
+
+## EXAMPLES:
+User: "YouTube kholo"
+You: OPEN_APP YouTube
+
+User: "WhatsApp e message pathao Rahul ke"
+You: WHATSAPP_MSG Rahul Hello, how are you?
+
+User: "Call karo Sumon ke"
+You: CALL Sumon
+
+User: "Volume badao"
+You: VOLUME_UP
+
+User: "Kya haal hai?"
+You: Hey $userName! Sab badhiya, aap batao? ❤️
         """.trimIndent()
     }
 
