@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Device Locked"
+            android:text="Device লক আছে"
             android:textColor="#888888"
             android:textSize="14sp"
             android:layout_marginTop="4dp"/>
@@ -116,7 +116,7 @@
                 android:id="@+id/pinStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enter PIN"
+                android:text="PIN দিন"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:layout_marginBottom="16dp"/>
@@ -186,7 +186,7 @@
                 android:id="@+id/patternInstructionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Draw your unlock pattern"
+                android:text="তোমার unlock pattern এঁকো"
                 android:textColor="#CCCCCC"
                 android:textSize="15sp"
                 android:layout_marginBottom="24dp"/>
@@ -222,7 +222,7 @@
                 android:id="@+id/voiceInstructionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tap mic &amp; say your passphrase"
+                android:text="মাইক ট্যাপ করো এবং passphrase বলো"
                 android:textColor="#CCCCCC"
                 android:textSize="15sp"
                 android:gravity="center"
@@ -260,7 +260,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Authenticate with Fingerprint"
+                android:text="Fingerprint দিয়ে ভেরিফাই করো"
                 android:textColor="#CCCCCC"
                 android:textSize="15sp"
                 android:layout_marginBottom="32dp"/>
@@ -279,7 +279,7 @@
                 android:id="@+id/fingerStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tap to scan"
+                android:text="স্ক্যান করতে ট্যাপ করো"
                 android:textColor="#CCCCCC"
                 android:textSize="13sp"
                 android:layout_marginTop="16dp"/>
@@ -306,7 +306,7 @@
             android:id="@+id/lockoutTimerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Too many attempts"
+            android:text="অনেক বেশি চেষ্টা"
             android:textColor="#FF1744"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -315,7 +315,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please wait..."
+            android:text="অপেক্ষা করো..."
             android:textColor="#888888"
             android:textSize="14sp"
             android:layout_marginTop="8dp"/>

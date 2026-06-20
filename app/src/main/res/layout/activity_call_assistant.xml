@@ -25,7 +25,7 @@
             android:id="@+id/callerNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Caller Name"
+            android:text="কলারের নাম"
             android:textColor="#FFFFFF"
             android:textSize="28sp"
             android:textStyle="bold"
@@ -35,7 +35,7 @@
             android:id="@+id/callStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Incoming Call..."
+            android:text="কল আসছে…"
             android:textColor="#00E676"
             android:textSize="18sp"
             android:layout_marginBottom="32dp"/>
@@ -50,7 +50,7 @@
             android:id="@+id/callInstructionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Say 'Utha lo' or 'Reject'"
+            android:text="বলো 'উঠাও' বা 'রিজেক্ট'"
             android:textColor="#888888"
             android:textSize="16sp"
             android:textStyle="italic"/>

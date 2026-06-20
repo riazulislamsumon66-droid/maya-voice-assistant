@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Security Settings"
+            android:text="নিরাপত্তা সেটিংস"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -31,7 +31,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Enable App Lock"
+                android:text="App Lock চালু করো"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"/>
 
@@ -45,7 +45,7 @@
             android:id="@+id/appLockStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔓 App Lock OFF"
+            android:text="🔓 App Lock বন্ধ"
             android:textColor="#888888"
             android:layout_marginBottom="8dp"/>
 
@@ -53,7 +53,7 @@
             android:id="@+id/selectAppsBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Apps to Lock"
+            android:text="কোন Apps লক করতে চাও সিলেক্ট করো"
             android:textAllCaps="false"
             android:layout_marginBottom="24dp"/>
 
@@ -61,7 +61,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Permissions Required"
+            android:text="Permissions দরকার"
             android:textColor="#FF1744"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -71,7 +71,7 @@
             android:id="@+id/usageStatsBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Allow Usage Stats"
+            android:text="Usage Stats অনুমতি দাও"
             android:textAllCaps="false"
             android:layout_marginBottom="8dp"/>
 
@@ -79,7 +79,7 @@
             android:id="@+id/overlayPermissionBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Allow Display Over Apps"
+            android:text="Apps উপরে Display অনুমতি দাও"
             android:textAllCaps="false"
             android:layout_marginBottom="24dp"/>
 
@@ -94,14 +94,14 @@
             android:id="@+id/setPinBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Set / Change PIN"
+            android:text="PIN সেট / পরিবর্তন করো"
             android:textAllCaps="false"/>
 
         <TextView
             android:id="@+id/pinStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="❌ PIN not set"
+            android:text="❌ PIN সেট নেই"
             android:textColor="#888888"
             android:layout_marginBottom="16dp"/>
 
@@ -110,14 +110,14 @@
             android:id="@+id/setPatternBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Set Pattern"
+            android:text="Pattern সেট করো"
             android:textAllCaps="false"/>
 
         <TextView
             android:id="@+id/patternStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="❌ Pattern not set"
+            android:text="❌ Pattern সেট নেই"
             android:textColor="#888888"
             android:layout_marginBottom="16dp"/>
 
@@ -126,14 +126,14 @@
             android:id="@+id/setVoiceBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Set Voice Passphrase"
+            android:text="Voice Passphrase সেট করো"
             android:textAllCaps="false"/>
 
         <TextView
             android:id="@+id/voiceStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="❌ Not set"
+            android:text="❌ সেট নেই"
             android:textColor="#888888"
             android:layout_marginBottom="24dp"/>
 
@@ -171,7 +171,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Use Device Screen Lock"
+                android:text="Device Screen Lock ব্যবহার করো"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"/>
 
@@ -187,7 +187,7 @@
             android:background="#333333"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Private Mode Section -->
+        <!-- প্রাইভেট মোড Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -199,7 +199,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Private Mode"
+                android:text="প্রাইভেট মোড"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"/>
 
@@ -213,7 +213,7 @@
             android:id="@+id/privateModeStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="👁️ Private Mode OFF"
+            android:text="👁️ প্রাইভেট মোড OFF"
             android:textColor="#888888"
             android:layout_marginBottom="24dp"/>
 

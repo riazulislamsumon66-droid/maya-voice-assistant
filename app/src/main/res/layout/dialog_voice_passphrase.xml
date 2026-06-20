@@ -10,7 +10,7 @@
         android:id="@+id/recordStatusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tap to start recording"
+        android:text="রেকর্ডিং শুরু করতে ট্যাপ করো"
         android:textSize="16sp"
         android:layout_marginBottom="24dp"/>
 
@@ -18,7 +18,7 @@
         android:id="@+id/recordPassphraseBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Record Phrase"
+        android:text="Phrase রেকর্ড করো"
         android:textAllCaps="false"/>
 
     <TextView

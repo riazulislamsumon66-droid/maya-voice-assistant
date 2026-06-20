@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚙️ SETTINGS"
+            android:text="⚙️ সেটিংস"
             android:textColor="#FF1744"
             android:textSize="20sp"
             android:fontFamily="sans-serif-black"
@@ -81,7 +81,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🗣️ Voice &amp; TTS Settings"
+                    android:text="🗣️ ভয়েস ও TTS সেটিংস"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -112,7 +112,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Voice Engine"
+                    android:text="ভয়েস ইঞ্জিন"
                     android:textColor="#888"
                     android:textSize="12sp"
                     android:layout_marginBottom="8dp" />
@@ -128,7 +128,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="System Default"
+                        android:text="সিস্টেম ডিফল্ট"
                         android:textColor="#CCC"
                         android:textSize="12sp"
                         android:buttonTint="#FF1744" />
@@ -161,7 +161,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Natural Voice (Live Mode)"
+                        android:text="Natural Voice (লাইভ মোড)"
                         android:textColor="#CCC"
                         android:textSize="13sp" />
 
@@ -193,7 +193,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="👤 Your Name"
+                    android:text="👤 তোমার নাম"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -238,7 +238,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="⭐ PRIME CONTACT"
+                        android:text="⭐ প্রাইম কন্টাক্ট"
                         android:textColor="#FF1744"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif-black"
@@ -256,7 +256,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PRIME"
+                        android:text="প্রাইম"
                         android:textColor="#FF1744"
                         android:textSize="9sp"
                         android:fontFamily="sans-serif-black"
@@ -320,7 +320,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💖 Personality Mode"
+                    android:text="💖 পার্সোনালিটি মোড"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -336,7 +336,7 @@
                         android:id="@+id/gfRadio"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="💖 GF Mode — Caring, Hinglish, Emotional"
+                        android:text="💖 GF মোড — যত্নশীল, Banglish, আবেগপ্রবণ"
                         android:textColor="#CCC"
                         android:textSize="13sp"
                         android:buttonTint="#FF1744" />
@@ -345,7 +345,7 @@
                         android:id="@+id/proRadio"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="💼 Professional Mode — Formal, English"
+                        android:text="💼 প্রফেশনাল মোড — Formal, English"
                         android:textColor="#CCC"
                         android:textSize="13sp"
                         android:buttonTint="#FF1744" />
@@ -354,7 +354,7 @@
                         android:id="@+id/assistantRadio"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="🤖 Assistant Mode — Balanced, Friendly"
+                        android:text="🤖 অ্যাসিস্ট্যান্ট মোড — Balanced, Friendly"
                         android:textColor="#CCC"
                         android:textSize="13sp"
                         android:buttonTint="#FF1744" />
@@ -380,7 +380,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🛡️ Advanced Permissions"
+                    android:text="🛡️ অ্যাডভান্সড Permissions"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -411,14 +411,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Device Administrator"
+                            android:text="ডিভাইস অ্যাডমিনিস্ট্রেটর"
                             android:textColor="#EEE"
                             android:textSize="13sp" />
                         <TextView
                             android:id="@+id/adminStatusText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Not Active"
+                            android:text="নিষ্ক্রিয়"
                             android:textColor="#888"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -456,14 +456,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Accessibility Service"
+                            android:text="অ্যাক্সেসিবিলিটি সার্ভিস"
                             android:textColor="#EEE"
                             android:textSize="13sp" />
                         <TextView
                             android:id="@+id/accessibilityStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Checking..."
+                            android:text="চেক করছি..."
                             android:textColor="#888"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -501,7 +501,7 @@
                     android:id="@+id/grantPermissionsBtn"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="Grant Permissions"
+                    android:text="Permissions দাও"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#FF1744"
                     android:textAllCaps="false"
@@ -511,7 +511,7 @@
                     android:id="@+id/permissionsStatusText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Permissions status will appear here."
+                    android:text="Permissions status এখানে দেখাবে।"
                     android:textColor="#888"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -535,7 +535,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🤖 Default Assistant"
+                    android:text="🤖 ডিফল্ট অ্যাসিস্ট্যান্ট"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -545,7 +545,7 @@
                     android:id="@+id/setDefaultAssistantBtn"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="Set Default Assistant"
+                    android:text="ডিফল্ট অ্যাসিস্ট্যান্ট সেট করো"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#FF1744"
                     android:textAllCaps="false" />
@@ -582,7 +582,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="📢 Call Announce"
+                        android:text="📢 কল ঘোষণা"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -611,7 +611,7 @@
                     android:id="@+id/callAnnounceStatusText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📢 Call aane pe MAYA naam bolegi"
+                    android:text="📢 কল আসলে MAYA নাম বলবে"
                     android:textColor="#00E676"
                     android:textSize="12sp"
                     android:layout_marginTop="6dp"/>
@@ -638,7 +638,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔐 Security &amp; Privacy"
+                    android:text="🔐 নিরাপত্তা ও গোপনীয়তা"
                     android:textColor="#FF6D6D"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-medium"
@@ -669,14 +669,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="App Lock &amp; Security"
+                            android:text="App Lock ও নিরাপত্তা"
                             android:textColor="#EEE"
                             android:textSize="13sp" />
                         <TextView
                             android:id="@+id/securityStatusText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="PIN, Pattern, Voice Lock"
+                            android:text="PIN, Pattern, ভয়েস Lock"
                             android:textColor="#888"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -696,7 +696,7 @@
             android:id="@+id/saveBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="SAVE SETTINGS"
+            android:text="সেটিংস সেভ করো"
             android:textColor="#FFF"
             android:textSize="15sp"
             android:fontFamily="sans-serif-black"

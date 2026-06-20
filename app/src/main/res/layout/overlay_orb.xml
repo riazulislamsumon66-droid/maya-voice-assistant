@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="2dp"
-            android:text="● RESPONDING"
+            android:text="● রেসপন্ড করছে"
             android:textColor="#FF1744"
             android:textSize="8sp"
             android:letterSpacing="0.2"

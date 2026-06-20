@@ -32,7 +32,7 @@ class কলMonitorService : Service(), TextToSpeech.চালুInitListener {
         const val ACTION_CALL_ACTIVE = "com.maya.assistant.CALL_ACTIVE"
         const val ACTION_CALL_ENDED = "com.maya.assistant.CALL_ENDED"
         const val ACTION_CALL_RINGING = "com.maya.assistant.CALL_RINGING"
-        private const val CHANNEL_ID = "myra_call_channel"
+        private const val CHANNEL_ID = "maya_call_channel"
         private const val TAG = "MAYA_CALL"
     }
 

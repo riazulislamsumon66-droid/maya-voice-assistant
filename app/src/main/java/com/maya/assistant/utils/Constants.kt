@@ -19,8 +19,8 @@ object Constants {
     const val KEY_WAKE_WORD = "wake_word"
 
     // নাtifications
-    const val NOTIF_CHANNEL_OVERLAY = "myra_overlay_channel"
-    const val NOTIF_CHANNEL_VOICE = "myra_voice_channel"
+    const val NOTIF_CHANNEL_OVERLAY = "maya_overlay_channel"
+    const val NOTIF_CHANNEL_VOICE = "maya_voice_channel"
     const val NOTIF_ID_OVERLAY = 1001
     const val NOTIF_ID_VOICE = 1002
 

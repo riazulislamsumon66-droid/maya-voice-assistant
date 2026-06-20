@@ -8,7 +8,7 @@
     <string name="speaking">SPEAKING…</string>
     <string name="settings">Settings</string>
     <string name="api_key_hint">Enter Gemini API Key</string>
-    <string name="save">SAVE SETTINGS</string>
+    <string name="save">সেটিংস সেভ করো</string>
     <string name="accessibility_enabled">Accessibility: Active ✅</string>
     <string name="accessibility_disabled">Accessibility: Disabled ⚠️</string>
     <string name="long_press_stop">Hold to reconnect</string>
@@ -45,7 +45,7 @@
     <string name="saved">Settings saved!</string>
     <string name="loading">Loading…</string>
     <string name="api_key_required">⚠️ API Key required. Please go to Settings → Enter Gemini API Key.</string>
-    <string name="enable_accessibility">⚠️ Enable Accessibility Service for app control. Settings → Accessibility.</string>
+    <string name="enable_accessibility">⚠️ Enable অ্যাক্সেসিবিলিটি সার্ভিস for app control. Settings → Accessibility.</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="hey_maya">Hey MAYA</string>
     <string name="accessibility_description">MAYA AI Assistant needs accessibility permission to read screen content, automate taps, and control apps for you.</string>

@@ -29,6 +29,6 @@
         android:layout_height="wrap_content"
         android:textColor="#FF0000"
         android:visibility="gone"
-        android:text="PINs do not match"/>
+        android:text="PIN মিলেনি"/>
 
 </LinearLayout>

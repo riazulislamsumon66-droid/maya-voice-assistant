@@ -136,7 +136,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             val view = inflater.inflate(R.layout.item_chat_user, parent, false)
             ব্যবহারকারীমেসেজViewHolder(view)
         } else {
-            val view = inflater.inflate(R.layout.item_chat_myra, parent, false)
+            val view = inflater.inflate(R.layout.item_chat_maya, parent, false)
             MayaমেসেজViewHolder(view)
         }
     }

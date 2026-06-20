@@ -172,7 +172,7 @@ STRICT RULES:
         return নাtificationCompat.Builder(this, Constants.NOTIF_CHANNEL_VOICE)
             .setContentTitle("MAYA শুনছে ❤️")
             .setContentText("সবসময় ready for you")
-            .setSmallIcon(R.drawable.ic_myra_notif)
+            .setSmallIcon(R.drawable.ic_maya_notif)
             .setContentIntent(pi)
             .setচালুgoing(true)
             .setPriority(নাtificationCompat.PRIORITY_LOW)

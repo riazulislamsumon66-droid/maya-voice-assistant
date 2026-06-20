@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="240dp"
-            android:text="User message"
+            android:text="ইউজার মেসেজ"
             android:textColor="#E8E8FF"
             android:textSize="13sp"
             android:fontFamily="sans-serif"

@@ -7,7 +7,7 @@
     android:paddingBottom="4dp">
 
     <TextView
-        android:id="@+id/myraTag"
+        android:id="@+id/mayaTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MAYA"
@@ -23,11 +23,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="240dp"
-        android:text="MAYA response"
+        android:text="MAYA রেসপন্স"
         android:textColor="#E8E8FF"
         android:textSize="13sp"
         android:fontFamily="sans-serif"
-        android:background="@drawable/bg_chat_myra"
+        android:background="@drawable/bg_chat_maya"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="8dp"

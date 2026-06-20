@@ -20,7 +20,7 @@ class MayaওভারলেService : Service() {
 
     companion object {
         var isRunning = false
-        const val CHANNEL_ID = "myra_overlay_channel"
+        const val CHANNEL_ID = "maya_overlay_channel"
         const val NOTIF_ID = 1001
     }
 
@@ -86,7 +86,7 @@ class MayaওভারলেService : Service() {
         overlayView?.apply {
             val orbContainer = findViewById<FrameLayout>(R.id.orbContainer)
             val closeBtn = findViewById<ImageView>(R.id.closeওভারলেBtn)
-            val myraLabel = findViewById<TextView>(R.id.respondingLabel)
+            val mayaLabel = findViewById<TextView>(R.id.respondingLabel)
 
             closeBtn?.setচালুClickListener { hideওভারলে() }
 
@@ -158,7 +158,7 @@ class MayaওভারলেService : Service() {
         return নাtificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MAYA is active ❤️")
             .setContentText("Press power button to activate overlay")
-            .setSmallIcon(R.drawable.ic_myra_notif)
+            .setSmallIcon(R.drawable.ic_maya_notif)
             .setContentIntent(pi)
             .setচালুgoing(true)
             .setPriority(নাtificationCompat.PRIORITY_LOW)
