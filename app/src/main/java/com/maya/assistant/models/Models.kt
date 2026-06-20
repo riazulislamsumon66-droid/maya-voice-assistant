@@ -1,10 +1,10 @@
 package com.maya.assistant.models
 
-data class VoiceCommand(
+data class ভয়েসCommand(
     val raw: String,
     val type: CommandType,
     val args: Map<String, String> = emptyMap(),
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = সিস্টেম.currentসময়Millis()
 )
 
 enum class CommandType {
@@ -18,16 +18,16 @@ enum class CommandType {
 
 data class AppModel(
     val name: String,
-    val packageName: String,
+    val packageনাম: String,
     val label: String
 )
 
-data class ScreenNodeModel(
+data class স্ক্রিননাdeModel(
     val text: String?,
     val contentDesc: String?,
-    val className: String?,
+    val classনাম: String?,
     val isClickable: Boolean,
-    val isEditable: Boolean,
+    val isএডিট করোable: Boolean,
     val bounds: android.graphics.Rect?,
     val viewId: String?
 )
@@ -49,8 +49,8 @@ enum class ActionType {
 
 data class AIStateModel(
     val state: String = "IDLE",
-    val statusMessage: String = "SYSTEM READY",
-    val isConnected: Boolean = false,
-    val isMicActive: Boolean = false,
+    val statusমেসেজ: String = "সিস্টেম প্রস্তুত",
+    val isসংযুক্ত ✅: Boolean = false,
+    val isMicসক্রিয়: Boolean = false,
     val amplitude: Float = 0f
 )

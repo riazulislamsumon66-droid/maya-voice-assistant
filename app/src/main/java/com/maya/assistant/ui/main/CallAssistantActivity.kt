@@ -22,14 +22,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.maya.assistant.R
 import com.maya.assistant.ai.GeminiLiveClient
-import com.maya.assistant.service.CallMonitorService
+import com.maya.assistant.service.কলMonitorService
 import com.maya.assistant.utils.LiveAudioManager
 import java.util.Locale
 
 
-class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
-    private lateinit var callerNameText: TextView
+class কলঅ্যাসিস্ট্যান্টActivity : AppCompatActivity(), TextToSpeech.চালুInitListener {
+
+    private lateinit var callerনামText: TextView
     private lateinit var statusText: TextView
     private var waveformView: WaveformView? = null
 
@@ -38,42 +39,43 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var speechRecognizer: SpeechRecognizer? = null
     private val handler = Handler(Looper.getMainLooper())
 
-    private var callerName = "অচেনা কলার"
+    private var callerনাম = "অজানা কলer"
     private var phoneNumber = ""
-    private var userName = "স্যার"
+    private var userনাম = "Sir"
     private var personality = "gf"
-    private var isWhatsAppCall = false
+    private var isWhatsAppকল = false
 
-    // State management
+    // State management — FIXED: Proper flags
     private var isDecisionMade = false
-    private var isListening = false
+    private var isশুনছে… = false
     private var announcementPlayed = false
-    private var isSpeaking = false
-    private var isCallAnswered = false
+    private var isবলছে… = false
+    private var isকলAnswered = false
 
     private lateinit var liveClient: GeminiLiveClient
     private lateinit var liveAudioManager: LiveAudioManager
-    private var isLiveConnected = false
+    private var isLiveসংযুক্ত ✅ = false
 
     private val TAG = "MAYA_CALL_UI"
 
-    // Broadcast receiver: call cut হলে finish
+    // Broadcast receiver: call cut hone par finish
     private val callStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                CallMonitorService.ACTION_CALL_ENDED -> {
-                    Log.d(TAG, "Call ended → closing assistant UI")
+                কলMonitorService.ACTION_CALL_ENDED -> {
+                    Log.d(TAG, "কল ended → closing assistant UI")
                     if (!isDecisionMade) {
+                        // কল ended before user decision — just finish
                         safeFinish()
                     }
                 }
-                CallMonitorService.ACTION_CALL_ACTIVE -> {
-                    Log.d(TAG, "Call active → closing assistant UI")
-                    isCallAnswered = true
+                কলMonitorService.ACTION_CALL_ACTIVE -> {
+                    Log.d(TAG, "কল active → closing assistant UI")
+                    isকলAnswered = true
                     safeFinish()
                 }
-                CallMonitorService.ACTION_CALL_RINGING -> {
-                    Log.d(TAG, "Call ringing received")
+                কলMonitorService.ACTION_CALL_RINGING -> {
+                    Log.d(TAG, "কল ringing received")
                 }
             }
         }
@@ -82,10 +84,10 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Lock screen এও দেখাও
+        // Lock screen pe bhi dikhao
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(true)
-            setTurnScreenOn(true)
+            setদেখাওWhenলক আছে(true)
+            setTurnস্ক্রিনচালু(true)
         } else {
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
@@ -97,31 +99,31 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         setContentView(R.layout.activity_call_assistant)
 
-        // Intent থেকে data নাও
-        callerName  = intent.getStringExtra("CALLER_NAME") ?: "অচেনা কলার"
+        // Intent se data lo — FIXED: WhatsApp call detection
+        callerনাম  = intent.getStringExtra("CALLER_NAME") ?: "অজানা কলer"
         phoneNumber = intent.getStringExtra("PHONE_NUMBER") ?: ""
-        userName    = intent.getStringExtra("USER_NAME") ?: getPrefsValue("user_name", "স্যার")
+        userনাম    = intent.getStringExtra("USER_NAME") ?: getPrefsValue("user_name", "Sir")
         personality = intent.getStringExtra("PERSONALITY") ?: getPrefsValue("personality_mode", "gf")
-        isWhatsAppCall = intent.getBooleanExtra("IS_WHATSAPP_CALL", false)
+        isWhatsAppকল = intent.getBooleanExtra("IS_WHATSAPP_CALL", false)
 
-        Log.d(TAG, "CallAssistant started: caller=$callerName, whatsapp=$isWhatsAppCall, personality=$personality")
+        Log.d(TAG, "কলঅ্যাসিস্ট্যান্ট started: caller=$callerনাম, whatsapp=$isWhatsAppকল, personality=$personality")
 
         initViews()
 
-        // Initialize Live Audio Manager FIRST
+        // Initialize Live Audio Manager FIRST (before Gemini)
         liveAudioManager = LiveAudioManager(this)
 
-        // Setup Gemini Live FIRST
+        // Setup Gemini Live FIRST for natural voice
         setupGeminiLive()
 
         // TTS as fallback only
         tts = TextToSpeech(this, this)
 
-        // Broadcast register করো
+        // Broadcast register karo
         val filter = IntentFilter().apply {
-            addAction(CallMonitorService.ACTION_CALL_ENDED)
-            addAction(CallMonitorService.ACTION_CALL_ACTIVE)
-            addAction(CallMonitorService.ACTION_CALL_RINGING)
+            addAction(কলMonitorService.ACTION_CALL_ENDED)
+            addAction(কলMonitorService.ACTION_CALL_ACTIVE)
+            addAction(কলMonitorService.ACTION_CALL_RINGING)
         }
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -133,24 +135,24 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             Log.e(TAG, "Receiver register failed: ${e.message}")
         }
 
-        // Phone state monitor
-        startCallStateMonitor()
+        // ফোন state monitor
+        startকলStateMonitor()
     }
 
     private fun initViews() {
-        callerNameText = findViewById(R.id.callerNameText)
+        callerনামText = findViewById(R.id.callerনামText)
         statusText     = findViewById(R.id.callStatusText)
         waveformView   = findViewById<WaveformView?>(R.id.callWaveform)
 
-        callerNameText.text = callerName
-        statusText.text = "MAYA তৈরি হচ্ছে..."
+        callerনামText.text = callerনাম
+        statusText.text = "MAYA preparing..."
     }
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale("bn", "BD"))
+            val result = tts?.setভাষা(Locale("bn", "BD"))
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts?.language = Locale("hi", "IN")
+                tts?.language = Locale.ENGLISH
             }
             isTtsReady = true
         } else {
@@ -158,95 +160,107 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
     }
 
+    /**
+     * ✅ FIXED: WebSocket natural voice for announcement
+     * না more robotic TTS — uses Gemini Live audio streaming
+     */
     private fun startAnnouncement() {
         if (isDecisionMade || announcementPlayed) {
-            if (!isDecisionMade) startListening()
+            if (!isDecisionMade) startশুনছে…()
             return
         }
 
         announcementPlayed = true
         val msg = buildAnnouncementText()
 
-        statusText.text = "ঘোষণা করছি..."
+        statusText.text = "Announcing..."
         Log.d(TAG, "Announcing via WebSocket: $msg")
 
+        // ✅ Use WebSocket natural voice instead of TTS
         speakViaWebSocket(msg)
 
+        // Announcement khatam hone ke baad listen karo
+        // WebSocket audio duration estimate
         val estimatedDuration = (msg.length * 80L).coerceIn(3000L, 8000L)
         handler.postDelayed({
-            if (!isDecisionMade && !isSpeaking) startListening()
+            if (!isDecisionMade && !isবলছে…) startশুনছে…()
         }, estimatedDuration)
     }
 
     private fun buildAnnouncementText(): String {
-        val isKnownContact = !isNumberLike(callerName)
+        val isKnownContact = !isNumberLike(callerনাম)
 
-        return if (isWhatsAppCall) {
+        return if (isWhatsAppকল) {
+            // WhatsApp call announcement
             when (personality) {
                 "gf" -> when {
                     isKnownContact ->
-                        "$userName, $callerName এর WhatsApp call আসছে। উঠাবো নাকি না?"
+                        "$userনাম, $callerনাম ka WhatsApp call aa raha hai. Uthana hai ya nahi?"
                     else ->
-                        "$userName, একটা অচেনা নম্বর থেকে WhatsApp call আসছে। উঠাবো নাকি না?"
+                        "$userনাম, ek anjaan number se WhatsApp call aa rahi hai. Uthana hai ya nahi?"
                 }
                 "professional" -> when {
                     isKnownContact ->
-                        "$userName, $callerName এর WhatsApp call আসছে। Answer করবো নাকি decline?"
+                        "$userনাম, incoming WhatsApp call from $callerনাম. Should I answer or decline?"
                     else ->
-                        "$userName, অচেনা WhatsApp caller। Answer করবো নাকি decline?"
+                        "$userনাম, unknown WhatsApp caller. Should I answer or decline?"
                 }
                 else ->
-                    "$userName, $callerName এর WhatsApp call আসছে। কী করবো?"
+                    "$userনাম, $callerনাম ka WhatsApp call aa raha hai. Kya karna hai?"
             }
         } else {
+            // নাrmal call announcement
             when (personality) {
                 "gf" -> when {
                     isKnownContact ->
-                        "$userName, $callerName এর call আসছে। উঠাবো নাকি না?"
+                        "$userনাম, $callerনাম ka call aa raha hai. Uthana hai ya nahi?"
                     else ->
-                        "$userName, একটা অচেনা নম্বর থেকে call আসছে। উঠাবো নাকি না?"
+                        "$userনাম, ek anjaan number se call aa rahi hai. Uthana hai ya nahi?"
                 }
                 "professional" -> when {
                     isKnownContact ->
-                        "$userName, incoming call from $callerName। Answer করবো নাকি decline?"
+                        "$userনাম, incoming call from $callerনাম. Should I answer or decline?"
                     else ->
-                        "$userName, unknown caller। Answer করবো নাকি decline?"
+                        "$userনাম, unknown caller. Should I answer or decline?"
                 }
                 else ->
-                    "$userName, $callerName এর call আসছে। কী করবো?"
+                    "$userনাম, $callerনাম ka call aa raha hai. Kya karna hai?"
             }
         }
     }
 
+    /**
+     * ✅ FIXED: Setup Gemini Live with proper prompt for call scenario
+     */
     private fun setupGeminiLive() {
         val prefs = getSharedPreferences("maya_prefs", MODE_PRIVATE)
         val apiKey = prefs.getString("api_key", "") ?: ""
         if (apiKey.isEmpty()) {
-            Log.e(TAG, "No API key found")
+            Log.e(TAG, "না API key found")
             return
         }
 
-        val callType = if (isWhatsAppCall) "WhatsApp call" else "phone call"
+        val callType = if (isWhatsAppকল) "WhatsApp call" else "phone call"
 
         val prompt = """
-            You are MAYA, a caring AI assistant for $userName. Personality: $personality.
+            You are MAYA, a caring AI assistant for $userনাম. ব্যক্তিগতity: $personality.
 
-            SITUATION: Incoming $callType from $callerName.
+            SITUATION: Incoming $callType from $callerনাম.
             
             TASKS:
-            1. Announce the incoming call naturally in Bangla (বাংলা).
-            2. If the user asks questions, answer them naturally in Bangla.
-            3. Guide the user to say "উঠাও" (Answer) or "না/রিজেক্ট" (Reject) to handle the call.
+            1. Announce the incoming call naturally in হাইnglish.
+            2. If the user asks questions (e.g., "Who is calling?", "What should I do?"), answer them naturally and helpfully.
+            3. Guide the user to say "Answer" or "Reject" to handle the call.
 
-            STYLE: Natural, warm, human-like tone. Respond in Bangla (বাংলা) with some English words mixed (Banglish). Keep it concise.
+            STYLE: Natural, warm, human-like tone. Respond in হাইnglish. Keep it concise.
         """.trimIndent()
 
         liveClient = GeminiLiveClient(apiKey, prompt, object : GeminiLiveClient.LiveListener {
             override fun onAudioReceived(data: ByteArray) {
-                isSpeaking = true
+                isবলছে… = true
                 liveAudioManager.playChunk(data)
-                runOnUiThread {
-                    statusText.text = "বলছি... 💬"
+                runচালুUiThread {
+                    statusText.text = "বলছে…... 💬"
                     waveformView?.startAnimation()
                 }
             }
@@ -255,23 +269,25 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 Log.d(TAG, "Gemini Text: $text")
             }
 
-            override fun onConnected() {
-                isLiveConnected = true
-                Log.d(TAG, "Gemini Live Connected ✅")
+            override fun onসংযুক্ত ✅() {
+                isLiveসংযুক্ত ✅ = true
+                Log.d(TAG, "Gemini Live সংযুক্ত ✅ ✅")
+                // শুরু করো announcement once connected
                 handler.postDelayed({ startAnnouncement() }, 500)
             }
 
             override fun onTurnComplete() {
-                isSpeaking = false
-                runOnUiThread {
+                isবলছে… = false
+                runচালুUiThread {
                     waveformView?.stopAnimation()
-                    if (!isDecisionMade) startListening()
+                    if (!isDecisionMade) startশুনছে…()
                 }
             }
 
-            override fun onError(msg: String) {
-                isLiveConnected = false
-                Log.e(TAG, "Gemini Error: $msg")
+            override fun onসমস্যা(msg: String) {
+                isLiveসংযুক্ত ✅ = false
+                Log.e(TAG, "Gemini সমস্যা: $msg")
+                // Fallback to TTS
                 handler.postDelayed({
                     if (!announcementPlayed) startAnnouncement()
                 }, 500)
@@ -280,28 +296,36 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         liveClient.start()
     }
 
+    /**
+     * ✅ NEW: Speak via WebSocket (natural voice)
+     */
     private fun speakViaWebSocket(text: String) {
-        if (isLiveConnected) {
-            isSpeaking = true
-            liveClient.sendTextMessage(text)
-            Log.d(TAG, "Speaking via WebSocket: $text")
+        if (isLiveসংযুক্ত ✅) {
+            isবলছে… = true
+            liveClient.sendTextমেসেজ(text)
+            Log.d(TAG, "বলছে… via WebSocket: $text")
             return
         }
+        // Fallback to TTS
         speakTTS(text)
     }
 
+    /**
+     * Fallback TTS (বন্ধ - only WebSocket natural voice allowed)
+     */
     private fun speakTTS(text: String) {
+        // Robotic TTS removed as per user request
         Log.d(TAG, "Robotic TTS skipped for: $text")
     }
 
-    private fun startListening() {
-        if (isDecisionMade || isListening || isSpeaking) return
-        isListening = true
+    private fun startশুনছে…() {
+        if (isDecisionMade || isশুনছে… || isবলছে…) return
+        isশুনছে… = true
 
-        statusText.text = "শুনছি... (বলো: উঠাও / রিজেক্ট)"
-        Log.d(TAG, "Starting voice recognition")
+        statusText.text = "Sun rahi hoon... (bolo: Uthao / Reject)"
+        Log.d(TAG, "শুরু করোing voice recognition")
 
-        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+        if (!SpeechRecognizer.isRecognitionপাওয়া যাচ্ছে(this)) {
             Log.e(TAG, "Speech recognition not available")
             handler.postDelayed({ repeatAnnouncement() }, 1000)
             return
@@ -312,10 +336,10 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
 
             override fun onResults(results: Bundle?) {
-                isListening = false
+                isশুনছে… = false
                 val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 val spoken = texts?.firstOrNull()?.lowercase()?.trim() ?: ""
-                Log.d(TAG, "User said: '$spoken'")
+                Log.d(TAG, "ব্যবহারকারী said: '$spoken'")
 
                 if (spoken.isEmpty()) {
                     if (!isDecisionMade) repeatAnnouncement()
@@ -324,8 +348,8 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 processCommand(spoken)
             }
 
-            override fun onError(errorCode: Int) {
-                isListening = false
+            override fun onসমস্যা(errorCode: Int) {
+                isশুনছে… = false
                 val errorMsg = when (errorCode) {
                     SpeechRecognizer.ERROR_NO_MATCH -> "NO_MATCH"
                     SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "TIMEOUT"
@@ -335,15 +359,15 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 Log.w(TAG, "Speech error: $errorMsg")
 
                 if (!isDecisionMade) {
-                    handler.postDelayed({ if (!isDecisionMade) startListening() }, 1500)
+                    handler.postDelayed({ if (!isDecisionMade) startশুনছে…() }, 1500)
                 }
             }
 
             override fun onReadyForSpeech(p0: Bundle?) {
-                statusText.text = "বলো... 🎙️"
+                statusText.text = "Bol do... 🎙️"
             }
             override fun onBeginningOfSpeech() {
-                statusText.text = "শুনছি... 👂"
+                statusText.text = "Sun rahi hoon... 👂"
                 waveformView?.startAnimation()
             }
             override fun onRmsChanged(rmsdB: Float) {
@@ -355,61 +379,94 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 waveformView?.stopAnimation()
             }
             override fun onPartialResults(p0: Bundle?) {}
-            override fun onEvent(p0: Int, p1: Bundle?) {}
+            override fun onইভেন্ট(p0: Int, p1: Bundle?) {}
         })
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            // Multi-language support: Bangla + Hindi + English
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "bn-BD")
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "bn-BD")
-            putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, arrayListOf("bn-BD", "hi-IN", "en-US", "en-IN"))
+            // ✅ Multi-language support
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "hi-IN")
+            putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, arrayListOf("hi-IN", "bn-BD", "en-IN", "bn-IN", "ta-IN", "te-IN", "mr-IN", "gu-IN", "kn-IN", "ml-IN", "pa-IN", "ur-IN"))
             putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, false)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000)
         }
-        speechRecognizer?.startListening(intent)
+        speechRecognizer?.startশুনছে…(intent)
     }
 
+    /**
+     * ✅ FIXED: Proper answer/reject detection with multi-language support
+     */
     private fun processCommand(spoken: String) {
         val lower = spoken.lowercase().trim()
         Log.d(TAG, "Processing command: '$lower'")
 
-        // ANSWER keywords — Bangla + Hindi + English
+        // ANSWER keywords — MULTI-LANGUAGE SUPPORT
         val answerWords = listOf(
-            // Bangla
-            "উঠাও", "উঠা", "উঠাবো", "উঠান", "answer", "pick", "receive", "accept",
-            "হ্যাঁ", "হাঁ", "ঠিক", "ঠিক আছে", "ওকে", "নে", "নেও",
-            "ফোন উঠাও", "উঠাও ফোন", "রিসিভ করো", "নিয়ে নাও",
-            "কথা বলো", "হ্যালো", "বলো", "শোনাও",
-            // Hindi
-            "utha", "uthao", "uthau", "haan", "han", "theek", "theek hai", "lo",
+            // হিন্দি/হাইnglish
+            "utha", "uthao", "uthau", "answer", "pick", "receive", "accept",
+            "haan", "han", "yes", "theek", "theek hai", "okay", "ok", "lo",
             "phone uthao", "uthao phone", "receive karo", "le lo", "uthane",
-            "baat karo", "halo", "bolo", "sunao",
-            // English
-            "answer", "pick up", "receive", "accept", "yes", "yeah", "yep",
-            "sure", "okay", "ok", "go ahead", "talk", "speak"
+            "baat karo", "hello", "halo", "bolo", "sunao",
+            // ইংরেজি
+            "answer", "pick up", "pick", "receive", "accept", "yes", "yeah", "yep",
+            "sure", "okay", "ok", "go ahead", "talk", "speak",
+            // Tamil
+            "eduthukko", "pesu", "sari",
+            // Telugu
+            "attuko", "matladu", "sare",
+            // Bengali
+            "tulun", "kotha bolo", "thik",
+            // Marathi
+            "uthav", "bol", "thik",
+            // Gujarati
+            "uthavo", "bolo", "thik",
+            // Kannada
+            "ettuko", "matadu", "sari",
+            // Malayalam
+            "eduthu", "samsarik", "sheri",
+            // Punjabi
+            "chukko", "gall karo", "thik",
+            // Urdu
+            "uthavo", "baat karo", "thik"
         )
 
-        // REJECT keywords — Bangla + Hindi + English
+        // REJECT keywords — MULTI-LANGUAGE SUPPORT
         val rejectWords = listOf(
-            // Bangla
-            "না", "নাহ", "রিজেক্ট", "কাট", "কেটে দাও", "বন্ধ করো", "ড্রপ",
-            "না উঠাবো", "ছেড়ে দাও", "ইগনোর", "কেট দাও",
-            "বিস্তর আছি", "পরে", "রাখ", "রোকো",
-            // Hindi
+            // হিন্দি/হাইnglish
             "reject", "decline", "cut", "kat", "kaat", "nahi", "na", "no",
             "mat", "band karo", "drop", "dismiss", "nahi uthana",
             "nahi uthao", "chhod do", "ignore", "kat do", "kaat do",
             "busy hoon", "baad mein", "later", "ruk", "rukna",
-            // English
+            // ইংরেজি
             "reject", "decline", "cut", "drop", "dismiss", "no", "nope", "nah",
-            "don't", "dont", "stop", "end", "busy", "later", "not now"
+            "don't", "dont", "stop", "end", "busy", "later", "not now",
+            // Tamil
+            "venam", "cut pannu", "apram",
+            // Telugu
+            "vaddu", "cut chey", "tarvata",
+            // Bengali
+            "na", "kat", " pore",
+            // Marathi
+            "nako", "kat", "nanter",
+            // Gujarati
+            "nahi", "kat", "pachi",
+            // Kannada
+            "beda", "kat", "melake",
+            // Malayalam
+            "venda", "kat", "pinnne",
+            // Punjabi
+            "nahi", "kat", "baad",
+            // Urdu
+            "nahi", "kat", "baad mein"
         )
 
+        // Decision logic — FIXED: Better detection
         val hasAnswer = answerWords.any { lower.contains(it) }
         val hasReject = rejectWords.any { lower.contains(it) }
 
+        // Priority: If both detected, check which appears first
         val answerIndex = answerWords.map { lower.indexOf(it) }.filter { it >= 0 }.minOrNull() ?: Int.MAX_VALUE
         val rejectIndex = rejectWords.map { lower.indexOf(it) }.filter { it >= 0 }.minOrNull() ?: Int.MAX_VALUE
 
@@ -422,15 +479,16 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             isAnswer && !isReject -> performAnswer()
             isReject -> performReject()
             else -> {
-                if (isLiveConnected) {
+                // ✅ ENHANCED: If not answer/reject, let Gemini handle the query naturally
+                if (isLiveসংযুক্ত ✅) {
                     Log.d(TAG, "Passing unrecognized command to Gemini: $spoken")
-                    isSpeaking = true
-                    runOnUiThread { statusText.text = "ভাবছি... 🤔" }
-                    liveClient.sendTextMessage(spoken)
+                    isবলছে… = true
+                    runচালুUiThread { statusText.text = "ভাবছে…... 🤔" }
+                    liveClient.sendTextমেসেজ(spoken)
                 } else {
                     val confusion = when (personality) {
-                        "gf"  -> "জান, বুঝলাম না। 'উঠাও' বা 'না' বলো।"
-                        else  -> "Please say 'Answer' or 'Reject'."
+                        "gf"  -> "Jaan, samajh nahi aaya. 'Uthao' ya 'Nahi' bolo."
+                        else  -> "অনুগ্রহ করে say 'Answer' or 'Reject'."
                     }
                     speakViaWebSocket(confusion)
                     handler.postDelayed({ if (!isDecisionMade) repeatAnnouncement() }, 4000)
@@ -439,47 +497,56 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
     }
 
+    /**
+     * ✅ FIXED: কল ANSWER — proper logic, no confusion with reject
+     */
     private fun performAnswer() {
         if (isDecisionMade) return
         isDecisionMade = true
-        isCallAnswered = true
-        stopListening()
+        isকলAnswered = true
+        stopশুনছে…()
 
         val confirmMsg = when (personality) {
-            "gf"  -> "জি $userName, call উঠাচ্ছি! 📞"
-            else  -> "Answering the call, $userName."
+            "gf"  -> "Ji $userনাম, call utha rahi hoon! 📞"
+            else  -> "Answering the call, $userনাম."
         }
         speakViaWebSocket(confirmMsg)
-        statusText.text = "উঠাচ্ছি... 📞"
+        statusText.text = "Answering... 📞"
         Log.d(TAG, "=== ANSWERING CALL ===")
 
         handler.postDelayed({
             var success = false
 
-            if (isWhatsAppCall) {
-                success = answerWhatsAppCall()
+            if (isWhatsAppকল) {
+                // WhatsApp call answer
+                success = answerWhatsAppকল()
             } else {
-                success = answerNormalCall()
+                // নাrmal call answer
+                success = answerনাrmalকল()
             }
 
             if (!success) {
-                speakViaWebSocket("সরি $userName, call উঠাতে পারিনি")
+                speakViaWebSocket("দুঃখিত $userনাম, call nahi uth payi")
             }
 
             handler.postDelayed({ safeFinish() }, 2000)
         }, 1500)
     }
 
-    private fun answerNormalCall(): Boolean {
+    /**
+     * ✅ NEW: Separate method for normal call answer
+     */
+    private fun answerনাrmalকল(): Boolean {
         var success = false
 
+        // Method 1: TelecomManager acceptRingingকল
         try {
             if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
-                val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+                val telecom = getসিস্টেমService(Context.TELECOM_SERVICE) as TelecomManager
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     @Suppress("DEPRECATION")
-                    telecom.acceptRingingCall()
-                    Log.d(TAG, "✅ Call accepted via TelecomManager.acceptRingingCall()")
+                    telecom.acceptRingingকল()
+                    Log.d(TAG, "✅ কল accepted via TelecomManager.acceptRingingকল()")
                     success = true
                 }
             }
@@ -487,42 +554,47 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             Log.e(TAG, "TelecomManager answer failed: ${e.message}")
         }
 
+        // Method 2: অ্যাক্সেসিবিলিটি fallback
         if (!success) {
             try {
-                val answered = com.maya.assistant.service.SmartAccessibilityEngine.click(
+                val answered = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     text = "Answer"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     contentDesc = "Answer"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     text = "Accept"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     contentDesc = "Accept"
                 )
-                Log.d(TAG, "Accessibility answer: $answered")
+                Log.d(TAG, "অ্যাক্সেসিবিলিটি answer: $answered")
                 success = answered
             } catch (e: Exception) {
-                Log.e(TAG, "Accessibility answer failed: ${e.message}")
+                Log.e(TAG, "অ্যাক্সেসিবিলিটি answer failed: ${e.message}")
             }
         }
 
         return success
     }
 
-    private fun answerWhatsAppCall(): Boolean {
+    /**
+     * ✅ NEW: Answer WhatsApp call via accessibility
+     */
+    private fun answerWhatsAppকল(): Boolean {
         var success = false
 
         try {
-            success = com.maya.assistant.service.SmartAccessibilityEngine.click(
+            // Try to click WhatsApp answer button
+            success = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 text = "Answer"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 contentDesc = "Answer"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 text = "Accept"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 contentDesc = "Accept call"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 id = "com.whatsapp:id/incoming_call_answer"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 id = "com.whatsapp.w4b:id/incoming_call_answer"
             )
 
@@ -534,91 +606,104 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         return success
     }
 
+    /**
+     * ✅ FIXED: কল REJECT — proper endকল(), no confusion
+     */
     private fun performReject() {
         if (isDecisionMade) return
         isDecisionMade = true
-        stopListening()
+        stopশুনছে…()
 
         val confirmMsg = when (personality) {
-            "gf"  -> "ঠিক আছে $userName, call reject করে দিলাম। ❌"
-            else  -> "Call declined, $userName."
+            "gf"  -> "Theek hai $userনাম, call reject kar diya. ❌"
+            else  -> "কল declined, $userনাম."
         }
         speakViaWebSocket(confirmMsg)
-        statusText.text = "রিজেক্ট করছি... ❌"
+        statusText.text = "Rejecting... ❌"
         Log.d(TAG, "=== REJECTING CALL ===")
 
         handler.postDelayed({
             var success = false
 
-            if (isWhatsAppCall) {
-                success = rejectWhatsAppCall()
+            if (isWhatsAppকল) {
+                // WhatsApp call reject
+                success = rejectWhatsAppকল()
             } else {
-                success = rejectNormalCall()
+                // নাrmal call reject
+                success = rejectনাrmalকল()
             }
 
             if (!success) {
-                speakViaWebSocket("সরি $userName, call reject হয়নি")
+                speakViaWebSocket("দুঃখিত $userনাম, call reject nahi ho paya")
             }
 
             handler.postDelayed({ safeFinish() }, 2000)
         }, 1500)
     }
 
-    private fun rejectNormalCall(): Boolean {
+    /**
+     * ✅ NEW: Separate method for normal call reject
+     */
+    private fun rejectনাrmalকল(): Boolean {
         var success = false
 
+        // Method 1: TelecomManager endকল
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
-                    val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+                    val telecom = getসিস্টেমService(Context.TELECOM_SERVICE) as TelecomManager
                     @Suppress("DEPRECATION")
-                    telecom.endCall()
-                    Log.d(TAG, "✅ Call rejected via TelecomManager.endCall()")
+                    telecom.endকল()
+                    Log.d(TAG, "✅ কল rejected via TelecomManager.endকল()")
                     success = true
                 } else {
                     Log.w(TAG, "Permission ANSWER_PHONE_CALLS missing")
                 }
             } else {
-                Log.w(TAG, "TelecomManager.endCall() requires API 28")
+                Log.w(TAG, "TelecomManager.endকল() requires API 28")
             }
         } catch (e: Exception) {
             Log.e(TAG, "TelecomManager reject failed: ${e.message}")
         }
 
+        // Method 2: অ্যাক্সেসিবিলিটি fallback
         if (!success) {
             try {
-                val rejected = com.maya.assistant.service.SmartAccessibilityEngine.click(
+                val rejected = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     text = "Decline"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     text = "Reject"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     contentDesc = "Decline"
-                ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+                ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                     contentDesc = "Reject call"
                 )
-                Log.d(TAG, "Accessibility reject: $rejected")
+                Log.d(TAG, "অ্যাক্সেসিবিলিটি reject: $rejected")
                 success = rejected
             } catch (e: Exception) {
-                Log.e(TAG, "Accessibility reject failed: ${e.message}")
+                Log.e(TAG, "অ্যাক্সেসিবিলিটি reject failed: ${e.message}")
             }
         }
 
         return success
     }
 
-    private fun rejectWhatsAppCall(): Boolean {
+    /**
+     * ✅ NEW: Reject WhatsApp call via accessibility
+     */
+    private fun rejectWhatsAppকল(): Boolean {
         var success = false
 
         try {
-            success = com.maya.assistant.service.SmartAccessibilityEngine.click(
+            success = com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 text = "Decline"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 contentDesc = "Decline"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 text = "Reject"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 id = "com.whatsapp:id/incoming_call_decline"
-            ) || com.maya.assistant.service.SmartAccessibilityEngine.click(
+            ) || com.maya.assistant.service.Smartঅ্যাক্সেসিবিলিটিEngine.click(
                 id = "com.whatsapp.w4b:id/incoming_call_decline"
             )
 
@@ -635,21 +720,21 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         startAnnouncement()
     }
 
-    private fun stopListening() {
-        isListening = false
+    private fun stopশুনছে…() {
+        isশুনছে… = false
         try {
             speechRecognizer?.cancel()
         } catch (_: Exception) {}
         waveformView?.stopAnimation()
     }
 
-    private fun startCallStateMonitor() {
-        val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    private fun startকলStateMonitor() {
+        val tm = getসিস্টেমService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val monitor = object : Runnable {
             override fun run() {
-                if (isDecisionMade || isCallAnswered) return
-                if (tm.callState == TelephonyManager.CALL_STATE_IDLE && !isWhatsAppCall) {
-                    Log.d(TAG, "Phone idle — closing call assistant")
+                if (isDecisionMade || isকলAnswered) return
+                if (tm.callState == TelephonyManager.CALL_STATE_IDLE && !isWhatsAppকল) {
+                    Log.d(TAG, "ফোন idle — closing call assistant")
                     safeFinish()
                     return
                 }
@@ -664,10 +749,11 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             try { speechRecognizer?.cancel() } catch (_: Exception) {}
             try { speechRecognizer?.destroy() } catch (_: Exception) {}
 
+            // ✅ FIXED: রিসেট করো state properly
             isDecisionMade = false
-            isListening = false
+            isশুনছে… = false
             announcementPlayed = false
-            isSpeaking = false
+            isবলছে… = false
 
             finish()
         }
@@ -681,25 +767,27 @@ class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             .getString(key, default) ?: default
     }
 
-    override fun onBackPressed() {
-        speakViaWebSocket("আগে decision নাও!")
+    override fun onপিছনেPressed() {
+        speakViaWebSocket("Pehle decision lo!")
+        // super.onপিছনেPressed() // সরাওd to block back button during call decision
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
+        handler.removeকলbacksAndমেসেজs(null)
         try { unregisterReceiver(callStateReceiver) } catch (_: Exception) {}
         tts?.shutdown()
         if (::liveClient.isInitialized) liveClient.disconnect()
         liveAudioManager.stop()
         speechRecognizer?.destroy()
 
+        // ✅ FIXED: রিসেট করো all states on destroy
         isDecisionMade = false
-        isListening = false
+        isশুনছে… = false
         announcementPlayed = false
-        isSpeaking = false
-        isCallAnswered = false
+        isবলছে… = false
+        isকলAnswered = false
 
-        Log.d(TAG, "CallAssistantActivity destroyed")
+        Log.d(TAG, "কলঅ্যাসিস্ট্যান্টActivity destroyed")
     }
 }

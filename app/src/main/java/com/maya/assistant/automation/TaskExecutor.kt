@@ -7,7 +7,7 @@ import com.maya.assistant.models.ActionModel
 import com.maya.assistant.models.ActionType
 import com.maya.assistant.utils.Logger
 
-object TaskExecutor {
+object টাস্কExecutor {
     private val TAG = "TASK_EXEC"
 
     fun execute(action: ActionModel): Boolean {

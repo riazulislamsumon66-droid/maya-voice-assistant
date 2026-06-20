@@ -1,7 +1,7 @@
 package com.maya.assistant.automation
 
 import android.graphics.Rect
-import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.অ্যাক্সেসিবিলিটিনাdeতথ্য
 import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
@@ -20,7 +20,7 @@ object UiTreeSerializer {
             .trim()
     }
 
-    fun serialize(root: AccessibilityNodeInfo?): String {
+    fun serialize(root: অ্যাক্সেসিবিলিটিনাdeতথ্য?): String {
         if (root == null) return "[]"
 
         val array = JSONArray()
@@ -30,12 +30,12 @@ object UiTreeSerializer {
     }
 
     private fun traverse(
-        node: AccessibilityNodeInfo,
+        node: অ্যাক্সেসিবিলিটিনাdeতথ্য,
         array: JSONArray
     ) {
 
         val rect = Rect()
-        node.getBoundsInScreen(rect)
+        node.getBoundsInস্ক্রিন(rect)
 
         val text = node.text?.toString() ?: ""
         val desc = node.contentDescription?.toString() ?: ""
@@ -43,10 +43,10 @@ object UiTreeSerializer {
         val obj = JSONObject().apply {
             put("text", text)
             put("desc", desc)
-            put("class", node.className?.toString() ?: "")
+            put("class", node.classনাম?.toString() ?: "")
             put("clickable", node.isClickable)
-            put("enabled", node.isEnabled)
-            put("visible", node.isVisibleToUser)
+            put("enabled", node.isচালু)
+            put("visible", node.isদৃশ্যমানToব্যবহারকারী)
             put(
                 "bounds",
                 "${rect.left},${rect.top},${rect.right},${rect.bottom}"
@@ -55,7 +55,7 @@ object UiTreeSerializer {
 
         array.put(obj)
 
-        for (i in 0 until node.childCount) {
+        for (i in 0 until node.childগণনা) {
             node.getChild(i)?.let {
                 traverse(it, array)
             }
@@ -66,13 +66,13 @@ object UiTreeSerializer {
      * Find elements matching a query in the UI tree
      */
     fun findMatchingElements(
-        root: AccessibilityNodeInfo?,
+        root: অ্যাক্সেসিবিলিটিনাdeতথ্য?,
         query: String
-    ): List<AccessibilityNodeInfo> {
+    ): List<অ্যাক্সেসিবিলিটিনাdeতথ্য> {
 
         if (root == null) return emptyList()
 
-        val results = mutableListOf<AccessibilityNodeInfo>()
+        val results = mutableListOf<অ্যাক্সেসিবিলিটিনাdeতথ্য>()
         val queryLower = normalize(query)
 
         findMatchingElementsRecursive(root, queryLower, results)
@@ -81,9 +81,9 @@ object UiTreeSerializer {
     }
 
     private fun findMatchingElementsRecursive(
-        node: AccessibilityNodeInfo,
+        node: অ্যাক্সেসিবিলিটিনাdeতথ্য,
         query: String,
-        results: MutableList<AccessibilityNodeInfo>
+        results: MutableList<অ্যাক্সেসিবিলিটিনাdeতথ্য>
     ) {
 
         val text = normalize(node.text?.toString() ?: "")
@@ -91,12 +91,12 @@ object UiTreeSerializer {
 
         // Match if text or description contains query
         if ((text.contains(query) || desc.contains(query)) &&
-            (node.isClickable || text.isNotEmpty())) {
+            (node.isClickable || text.isনাtEmpty())) {
             results.add(node)
         }
 
         // Recurse through children
-        for (i in 0 until node.childCount) {
+        for (i in 0 until node.childগণনা) {
             node.getChild(i)?.let {
                 findMatchingElementsRecursive(it, query, results)
             }
@@ -107,27 +107,27 @@ object UiTreeSerializer {
      * Get all clickable elements
      */
     fun findClickableElements(
-        root: AccessibilityNodeInfo?
-    ): List<AccessibilityNodeInfo> {
+        root: অ্যাক্সেসিবিলিটিনাdeতথ্য?
+    ): List<অ্যাক্সেসিবিলিটিনাdeতথ্য> {
 
         if (root == null) return emptyList()
 
-        val results = mutableListOf<AccessibilityNodeInfo>()
+        val results = mutableListOf<অ্যাক্সেসিবিলিটিনাdeতথ্য>()
         findClickableElementsRecursive(root, results)
 
         return results
     }
 
     private fun findClickableElementsRecursive(
-        node: AccessibilityNodeInfo,
-        results: MutableList<AccessibilityNodeInfo>
+        node: অ্যাক্সেসিবিলিটিনাdeতথ্য,
+        results: MutableList<অ্যাক্সেসিবিলিটিনাdeতথ্য>
     ) {
 
-        if (node.isClickable && node.isVisibleToUser) {
+        if (node.isClickable && node.isদৃশ্যমানToব্যবহারকারী) {
             results.add(node)
         }
 
-        for (i in 0 until node.childCount) {
+        for (i in 0 until node.childগণনা) {
             node.getChild(i)?.let {
                 findClickableElementsRecursive(it, results)
             }
@@ -137,9 +137,9 @@ object UiTreeSerializer {
     /**
      * Get node center coordinates
      */
-    fun getNodeCenter(node: AccessibilityNodeInfo): Pair<Int, Int> {
+    fun getনাdeCenter(node: অ্যাক্সেসিবিলিটিনাdeতথ্য): Pair<Int, Int> {
         val rect = Rect()
-        node.getBoundsInScreen(rect)
+        node.getBoundsInস্ক্রিন(rect)
 
         return Pair(
             (rect.left + rect.right) / 2,

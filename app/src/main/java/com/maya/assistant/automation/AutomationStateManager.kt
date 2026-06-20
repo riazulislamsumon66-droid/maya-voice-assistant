@@ -1,6 +1,6 @@
 package com.maya.assistant.automation
 
-object AutomationStateManager {
+object অটোmationStateManager {
     enum class State { IDLE, RUNNING, PAUSED, ERROR }
 
     @Volatile var state: State = State.IDLE
@@ -8,7 +8,7 @@ object AutomationStateManager {
 
     fun setRunning() { state = State.RUNNING }
     fun setIdle() { state = State.IDLE }
-    fun setPaused() { state = State.PAUSED }
-    fun setError() { state = State.ERROR }
+    fun setবিরতিd() { state = State.PAUSED }
+    fun setসমস্যা() { state = State.ERROR }
     fun isRunning() = state == State.RUNNING
 }

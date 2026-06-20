@@ -2,40 +2,40 @@ package com.maya.assistant.network
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.net.নেটওয়ার্ক
+import android.net.নেটওয়ার্কCapabilities
+import android.net.নেটওয়ার্কRequest
 import com.maya.assistant.utils.Logger
 
-class NetworkMonitor(context: Context) {
+class নেটওয়ার্কMonitor(context: Context) {
     private val TAG = "NET"
-    private val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    var isConnected = false
+    private val cm = context.getসিস্টেমService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    var isসংযুক্ত ✅ = false
         private set
     var onConnectionChange: ((Boolean) -> Unit)? = null
 
-    private val callback = object : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            isConnected = true
-            Logger.d(TAG, "Network available")
+    private val callback = object : ConnectivityManager.নেটওয়ার্ককলback() {
+        override fun onপাওয়া যাচ্ছে(network: নেটওয়ার্ক) {
+            isসংযুক্ত ✅ = true
+            Logger.d(TAG, "নেটওয়ার্ক available")
             onConnectionChange?.invoke(true)
         }
-        override fun onLost(network: Network) {
-            isConnected = false
-            Logger.d(TAG, "Network lost")
+        override fun onLost(network: নেটওয়ার্ক) {
+            isসংযুক্ত ✅ = false
+            Logger.d(TAG, "নেটওয়ার্ক lost")
             onConnectionChange?.invoke(false)
         }
     }
 
     fun start() {
-        val req = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        val req = নেটওয়ার্কRequest.Builder()
+            .addCapability(নেটওয়ার্কCapabilities.NET_CAPABILITY_INTERNET)
             .build()
-        cm.registerNetworkCallback(req, callback)
-        isConnected = cm.activeNetwork != null
+        cm.registerনেটওয়ার্ককলback(req, callback)
+        isসংযুক্ত ✅ = cm.activeনেটওয়ার্ক != null
     }
 
     fun stop() {
-        try { cm.unregisterNetworkCallback(callback) } catch (_: Exception) {}
+        try { cm.unregisterনেটওয়ার্ককলback(callback) } catch (_: Exception) {}
     }
 }

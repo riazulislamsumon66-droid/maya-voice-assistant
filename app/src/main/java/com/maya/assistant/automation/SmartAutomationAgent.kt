@@ -1,14 +1,14 @@
 package com.maya.assistant.automation
 
-import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
 import android.util.Log
 
-object SmartAutomationAgent {
+object SmartঅটোmationAgent {
 
     private const val TAG = "MAYA_AGENT"
 
     fun run(
-        service: AccessibilityService,
+        service: অ্যাক্সেসিবিলিটিService,
         command: String
     ): Boolean {
 
@@ -35,11 +35,11 @@ object SmartAutomationAgent {
      * Analyze UI tree and find relevant clickable elements
      */
     private fun analyzeAndClick(
-        service: AccessibilityService,
+        service: অ্যাক্সেসিবিলিটিService,
         command: String
     ): Boolean {
 
-        val root = service.rootInActiveWindow ?: return false
+        val root = service.rootInসক্রিয়Window ?: return false
 
         // Get relevant elements based on command
         val relevant = UiTreeSerializer.findMatchingElements(
@@ -48,7 +48,7 @@ object SmartAutomationAgent {
         )
 
         if (relevant.isEmpty()) {
-            Log.d(TAG, "No matching elements found for: $command")
+            Log.d(TAG, "না matching elements found for: $command")
             return false
         }
 
@@ -69,7 +69,7 @@ object SmartAutomationAgent {
      * Try clicking with cleaned command (remove common words)
      */
     private fun clickWithCleanedCommand(
-        service: AccessibilityService,
+        service: অ্যাক্সেসিবিলিটিService,
         command: String
     ): Boolean {
 
@@ -80,7 +80,7 @@ object SmartAutomationAgent {
             .replace("press", "", ignoreCase = true)
             .trim()
 
-        if (target.isNotEmpty()) {
+        if (target.isনাtEmpty()) {
             return ActionExecutor.clickByText(service, target)
         }
 

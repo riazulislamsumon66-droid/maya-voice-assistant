@@ -3,27 +3,27 @@ package com.maya.assistant.screenvision
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
-import android.hardware.display.DisplayManager
-import android.hardware.display.VirtualDisplay
+import android.hardware.display.ডিসপ্লেManager
+import android.hardware.display.Virtualডিসপ্লে
 import android.media.ImageReader
 import android.media.projection.MediaProjection
 import android.util.Log
 
-class ScreenCaptureManager(private val context: Context) {
+class স্ক্রিনCaptureManager(private val context: Context) {
     private val TAG = "SCREEN_CAP"
     private var mediaProjection: MediaProjection? = null
     private var imageReader: ImageReader? = null
-    private var virtualDisplay: VirtualDisplay? = null
+    private var virtualডিসপ্লে: Virtualডিসপ্লে? = null
 
     fun startCapture(projection: MediaProjection, width: Int, height: Int, dpi: Int) {
         mediaProjection = projection
         imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
-        virtualDisplay = projection.createVirtualDisplay(
-            "MAYA_Screen", width, height, dpi,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+        virtualডিসপ্লে = projection.createVirtualডিসপ্লে(
+            "MAYA_স্ক্রিন", width, height, dpi,
+            ডিসপ্লেManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
             imageReader!!.surface, null, null
         )
-        Log.d(TAG, "Screen capture started")
+        Log.d(TAG, "স্ক্রিন capture started")
     }
 
     fun captureFrame(): Bitmap? {
@@ -50,9 +50,9 @@ class ScreenCaptureManager(private val context: Context) {
     }
 
     fun stop() {
-        virtualDisplay?.release()
+        virtualডিসপ্লে?.release()
         imageReader?.close()
         mediaProjection?.stop()
-        virtualDisplay = null; imageReader = null; mediaProjection = null
+        virtualডিসপ্লে = null; imageReader = null; mediaProjection = null
     }
 }

@@ -17,11 +17,10 @@ object Constants {
     const val KEY_PRIME_NUMBER = "prime_number"
     const val KEY_CALL_ANNOUNCE = "call_announce"
     const val KEY_WAKE_WORD = "wake_word"
-    const val KEY_LANGUAGE = "language"
 
-    // Notifications
-    const val NOTIF_CHANNEL_OVERLAY = "maya_overlay_channel"
-    const val NOTIF_CHANNEL_VOICE = "maya_voice_channel"
+    // নাtifications
+    const val NOTIF_CHANNEL_OVERLAY = "myra_overlay_channel"
+    const val NOTIF_CHANNEL_VOICE = "myra_voice_channel"
     const val NOTIF_ID_OVERLAY = 1001
     const val NOTIF_ID_VOICE = 1002
 
@@ -36,7 +35,7 @@ object Constants {
     const val ACTION_START_LISTENING = "START_LISTENING"
     const val ACTION_STOP_LISTENING = "STOP_LISTENING"
 
-    // Voice States
+    // ভয়েস States
     const val STATE_IDLE = "IDLE"
     const val STATE_LISTENING = "LISTENING"
     const val STATE_THINKING = "THINKING"

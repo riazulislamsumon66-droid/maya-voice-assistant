@@ -17,7 +17,7 @@ class AudioPlayer {
     @Volatile private var isPlaying = false
     private var playThread: Thread? = null
 
-    var onPlaybackStarted: (() -> Unit)? = null
+    var onPlaybackশুরু করোed: (() -> Unit)? = null
     var onPlaybackFinished: (() -> Unit)? = null
 
     init {
@@ -26,7 +26,7 @@ class AudioPlayer {
     }
 
     private fun initTrack() {
-        val minBuf = AudioTrack.getMinBufferSize(
+        val minBuf = AudioTrack.getMinBufferআকার(
             SAMPLE_RATE,
             AudioFormat.CHANNEL_OUT_MONO,
             AudioFormat.ENCODING_PCM_16BIT
@@ -47,7 +47,7 @@ class AudioPlayer {
                         .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                         .build()
                 )
-                .setBufferSizeInBytes(minBuf * 4)
+                .setBufferআকারInBytes(minBuf * 4)
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build()
         } else {
@@ -72,8 +72,8 @@ class AudioPlayer {
                 if (chunk != null) {
                     if (!wasPlaying) {
                         wasPlaying = true
-                        VoiceStateManager.setSpeaking()
-                        onPlaybackStarted?.invoke()
+                        ভয়েসStateManager.setবলছে…()
+                        onPlaybackশুরু করোed?.invoke()
                     }
                     try {
                         audioTrack?.write(chunk, 0, chunk.size)
@@ -96,12 +96,12 @@ class AudioPlayer {
     }
 
     fun playChunk(data: ByteArray) {
-        if (data.isNotEmpty()) queue.offer(data)
+        if (data.isনাtEmpty()) queue.offer(data)
     }
 
-    fun clearAndStop() {
+    fun clearAndবন্ধ করো() {
         queue.clear()
-        VoiceStateManager.setListening()
+        ভয়েসStateManager.setশুনছে…()
     }
 
     fun release() {

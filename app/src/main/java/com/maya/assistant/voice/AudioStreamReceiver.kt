@@ -6,8 +6,8 @@ package com.maya.assistant.voice
 class AudioStreamReceiver(private val player: AudioPlayer) {
 
     fun receive(data: ByteArray) {
-        if (data.isNotEmpty()) player.playChunk(data)
+        if (data.isনাtEmpty()) player.playChunk(data)
     }
 
-    fun clear() = player.clearAndStop()
+    fun clear() = player.clearAndবন্ধ করো()
 }

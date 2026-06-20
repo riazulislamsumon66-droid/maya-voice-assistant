@@ -5,13 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.widget.Toast
 
-class SystemController(private val context: Context) {
+class সিস্টেমController(private val context: Context) {
 
-    fun openApp(spokenName: String) {
+    fun openApp(spokenনাম: String) {
         val pm = context.packageManager
-        val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        val apps = pm.getইনস্টল করোedApplications(PackageManager.GET_META_DATA)
 
-        val cleanedInput = spokenName
+        val cleanedInput = spokenনাম
             .lowercase()
             .replace("open", "")
             .replace("khol", "")
@@ -29,7 +29,7 @@ class SystemController(private val context: Context) {
                 cleanedInput.contains(appLabel)
             ) {
 
-                val intent = pm.getLaunchIntentForPackage(app.packageName)
+                val intent = pm.getLaunchIntentForPackage(app.packageনাম)
 
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -41,7 +41,7 @@ class SystemController(private val context: Context) {
 
         Toast.makeText(
             context,
-            "$spokenName not installed",
+            "$spokenনাম not installed",
             Toast.LENGTH_SHORT
         ).show()
     }

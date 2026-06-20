@@ -6,7 +6,7 @@ import okhttp3.*
 import okio.ByteString
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.সময়Unit
 
 class GeminiLiveClient(
     private val apiKey: String,
@@ -18,9 +18,9 @@ class GeminiLiveClient(
     private var webSocket: WebSocket? = null
 
     private val client = OkHttpClient.Builder()
-        .readTimeout(0, TimeUnit.MILLISECONDS)
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .pingInterval(20, TimeUnit.SECONDS) // Connection ko zinda rakhne ke liye
+        .readটাইমআউট(0, সময়Unit.MILLISECONDS)
+        .connectটাইমআউট(20, সময়Unit.SECONDS)
+        .pingInterval(20, সময়Unit.SECONDS) // Connection ko zinda rakhne ke liye
         .build()
 
     // Aapka original model name
@@ -29,9 +29,9 @@ class GeminiLiveClient(
     interface LiveListener {
         fun onAudioReceived(data: ByteArray)
         fun onTextReceived(text: String)
-        fun onConnected()
+        fun onসংযুক্ত ✅()
         fun onTurnComplete()
-        fun onError(msg: String)
+        fun onসমস্যা(msg: String)
     }
 
     fun start() {
@@ -42,32 +42,32 @@ class GeminiLiveClient(
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d(TAG, "Connected ✅")
+            override fun onখোলো(webSocket: WebSocket, response: Response) {
+                Log.d(TAG, "সংযুক্ত ✅ ✅")
                 sendSetup()
             }
 
-            override fun onMessage(webSocket: WebSocket, text: String) {
+            override fun onমেসেজ(webSocket: WebSocket, text: String) {
                 // Saara data JSON mein aata hai, use handle karein
                 handleResponse(text)
             }
 
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+            override fun onমেসেজ(webSocket: WebSocket, bytes: ByteString) {
                 // Gemini Live API hamesha JSON Text bhejta hai.
                 // Binary frame ki handle karne ki zaroorat nahi hai, par safety ke liye:
                 try {
                     handleResponse(bytes.utf8())
                 } catch (e: Exception) {
-                    Log.e(TAG, "Binary Error: ${e.message}")
+                    Log.e(TAG, "Binary সমস্যা: ${e.message}")
                 }
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 isSetupComplete = false
-                callback.onError("Connection Failed: ${t.message}")
+                callback.onসমস্যা("Connection ব্যর্থ: ${t.message}")
             }
 
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            override fun onবন্ধ করোd(webSocket: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
             }
         })
@@ -82,8 +82,8 @@ class GeminiLiveClient(
                         put("responseModalities", JSONArray().put("AUDIO"))
                         put("speechConfig", JSONObject().apply {
                             put("voiceConfig", JSONObject().apply {
-                                put("prebuiltVoiceConfig", JSONObject().apply {
-                                    put("voiceName", "Aoede")
+                                put("prebuiltভয়েসConfig", JSONObject().apply {
+                                    put("voiceনাম", "Aoede")
                                 })
                             })
                         })
@@ -96,11 +96,11 @@ class GeminiLiveClient(
             webSocket?.send(setupJson.toString())
             Log.d(TAG, "Setup Sent ✅")
         } catch (e: Exception) {
-            Log.e(TAG, "Setup Error: ${e.message}")
+            Log.e(TAG, "Setup সমস্যা: ${e.message}")
         }
     }
 
-    fun sendTextMessage(text: String) {
+    fun sendTextমেসেজ(text: String) {
         if (!isSetupComplete) return
         try {
             val msg = JSONObject().apply {
@@ -116,7 +116,7 @@ class GeminiLiveClient(
             }
             webSocket?.send(msg.toString())
         } catch (e: Exception) {
-            Log.e(TAG, "Send Error: ${e.message}")
+            Log.e(TAG, "Send সমস্যা: ${e.message}")
         }
     }
 
@@ -129,7 +129,7 @@ class GeminiLiveClient(
             if (json.has("setupComplete")) {
                 isSetupComplete = true
                 Log.d(TAG, "GEMINI READY ✅")
-                callback.onConnected()
+                callback.onসংযুক্ত ✅()
                 return
             }
 
@@ -137,14 +137,14 @@ class GeminiLiveClient(
             if (json.optJSONObject("setupComplete") != null) {
                 isSetupComplete = true
                 Log.d(TAG, "GEMINI READY (nested) ✅")
-                callback.onConnected()
+                callback.onসংযুক্ত ✅()
                 return
             }
 
             // Handle serverContent
             val serverContent = json.optJSONObject("serverContent")
             if (serverContent == null) {
-                Log.d(TAG, "No serverContent in response")
+                Log.d(TAG, "না serverContent in response")
                 return
             }
 
@@ -153,7 +153,7 @@ class GeminiLiveClient(
             if (modelTurn != null) {
                 val parts = modelTurn.optJSONArray("parts")
                 if (parts == null) {
-                    Log.d(TAG, "No parts in modelTurn")
+                    Log.d(TAG, "না parts in modelTurn")
                     return
                 }
 
@@ -198,14 +198,14 @@ class GeminiLiveClient(
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Parse Error: ${e.message}")
+            Log.e(TAG, "Parse সমস্যা: ${e.message}")
             Log.e(TAG, "JSON: ${jsonString.take(500)}")
             e.printStackTrace()
         }
     }
 
     fun disconnect() {
-        webSocket?.close(1000, "Bye")
+        webSocket?.close(1000, "বাই")
         isSetupComplete = false
     }
 }

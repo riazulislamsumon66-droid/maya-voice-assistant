@@ -3,47 +3,47 @@ package com.maya.assistant.voice
 import androidx.lifecycle.MutableLiveData
 import com.maya.assistant.utils.Constants
 
-object VoiceStateManager {
+object ভয়েসStateManager {
 
     val state = MutableLiveData(Constants.STATE_IDLE)
-    val statusMessage = MutableLiveData("SYSTEM READY")
+    val statusমেসেজ = MutableLiveData("সিস্টেম প্রস্তুত")
     val amplitude = MutableLiveData(0f)
     val isMicMuted = MutableLiveData(false)
 
-    fun setListening() {
+    fun setশুনছে…() {
         state.postValue(Constants.STATE_LISTENING)
-        statusMessage.postValue("LISTENING...")
+        statusমেসেজ.postValue("শুনছে…")
         isMicMuted.postValue(false)
     }
 
-    fun setThinking() {
+    fun setভাবছে…() {
         state.postValue(Constants.STATE_THINKING)
-        statusMessage.postValue("THINKING...")
+        statusমেসেজ.postValue("ভাবছে…")
     }
 
-    fun setSpeaking() {
+    fun setবলছে…() {
         state.postValue(Constants.STATE_SPEAKING)
-        statusMessage.postValue("SPEAKING...")
+        statusমেসেজ.postValue("বলছে…")
         isMicMuted.postValue(true)
     }
 
     fun setIdle() {
         state.postValue(Constants.STATE_IDLE)
-        statusMessage.postValue("SYSTEM READY")
+        statusমেসেজ.postValue("সিস্টেম প্রস্তুত")
         isMicMuted.postValue(false)
         amplitude.postValue(0f)
     }
 
-    fun setError(msg: String) {
+    fun setসমস্যা(msg: String) {
         state.postValue(Constants.STATE_IDLE)
-        statusMessage.postValue(msg)
+        statusমেসেজ.postValue(msg)
     }
 
     fun updateAmplitude(rms: Float) {
         amplitude.postValue(rms.coerceIn(0f, 1f))
     }
 
-    fun isAiSpeaking() = state.value == Constants.STATE_SPEAKING
+    fun isAiবলছে…() = state.value == Constants.STATE_SPEAKING
 
-    fun isListening() = state.value == Constants.STATE_LISTENING
+    fun isশুনছে…() = state.value == Constants.STATE_LISTENING
 }

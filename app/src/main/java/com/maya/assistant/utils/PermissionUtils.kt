@@ -30,7 +30,7 @@ object PermissionUtils {
 
     fun requestMissing(activity: Activity, requestCode: Int) {
         val missing = getMissingPermissions(activity)
-        if (missing.isNotEmpty()) {
+        if (missing.isনাtEmpty()) {
             ActivityCompat.requestPermissions(activity, missing.toTypedArray(), requestCode)
         }
     }

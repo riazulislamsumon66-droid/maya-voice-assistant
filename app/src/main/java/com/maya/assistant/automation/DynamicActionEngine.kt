@@ -43,13 +43,13 @@ object DynamicActionEngine {
     private fun enqueue(action: ActionModel) {
         ActionQueue.enqueue(action)
         scope.launch {
-            if (!AutomationStateManager.isRunning()) {
-                AutomationStateManager.setRunning()
+            if (!অটোmationStateManager.isRunning()) {
+                অটোmationStateManager.setRunning()
                 while (!ActionQueue.isEmpty()) {
-                    ActionQueue.dequeue()?.let { TaskExecutor.execute(it) }
+                    ActionQueue.dequeue()?.let { টাস্কExecutor.execute(it) }
                     kotlinx.coroutines.delay(300)
                 }
-                AutomationStateManager.setIdle()
+                অটোmationStateManager.setIdle()
             }
         }
     }

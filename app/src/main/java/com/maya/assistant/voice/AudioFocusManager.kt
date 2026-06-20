@@ -9,11 +9,11 @@ import com.maya.assistant.utils.Logger
 
 class AudioFocusManager(private val context: Context) {
     private val TAG = "AUDIO_FOCUS"
-    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val audioManager = context.getসিস্টেমService(Context.AUDIO_SERVICE) as AudioManager
     private var focusRequest: AudioFocusRequest? = null
 
     fun requestFocus(onGained: () -> Unit, onLost: () -> Unit) {
-        val listener = AudioManager.OnAudioFocusChangeListener { change ->
+        val listener = AudioManager.চালুAudioFocusChangeListener { change ->
             when (change) {
                 AudioManager.AUDIOFOCUS_GAIN -> onGained()
                 AudioManager.AUDIOFOCUS_LOSS,
@@ -29,7 +29,7 @@ class AudioFocusManager(private val context: Context) {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build()
                 )
-                .setOnAudioFocusChangeListener(listener)
+                .setচালুAudioFocusChangeListener(listener)
                 .build()
             val result = audioManager.requestAudioFocus(focusRequest!!)
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) onGained()

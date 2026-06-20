@@ -1,17 +1,17 @@
 package com.maya.assistant.ai
 
-data class Turn(val role: String, val text: String, val timestamp: Long = System.currentTimeMillis())
+data class Turn(val role: String, val text: String, val timestamp: Long = সিস্টেম.currentসময়Millis())
 
-object ConversationMemory {
+object Conversationমেমোরি {
     private val history = mutableListOf<Turn>()
     private const val MAX_TURNS = 20
 
-    fun addUser(text: String) {
+    fun addব্যবহারকারী(text: String) {
         history.add(Turn("user", text))
         trim()
     }
 
-    fun addAssistant(text: String) {
+    fun addঅ্যাসিস্ট্যান্ট(text: String) {
         history.add(Turn("assistant", text))
         trim()
     }

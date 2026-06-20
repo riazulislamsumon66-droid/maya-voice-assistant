@@ -13,14 +13,14 @@ import kotlinx.coroutines.launch
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val aiResponse = MutableLiveData<String>()
-    val userMessage = MutableLiveData<String>()
+    val userমেসেজ = MutableLiveData<String>()
 
     fun processCommand(rawCommand: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val command = IntentAnalyzer.analyze(rawCommand)
             if (command.type != CommandType.CONVERSATION) {
                 val response = DynamicDecisionEngine.execute(getApplication(), command)
-                if (response.isNotBlank()) aiResponse.postValue(response)
+                if (response.isনাtBlank()) aiResponse.postValue(response)
             }
         }
     }

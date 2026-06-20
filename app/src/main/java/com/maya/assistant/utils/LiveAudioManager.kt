@@ -33,7 +33,7 @@ class LiveAudioManager(private val context: Context) {
     }
 
     private fun initAudioTrack() {
-        val minBufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
+        val minBufferআকার = AudioTrack.getMinBufferআকার(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
 
         audioTrack = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
@@ -50,7 +50,7 @@ class LiveAudioManager(private val context: Context) {
                         .setChannelMask(CHANNEL_CONFIG)
                         .build()
                 )
-                .setBufferSizeInBytes(minBufferSize * 2)
+                .setBufferআকারInBytes(minBufferআকার * 2)
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build()
         } else {
@@ -60,7 +60,7 @@ class LiveAudioManager(private val context: Context) {
                 SAMPLE_RATE,
                 CHANNEL_CONFIG,
                 AUDIO_FORMAT,
-                minBufferSize * 2,
+                minBufferআকার * 2,
                 AudioTrack.MODE_STREAM
             )
         }
@@ -118,7 +118,7 @@ class LiveAudioManager(private val context: Context) {
         try {
             MediaPlayer().apply {
                 setDataSource(path)
-                setOnCompletionListener { release() }
+                setচালুCompletionListener { release() }
                 prepare()
                 start()
             }
@@ -133,12 +133,12 @@ class LiveAudioManager(private val context: Context) {
     fun playMp3Data(mp3Data: ByteArray) {
         try {
             // Write to temp file and play
-            val tempFile = File.createTempFile("maya_audio", ".mp3", context.cacheDir)
+            val tempFile = File.createTempFile("myra_audio", ".mp3", context.cacheDir)
             FileOutputStream(tempFile).use { it.write(mp3Data) }
 
             MediaPlayer().apply {
                 setDataSource(tempFile.absolutePath)
-                setOnCompletionListener {
+                setচালুCompletionListener {
                     release()
                     tempFile.delete()
                 }
@@ -164,7 +164,7 @@ class LiveAudioManager(private val context: Context) {
 
             Log.d(TAG, "Audio stopped")
         } catch (e: Exception) {
-            Log.e(TAG, "Stop error: ${e.message}")
+            Log.e(TAG, "বন্ধ করো error: ${e.message}")
         }
     }
 

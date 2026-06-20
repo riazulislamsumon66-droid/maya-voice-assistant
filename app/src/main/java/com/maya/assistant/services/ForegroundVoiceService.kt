@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
+import androidx.core.app.নাtificationCompat
 import com.maya.assistant.R
 import com.maya.assistant.ai.AIResponseManager
-import com.maya.assistant.ai.ConversationMemory
+import com.maya.assistant.ai.Conversationমেমোরি
 import com.maya.assistant.ai.IntentAnalyzer
 import com.maya.assistant.ai.DynamicDecisionEngine
 import com.maya.assistant.ui.main.MainActivity
@@ -18,27 +18,27 @@ import com.maya.assistant.utils.prefs
 import com.maya.assistant.voice.AudioFocusManager
 import com.maya.assistant.voice.AudioPlayer
 import com.maya.assistant.voice.AudioRecorder
-import com.maya.assistant.voice.VoiceActivityDetector
-import com.maya.assistant.voice.VoiceStateManager
+import com.maya.assistant.voice.ভয়েসActivityDetector
+import com.maya.assistant.voice.ভয়েসStateManager
 import com.maya.assistant.websocket.GeminiWebSocketClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class ForegroundVoiceService : Service() {
+class Foregroundভয়েসService : Service() {
     private val TAG = "VOICE_SVC"
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     private lateinit var audioRecorder: AudioRecorder
     private lateinit var audioPlayer: AudioPlayer
-    private lateinit var vad: VoiceActivityDetector
+    private lateinit var vad: ভয়েসActivityDetector
     private lateinit var audioFocus: AudioFocusManager
     private var geminiClient: GeminiWebSocketClient? = null
 
     companion object {
-        var instance: ForegroundVoiceService? = null
+        var instance: Foregroundভয়েসService? = null
         var isRunning = false
     }
 
@@ -46,7 +46,7 @@ class ForegroundVoiceService : Service() {
         super.onCreate()
         instance = this
         isRunning = true
-        startForeground(Constants.NOTIF_ID_VOICE, buildNotification())
+        startForeground(Constants.NOTIF_ID_VOICE, buildনাtification())
         initComponents()
     }
 
@@ -54,32 +54,32 @@ class ForegroundVoiceService : Service() {
         audioFocus = AudioFocusManager(this)
         audioPlayer = AudioPlayer()
 
-        audioPlayer.onPlaybackStarted = {
-            VoiceStateManager.setSpeaking()
+        audioPlayer.onPlaybackশুরু করোed = {
+            ভয়েসStateManager.setবলছে…()
         }
         audioPlayer.onPlaybackFinished = {
-            VoiceStateManager.setListening()
+            ভয়েসStateManager.setশুনছে…()
         }
 
-        vad = VoiceActivityDetector(
-            onSpeechStart = {
-                VoiceStateManager.setListening()
+        vad = ভয়েসActivityDetector(
+            onSpeechশুরু করো = {
+                ভয়েসStateManager.setশুনছে…()
             },
             onSpeechEnd = {
-                VoiceStateManager.setThinking()
+                ভয়েসStateManager.setভাবছে…()
             }
         )
 
         audioRecorder = AudioRecorder(this) { chunk ->
             // Don't send audio while AI is speaking
-            if (!VoiceStateManager.isAiSpeaking()) {
+            if (!ভয়েসStateManager.isAiবলছে…()) {
                 vad.processChunk(chunk)
                 geminiClient?.sendAudioChunk(chunk)
             }
         }
 
         val apiKey = prefs().getString(Constants.KEY_API_KEY, "") ?: ""
-        if (apiKey.isNotEmpty()) {
+        if (apiKey.isনাtEmpty()) {
             connectGemini(apiKey)
         }
     }
@@ -87,9 +87,9 @@ class ForegroundVoiceService : Service() {
     private fun connectGemini(apiKey: String) {
         geminiClient = GeminiWebSocketClient(
             apiKey = apiKey,
-            systemPrompt = buildSystemPrompt(),
-            onConnected = {
-                VoiceStateManager.setListening()
+            systemPrompt = buildসিস্টেমPrompt(),
+            onসংযুক্ত ✅ = {
+                ভয়েসStateManager.setশুনছে…()
                 audioRecorder.start()
             },
             onAudioReceived = { data ->
@@ -97,13 +97,13 @@ class ForegroundVoiceService : Service() {
             },
             onTextReceived = { text ->
                 val clean = AIResponseManager.clean(text)
-                if (clean.isNotBlank()) {
-                    ConversationMemory.addAssistant(clean)
+                if (clean.isনাtBlank()) {
+                    Conversationমেমোরি.addঅ্যাসিস্ট্যান্ট(clean)
                     val cmd = AIResponseManager.extractCommand(clean)
                     if (cmd != null) {
                         scope.launch {
                             val intent = IntentAnalyzer.analyze(cmd)
-                            DynamicDecisionEngine.execute(this@ForegroundVoiceService, intent)
+                            DynamicDecisionEngine.execute(this@Foregroundভয়েসService, intent)
                         }
                     }
                     // Broadcast to UI
@@ -111,13 +111,13 @@ class ForegroundVoiceService : Service() {
                 }
             },
             onTurnComplete = {
-                // Resume listening after AI finishes
-                if (!audioRecorder.isActive()) audioRecorder.start()
+                // চালিয়ে যাও listening after AI finishes
+                if (!audioRecorder.isসক্রিয়()) audioRecorder.start()
             },
-            onError = { msg ->
+            onসমস্যা = { msg ->
                 Logger.e(TAG, "Gemini error: $msg")
-                VoiceStateManager.setError("Reconnecting...")
-                // Auto-reconnect after delay
+                ভয়েসStateManager.setসমস্যা("পুনরায় সংযুক্ত হচ্ছে…")
+                // অটো-reconnect after delay
                 scope.launch {
                     kotlinx.coroutines.delay(3000)
                     geminiClient?.connect()
@@ -128,86 +128,69 @@ class ForegroundVoiceService : Service() {
     }
 
     fun sendTextToGemini(text: String) {
-        ConversationMemory.addUser(text)
-        VoiceStateManager.setThinking()
-        geminiClient?.sendTextMessage(text)
+        Conversationমেমোরি.addব্যবহারকারী(text)
+        ভয়েসStateManager.setভাবছে…()
+        geminiClient?.sendTextমেসেজ(text)
     }
 
     fun reconnectGemini() {
         val apiKey = prefs().getString(Constants.KEY_API_KEY, "") ?: ""
-        if (apiKey.isNotEmpty()) {
+        if (apiKey.isনাtEmpty()) {
             geminiClient?.disconnect()
             connectGemini(apiKey)
         }
     }
 
-    private fun buildSystemPrompt(): String {
-        val userName = prefs().getString(Constants.KEY_USER_NAME, "Boss") ?: "Boss"
+    private fun buildসিস্টেমPrompt(): String {
+        val userনাম = prefs().getString(Constants.KEY_USER_NAME, "Boss") ?: "Boss"
         val personality = prefs().getString(Constants.KEY_PERSONALITY, "friendly") ?: "friendly"
-        val language = prefs().getString(Constants.KEY_LANGUAGE, "bangla") ?: "bangla"
         return """
-YOU ARE MAYA - মায়া (Maya), a personal AI assistant.
-User's name is $userName.
-Personality: $personality.
-Primary Language: $language (Bangla/Bengali is default).
-
-MULTILINGUAL RULES:
-- ALWAYS reply in the user's primary language: Bangla (বাংলা) by default
-- If user speaks Hindi (हिंदी), reply in Hindi
-- If user speaks English, reply in English
-- You can understand and respond in all three languages: Bangla, Hindi, English
-- For Bangla replies, use বাংলা ভাষা (Bengali script)
-- For Hindi replies, use हिंदी (Devanagari script)
-- Mixing languages in response is OK if user mixes
-
-LANGUAGE DETECTION:
-- Bangla keywords: কী, কেমন, কোথায়, কখন, কেন, কিভাবে, হ্যাঁ, না, ধন্যবাদ, করো, বলো, দেখো, শুনো, খোলো, চালু, বন্ধ, কল, মেসেজ, গান, ভলিউম
-- Hindi keywords: कैसे, क्या, कहाँ, कब, क्यों, हाँ, नहीं, धन्यवाद, करो, बोलो, देखो, सुनो, खोलो, चालू, बंद, कॉल, मैसेज, गाना, वॉल्यूম
-- Default to Bangla if unsure
+YOU ARE MAYA - My Yours Responsive অ্যাসিস্ট্যান্ট.
+ব্যবহারকারী's name is $userনাম.
+ব্যক্তিগতity: $personality.
 
 STRICT RULES:
-- Never explain or think aloud
-- Never say: "Responding to", "I've registered", "Formulating", "Interpreting", "Processing"
+- কখনো না explain or think aloud
+- কখনো না say: "Responding to", "I've registered", "Formulating", "Interpreting", "Processing"
 - For device actions return ONLY the command:
   OPEN_APP <name> | CALL <name> | WHATSAPP_CALL <name>
   WHATSAPP_MSG <name> <message> | YOUTUBE_PLAY <query>
   SPOTIFY_PLAY <query> | FLASHLIGHT_ON | FLASHLIGHT_OFF
   VOLUME_UP | VOLUME_DOWN | SMS <name> <message>
-- For conversation: Reply short and natural in user's language
-- Address user as $userName
+- For conversation: Reply short and natural in হাইnglish
+- যোগ করোress user as $userনাম
 - Be warm, witty, and human-like
-- Use appropriate greeting: নমস্কার/হ্যালো (Bangla), नमस्ते/हैलो (Hi), Hi/Hello (English)
         """.trimIndent()
     }
 
-    private fun buildNotification(): Notification {
+    private fun buildনাtification(): নাtification {
         createChannel()
         val pi = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        return NotificationCompat.Builder(this, Constants.NOTIF_CHANNEL_VOICE)
-            .setContentTitle("MAYA is listening ❤️")
-            .setContentText("Always ready for you")
-            .setSmallIcon(R.drawable.ic_maya_notif)
+        return নাtificationCompat.Builder(this, Constants.NOTIF_CHANNEL_VOICE)
+            .setContentTitle("MAYA শুনছে ❤️")
+            .setContentText("সবসময় ready for you")
+            .setSmallIcon(R.drawable.ic_myra_notif)
             .setContentIntent(pi)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setচালুgoing(true)
+            .setPriority(নাtificationCompat.PRIORITY_LOW)
             .build()
     }
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val ch = NotificationChannel(
+            val ch = নাtificationChannel(
                 Constants.NOTIF_CHANNEL_VOICE,
-                "MAYA Voice Service",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply { setShowBadge(false) }
-            getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
+                "MAYA ভয়েস Service",
+                নাtificationManager.IMPORTANCE_LOW
+            ).apply { setদেখাওBadge(false) }
+            getসিস্টেমService(নাtificationManager::class.java).createনাtificationChannel(ch)
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    override fun onশুরু করোCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
 
     override fun onBind(intent: Intent?): IBinder? = null
 

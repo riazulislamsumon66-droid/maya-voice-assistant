@@ -7,7 +7,7 @@ import android.graphics.Path
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.MotionEvent
+import android.view.Motionইভেন্ট
 import android.view.View
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -31,9 +31,9 @@ class PatternLockView @JvmOverloads constructor(
     }
 
     interface PatternListener {
-        fun onPatternStarted()
+        fun onPatternশুরু করোed()
         fun onPatternComplete(pattern: List<Int>)
-        fun onPatternCleared()
+        fun onPatternপরিষ্কার করোed()
     }
 
     var listener: PatternListener? = null
@@ -49,12 +49,12 @@ class PatternLockView @JvmOverloads constructor(
 
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
+        style = Paint.Style.STRঠিক আছেE
         strokeWidth = 10f
         strokeCap = Paint.Cap.ROUND
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onআকারChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         val size = minOf(w, h).toFloat()
         val cell = size / GRID_SIZE
         val startX = (w - size) / 2f
@@ -115,25 +115,25 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    override fun onTouchইভেন্ট(event: Motionইভেন্ট): Boolean {
         if (state != PatternState.NORMAL) return true
 
         val radius = minOf(width, height) * TOUCH_RADIUS_RATIO
 
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
+            Motionইভেন্ট.ACTION_DOWN -> {
                 clearPatternInternal()
                 handleTouch(event.x, event.y, radius)
             }
 
-            MotionEvent.ACTION_MOVE -> {
+            Motionইভেন্ট.ACTION_MOVE -> {
                 currentX = event.x
                 currentY = event.y
                 handleTouch(event.x, event.y, radius)
                 invalidate()
             }
 
-            MotionEvent.ACTION_UP -> {
+            Motionইভেন্ট.ACTION_UP -> {
                 currentX = -1f
                 currentY = -1f
                 finishPattern()
@@ -147,9 +147,9 @@ class PatternLockView @JvmOverloads constructor(
         val dot = findNearestDot(x, y, radius) ?: return
 
         if (!selectedDots.contains(dot)) {
-            if (selectedDots.isEmpty()) listener?.onPatternStarted()
+            if (selectedDots.isEmpty()) listener?.onPatternশুরু করোed()
 
-            addSkippedDot(dot)
+            addএড়িয়ে যাওpedDot(dot)
             selectedDots.add(dot)
             invalidate()
         }
@@ -158,7 +158,7 @@ class PatternLockView @JvmOverloads constructor(
     /**
      * FIX: skipped middle dot auto-select
      */
-    private fun addSkippedDot(newDot: Int) {
+    private fun addএড়িয়ে যাওpedDot(newDot: Int) {
         if (selectedDots.isEmpty()) return
 
         val last = selectedDots.last()
@@ -193,11 +193,11 @@ class PatternLockView @JvmOverloads constructor(
         if (selectedDots.size >= MIN_PATTERN_LENGTH) {
             listener?.onPatternComplete(selectedDots.toList())
         } else {
-            showError()
+            showসমস্যা()
         }
     }
 
-    fun showError() {
+    fun showসমস্যা() {
         state = PatternState.ERROR
         invalidate()
 
@@ -206,7 +206,7 @@ class PatternLockView @JvmOverloads constructor(
         }, 900)
     }
 
-    fun showSuccess() {
+    fun showসফল() {
         state = PatternState.SUCCESS
         invalidate()
 
@@ -219,7 +219,7 @@ class PatternLockView @JvmOverloads constructor(
         clearPatternInternal()
         state = PatternState.NORMAL
         invalidate()
-        listener?.onPatternCleared()
+        listener?.onPatternপরিষ্কার করোed()
     }
 
     private fun clearPatternInternal() {
@@ -230,6 +230,6 @@ class PatternLockView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        handler.removeCallbacksAndMessages(null)
+        handler.removeকলbacksAndমেসেজs(null)
     }
 }

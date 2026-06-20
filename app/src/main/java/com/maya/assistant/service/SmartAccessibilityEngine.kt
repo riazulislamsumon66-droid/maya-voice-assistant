@@ -1,21 +1,21 @@
 ﻿package com.maya.assistant.service
 
-import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
 import android.content.Intent
 import android.media.AudioManager
 import android.util.Log
-import android.view.accessibility.AccessibilityNodeInfo
-import com.maya.assistant.accessibility.NodeFinder
+import android.view.accessibility.অ্যাক্সেসিবিলিটিনাdeতথ্য
+import com.maya.assistant.accessibility.নাdeFinder
 import com.maya.assistant.automation.AppDetector
-import com.maya.assistant.automation.SmartAutomationAgent
+import com.maya.assistant.automation.SmartঅটোmationAgent
 import com.maya.assistant.automation.ActionExecutor
-import com.maya.assistant.service.ScreenVisionAnalyzer
+import com.maya.assistant.service.স্ক্রিনVisionAnalyzer
 
-object SmartAccessibilityEngine {
+object Smartঅ্যাক্সেসিবিলিটিEngine {
 
     private const val TAG = "MAYA_SMART"
 
-    var service: AccessibilityService? = null
+    var service: অ্যাক্সেসিবিলিটিService? = null
 
     data class Result(
         val success: Boolean,
@@ -31,10 +31,10 @@ object SmartAccessibilityEngine {
         val success = when {
 
             cmd.startsWith("OPEN_APP", true) ->
-                handleOpenApp(cmd)
+                handleখোলোApp(cmd)
 
             cmd.startsWith("PLAY_MUSIC", true) ->
-                handlePlayMusic(cmd)
+                handlePlayগান(cmd)
 
             cmd.startsWith("CLICK", true) ->
                 genericClick(
@@ -42,7 +42,7 @@ object SmartAccessibilityEngine {
                 )
 
             cmd.startsWith("SEARCH", true) ->
-                genericSearch(
+                genericখুঁজো(
                     cmd.removePrefix("SEARCH").trim()
                 )
 
@@ -53,12 +53,12 @@ object SmartAccessibilityEngine {
                 volumeDown()
 
             else ->
-                runSmartAutomation(cmd)
+                runSmartঅটোmation(cmd)
         }
 
         return Result(
             success,
-            if (success) "Done" else "Failed"
+            if (success) "হয়ে গেছে" else "ব্যর্থ"
         )
     }
 
@@ -75,7 +75,7 @@ object SmartAccessibilityEngine {
     // SMART AI AUTOMATION
     // ============================
 
-    private fun runSmartAutomation(
+    private fun runSmartঅটোmation(
         command: String
     ): Boolean {
 
@@ -83,7 +83,7 @@ object SmartAccessibilityEngine {
 
         Log.d(TAG, "SMART MODE -> $command")
 
-        return SmartAutomationAgent.run(
+        return SmartঅটোmationAgent.run(
             svc,
             command
         )
@@ -93,17 +93,17 @@ object SmartAccessibilityEngine {
     // DYNAMIC APP OPEN
     // ============================
 
-    private fun handleOpenApp(
+    private fun handleখোলোApp(
         command: String
     ): Boolean {
 
-        val appName = command
+        val appনাম = command
             .removePrefix("OPEN_APP")
             .removePrefix(":")
             .trim()
 
         val intent =
-            findLaunchIntent(appName)
+            findLaunchIntent(appনাম)
                 ?: return false
 
         intent.addFlags(
@@ -112,11 +112,11 @@ object SmartAccessibilityEngine {
 
         service?.startActivity(intent)
 
-        Log.d(TAG, "OPENED -> $appName")
+        Log.d(TAG, "OPENED -> $appনাম")
         return true
     }
 
-    private fun handlePlayMusic(
+    private fun handlePlayগান(
         command: String
     ): Boolean {
 
@@ -133,29 +133,29 @@ object SmartAccessibilityEngine {
         val app = AppDetector.findAppByKeywords(svc, musicKeywords)
             ?: return false
 
-        return launchPackage(app.packageName, "PLAY_MUSIC")
+        return launchPackage(app.packageনাম, "PLAY_MUSIC")
     }
 
     private fun findLaunchIntent(
-        appName: String
+        appনাম: String
     ): Intent? {
 
         val svc = service ?: return null
-        val app = AppDetector.findAppByName(svc, appName) ?: return null
-        return svc.packageManager.getLaunchIntentForPackage(app.packageName)
+        val app = AppDetector.findAppByনাম(svc, appনাম) ?: return null
+        return svc.packageManager.getLaunchIntentForPackage(app.packageনাম)
     }
 
     private fun launchPackage(
-        packageName: String,
+        packageনাম: String,
         tag: String
     ): Boolean {
         val svc = service ?: return false
-        val intent = svc.packageManager.getLaunchIntentForPackage(packageName)
+        val intent = svc.packageManager.getLaunchIntentForPackage(packageনাম)
             ?: return false
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         svc.startActivity(intent)
-        Log.d(TAG, "Opened $tag -> $packageName")
+        Log.d(TAG, "খোলোed $tag -> $packageনাম")
         return true
     }
 
@@ -170,18 +170,18 @@ object SmartAccessibilityEngine {
     ): Boolean {
 
         val root =
-            service?.rootInActiveWindow
+            service?.rootInসক্রিয়Window
                 ?: return false
 
         val nodes = when {
             id != null ->
-                root.findAccessibilityNodeInfosByViewId(id)
+                root.findঅ্যাক্সেসিবিলিটিনাdeতথ্যsByViewId(id)
 
             text != null ->
-                root.findAccessibilityNodeInfosByText(text)
+                root.findঅ্যাক্সেসিবিলিটিনাdeতথ্যsByText(text)
 
             contentDesc != null ->
-                root.findAccessibilityNodeInfosByText(contentDesc)
+                root.findঅ্যাক্সেসিবিলিটিনাdeতথ্যsByText(contentDesc)
 
             else -> return false
         }
@@ -191,14 +191,14 @@ object SmartAccessibilityEngine {
         for (node in nodes) {
 
             var current:
-                    AccessibilityNodeInfo? = node
+                    অ্যাক্সেসিবিলিটিনাdeতথ্য? = node
 
             while (current != null) {
 
                 if (current.isClickable) {
 
                     return current.performAction(
-                        AccessibilityNodeInfo.ACTION_CLICK
+                        অ্যাক্সেসিবিলিটিনাdeতথ্য.ACTION_CLICK
                     )
                 }
 
@@ -219,20 +219,20 @@ object SmartAccessibilityEngine {
     // GENERIC SEARCH
     // ============================
 
-    private fun genericSearch(
+    private fun genericখুঁজো(
         query: String
     ): Boolean {
 
         val svc = service ?: return false
-        val root = svc.rootInActiveWindow ?: return false
+        val root = svc.rootInসক্রিয়Window ?: return false
 
         val searchClicked = ActionExecutor.clickByIntention(svc, "search")
         if (!searchClicked) {
-            NodeFinder.findClickable(root, "search")?.let { node ->
-                var current: AccessibilityNodeInfo? = node
+            নাdeFinder.findClickable(root, "search")?.let { node ->
+                var current: অ্যাক্সেসিবিলিটিনাdeতথ্য? = node
                 while (current != null) {
                     if (current.isClickable) {
-                        current.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        current.performAction(অ্যাক্সেসিবিলিটিনাdeতথ্য.ACTION_CLICK)
                         break
                     }
                     current = current.parent
@@ -240,37 +240,37 @@ object SmartAccessibilityEngine {
             }
         }
 
-        val updatedRoot = svc.rootInActiveWindow ?: root
-        val editable = findEditableNode(updatedRoot) ?: findEditableNode(root) ?: return false
+        val updatedRoot = svc.rootInসক্রিয়Window ?: root
+        val editable = findএডিট করোableনাde(updatedRoot) ?: findএডিট করোableনাde(root) ?: return false
 
         val args = android.os.Bundle().apply {
             putCharSequence(
-                AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
+                অ্যাক্সেসিবিলিটিনাdeতথ্য.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
                 query
             )
         }
 
         return editable.performAction(
-            AccessibilityNodeInfo.ACTION_SET_TEXT,
+            অ্যাক্সেসিবিলিটিনাdeতথ্য.ACTION_SET_TEXT,
             args
         )
     }
 
-    private fun findEditableNode(
-        node: AccessibilityNodeInfo
-    ): AccessibilityNodeInfo? {
+    private fun findএডিট করোableনাde(
+        node: অ্যাক্সেসিবিলিটিনাdeতথ্য
+    ): অ্যাক্সেসিবিলিটিনাdeতথ্য? {
 
-        if (node.isEditable)
+        if (node.isএডিট করোable)
             return node
 
-        for (i in 0 until node.childCount) {
+        for (i in 0 until node.childগণনা) {
 
             val child = node.getChild(i)
 
             if (child != null) {
 
                 val result =
-                    findEditableNode(child)
+                    findএডিট করোableনাde(child)
 
                 if (result != null)
                     return result
@@ -287,11 +287,11 @@ object SmartAccessibilityEngine {
     private fun volumeUp(): Boolean {
 
         val audio =
-            service?.getSystemService(
+            service?.getসিস্টেমService(
                 AudioManager::class.java
             ) ?: return false
 
-        audio.adjustVolume(
+        audio.adjustভলিউম(
             AudioManager.ADJUST_RAISE,
             AudioManager.FLAG_SHOW_UI
         )
@@ -302,11 +302,11 @@ object SmartAccessibilityEngine {
     private fun volumeDown(): Boolean {
 
         val audio =
-            service?.getSystemService(
+            service?.getসিস্টেমService(
                 AudioManager::class.java
             ) ?: return false
 
-        audio.adjustVolume(
+        audio.adjustভলিউম(
             AudioManager.ADJUST_LOWER,
             AudioManager.FLAG_SHOW_UI
         )

@@ -5,28 +5,28 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 
 /**
- * Convenience helper to manage the ForegroundVoiceService lifecycle.
+ * Convenience helper to manage the Foregroundভয়েসService lifecycle.
  */
 object RealtimeConversationService {
 
     fun start(context: Context) {
         ContextCompat.startForegroundService(
             context,
-            Intent(context, ForegroundVoiceService::class.java)
+            Intent(context, Foregroundভয়েসService::class.java)
         )
     }
 
     fun stop(context: Context) {
-        context.stopService(Intent(context, ForegroundVoiceService::class.java))
+        context.stopService(Intent(context, Foregroundভয়েসService::class.java))
     }
 
-    fun isRunning() = ForegroundVoiceService.isRunning
+    fun isRunning() = Foregroundভয়েসService.isRunning
 
-    fun sendMessage(text: String) {
-        ForegroundVoiceService.instance?.sendTextToGemini(text)
+    fun sendমেসেজ(text: String) {
+        Foregroundভয়েসService.instance?.sendTextToGemini(text)
     }
 
     fun reconnect() {
-        ForegroundVoiceService.instance?.reconnectGemini()
+        Foregroundভয়েসService.instance?.reconnectGemini()
     }
 }

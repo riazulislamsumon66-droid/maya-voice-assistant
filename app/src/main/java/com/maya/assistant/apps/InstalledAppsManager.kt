@@ -2,29 +2,29 @@ package com.maya.assistant.apps
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
+import android.content.pm.Applicationতথ্য
 import android.content.pm.PackageManager
 import com.maya.assistant.models.AppModel
 import com.maya.assistant.utils.Logger
 
-object InstalledAppsManager {
+object ইনস্টল করোedAppsManager {
     private val TAG = "APPS"
     private var cachedApps: List<AppModel>? = null
 
-    fun getAllApps(context: Context): List<AppModel> {
+    fun getসবApps(context: Context): List<AppModel> {
         if (cachedApps != null) return cachedApps!!
 
         val pm = context.packageManager
-        val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        val apps = pm.getইনস্টল করোedApplications(PackageManager.GET_META_DATA)
 
-        cachedApps = apps.mapNotNull { info ->
+        cachedApps = apps.mapনাtNull { info ->
             try {
                 val label = pm.getApplicationLabel(info).toString()
-                val launchIntent = pm.getLaunchIntentForPackage(info.packageName)
+                val launchIntent = pm.getLaunchIntentForPackage(info.packageনাম)
                 if (launchIntent != null) {
                     AppModel(
                         name = label.lowercase(),
-                        packageName = info.packageName,
+                        packageনাম = info.packageনাম,
                         label = label
                     )
                 } else null
@@ -37,10 +37,10 @@ object InstalledAppsManager {
 
     fun findApp(context: Context, query: String): AppModel? {
         val normalized = query.lowercase().trim()
-        val apps = getAllApps(context)
+        val apps = getসবApps(context)
 
         // Exact match first
-        apps.find { it.name == normalized || it.packageName.contains(normalized) }
+        apps.find { it.name == normalized || it.packageনাম.contains(normalized) }
             ?.let { return it }
 
         // Contains match
@@ -56,7 +56,7 @@ object InstalledAppsManager {
 
     fun getLaunchIntent(context: Context, query: String): Intent? {
         val app = findApp(context, query) ?: return null
-        return context.packageManager.getLaunchIntentForPackage(app.packageName)
+        return context.packageManager.getLaunchIntentForPackage(app.packageনাম)
     }
 
     fun invalidateCache() { cachedApps = null }

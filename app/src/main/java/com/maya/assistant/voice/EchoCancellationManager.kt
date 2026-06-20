@@ -1,33 +1,33 @@
 package com.maya.assistant.voice
 
-import android.media.audiofx.AcousticEchoCanceler
-import android.media.audiofx.AutomaticGainControl
-import android.media.audiofx.NoiseSuppressor
+import android.media.audiofx.AcousticEchoবাতিলer
+import android.media.audiofx.অটোmaticGainControl
+import android.media.audiofx.নাiseSuppressor
 import com.maya.assistant.utils.Logger
 
-object EchoCancellationManager {
+object EchoবাতিলlationManager {
     private val TAG = "ECHO"
 
-    private var aec: AcousticEchoCanceler? = null
-    private var ns: NoiseSuppressor? = null
-    private var agc: AutomaticGainControl? = null
+    private var aec: AcousticEchoবাতিলer? = null
+    private var ns: নাiseSuppressor? = null
+    private var agc: অটোmaticGainControl? = null
 
     fun attach(audioSessionId: Int) {
         try {
-            if (AcousticEchoCanceler.isAvailable()) {
-                aec = AcousticEchoCanceler.create(audioSessionId)?.apply { enabled = true }
+            if (AcousticEchoবাতিলer.isপাওয়া যাচ্ছে()) {
+                aec = AcousticEchoবাতিলer.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "AEC enabled")
             }
-            if (NoiseSuppressor.isAvailable()) {
-                ns = NoiseSuppressor.create(audioSessionId)?.apply { enabled = true }
+            if (নাiseSuppressor.isপাওয়া যাচ্ছে()) {
+                ns = নাiseSuppressor.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "NS enabled")
             }
-            if (AutomaticGainControl.isAvailable()) {
-                agc = AutomaticGainControl.create(audioSessionId)?.apply { enabled = true }
+            if (অটোmaticGainControl.isপাওয়া যাচ্ছে()) {
+                agc = অটোmaticGainControl.create(audioSessionId)?.apply { enabled = true }
                 Logger.d(TAG, "AGC enabled")
             }
         } catch (e: Exception) {
-            Logger.e(TAG, "Failed to attach effects: ${e.message}")
+            Logger.e(TAG, "ব্যর্থ to attach effects: ${e.message}")
         }
     }
 

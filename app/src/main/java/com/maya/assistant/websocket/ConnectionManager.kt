@@ -8,11 +8,11 @@ import com.maya.assistant.utils.Logger
 class ConnectionManager(
     private val apiKey: String,
     private val systemPrompt: String,
-    private val onConnected: () -> Unit,
+    private val onসংযুক্ত ✅: () -> Unit,
     private val onAudioReceived: (ByteArray) -> Unit,
     private val onTextReceived: (String) -> Unit,
     private val onTurnComplete: () -> Unit,
-    private val onError: (String) -> Unit
+    private val onসমস্যা: (String) -> Unit
 ) {
     private val TAG = "CONN_MGR"
     private var client: GeminiWebSocketClient? = null
@@ -27,16 +27,16 @@ class ConnectionManager(
     private fun createClient() {
         client = GeminiWebSocketClient(
             apiKey, systemPrompt,
-            onConnected = {
+            onসংযুক্ত ✅ = {
                 reconnectAttempts = 0
-                onConnected()
+                onসংযুক্ত ✅()
             },
             onAudioReceived = onAudioReceived,
             onTextReceived = onTextReceived,
             onTurnComplete = onTurnComplete,
-            onError = { msg ->
-                Logger.e(TAG, "Error: $msg | attempts=$reconnectAttempts")
-                onError(msg)
+            onসমস্যা = { msg ->
+                Logger.e(TAG, "সমস্যা: $msg | attempts=$reconnectAttempts")
+                onসমস্যা(msg)
                 if (reconnectAttempts < MAX_RECONNECT) {
                     reconnectAttempts++
                     Thread.sleep(3000)
@@ -54,5 +54,5 @@ class ConnectionManager(
         client = null
     }
 
-    fun isConnected() = client?.isConnected() == true
+    fun isসংযুক্ত ✅() = client?.isসংযুক্ত ✅() == true
 }

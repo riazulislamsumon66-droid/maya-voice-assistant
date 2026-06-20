@@ -12,42 +12,42 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.NotificationCompat
+import androidx.core.app.নাtificationCompat
 import com.maya.assistant.R
 import com.maya.assistant.ui.main.MainActivity
 
-class MayaOverlayService : Service() {
+class MayaওভারলেService : Service() {
 
     companion object {
         var isRunning = false
-        const val CHANNEL_ID = "maya_overlay_channel"
+        const val CHANNEL_ID = "myra_overlay_channel"
         const val NOTIF_ID = 1001
     }
 
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
-    private var isVisible = false
+    private var isদৃশ্যমান = false
 
     override fun onCreate() {
         super.onCreate()
         isRunning = true
-        createNotificationChannel()
-        startForeground(NOTIF_ID, buildNotification())
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        createনাtificationChannel()
+        startForeground(NOTIF_ID, buildনাtification())
+        windowManager = getসিস্টেমService(WINDOW_SERVICE) as WindowManager
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onশুরু করোCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            "SHOW_OVERLAY" -> showOverlay()
-            "HIDE_OVERLAY" -> hideOverlay()
-            "TOGGLE_OVERLAY" -> if (isVisible) hideOverlay() else showOverlay()
+            "SHOW_OVERLAY" -> showওভারলে()
+            "HIDE_OVERLAY" -> hideওভারলে()
+            "TOGGLE_OVERLAY" -> if (isদৃশ্যমান) hideওভারলে() else showওভারলে()
         }
         return START_STICKY
     }
 
-    private fun showOverlay() {
-        if (isVisible || overlayView != null) return
-        if (!android.provider.Settings.canDrawOverlays(this)) return
+    private fun showওভারলে() {
+        if (isদৃশ্যমান || overlayView != null) return
+        if (!android.provider.সেটিংস.canDrawওভারলেs(this)) return
 
         val inflater = LayoutInflater.from(this)
         overlayView = inflater.inflate(R.layout.overlay_orb, null)
@@ -69,29 +69,29 @@ class MayaOverlayService : Service() {
         }
 
         windowManager?.addView(overlayView, params)
-        isVisible = true
+        isদৃশ্যমান = true
 
-        // Start orb animation
-        setupOverlayInteraction()
+        // শুরু করো orb animation
+        setupওভারলেInteraction()
         startOrbPulse()
 
-        // Auto open main activity
+        // অটো open main activity
         val mainIntent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
         startActivity(mainIntent)
     }
 
-    private fun setupOverlayInteraction() {
+    private fun setupওভারলেInteraction() {
         overlayView?.apply {
             val orbContainer = findViewById<FrameLayout>(R.id.orbContainer)
-            val closeBtn = findViewById<ImageView>(R.id.closeOverlayBtn)
-            val mayaLabel = findViewById<TextView>(R.id.respondingLabel)
+            val closeBtn = findViewById<ImageView>(R.id.closeওভারলেBtn)
+            val myraLabel = findViewById<TextView>(R.id.respondingLabel)
 
-            closeBtn?.setOnClickListener { hideOverlay() }
+            closeBtn?.setচালুClickListener { hideওভারলে() }
 
-            orbContainer?.setOnClickListener {
-                val intent = Intent(this@MayaOverlayService, MainActivity::class.java).apply {
+            orbContainer?.setচালুClickListener {
+                val intent = Intent(this@MayaওভারলেService, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 }
                 startActivity(intent)
@@ -102,16 +102,16 @@ class MayaOverlayService : Service() {
             var initialTouchX = 0f; var initialTouchY = 0f
             val overlayParams = layoutParams as WindowManager.LayoutParams
 
-            setOnTouchListener { _, event ->
+            setচালুTouchListener { _, event ->
                 when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
+                    Motionইভেন্ট.ACTION_DOWN -> {
                         initialX = overlayParams.x
                         initialY = overlayParams.y
                         initialTouchX = event.rawX
                         initialTouchY = event.rawY
                         true
                     }
-                    MotionEvent.ACTION_MOVE -> {
+                    Motionইভেন্ট.ACTION_MOVE -> {
                         overlayParams.x = initialX + (event.rawX - initialTouchX).toInt()
                         overlayParams.y = initialY + (event.rawY - initialTouchY).toInt()
                         windowManager?.updateViewLayout(overlayView, overlayParams)
@@ -127,41 +127,41 @@ class MayaOverlayService : Service() {
         // Orb pulsing animation is handled in the OrbAnimationView
     }
 
-    fun hideOverlay() {
+    fun hideওভারলে() {
         overlayView?.let {
             windowManager?.removeView(it)
             overlayView = null
         }
-        isVisible = false
+        isদৃশ্যমান = false
     }
 
-    private fun createNotificationChannel() {
+    private fun createনাtificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val channel = নাtificationChannel(
                 CHANNEL_ID,
-                "MAYA Assistant",
-                NotificationManager.IMPORTANCE_LOW
+                "MAYA অ্যাসিস্ট্যান্ট",
+                নাtificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "MAYA is running in background"
-                setShowBadge(false)
+                setদেখাওBadge(false)
             }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            val manager = getসিস্টেমService(নাtificationManager::class.java)
+            manager.createনাtificationChannel(channel)
         }
     }
 
-    private fun buildNotification(): Notification {
+    private fun buildনাtification(): নাtification {
         val intent = Intent(this, MainActivity::class.java)
         val pi = PendingIntent.getActivity(this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return নাtificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MAYA is active ❤️")
             .setContentText("Press power button to activate overlay")
-            .setSmallIcon(R.drawable.ic_maya_notif)
+            .setSmallIcon(R.drawable.ic_myra_notif)
             .setContentIntent(pi)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setচালুgoing(true)
+            .setPriority(নাtificationCompat.PRIORITY_LOW)
             .build()
     }
 
@@ -169,7 +169,7 @@ class MayaOverlayService : Service() {
 
     override fun onDestroy() {
         isRunning = false
-        hideOverlay()
+        hideওভারলে()
         super.onDestroy()
     }
 }

@@ -4,10 +4,10 @@ import com.maya.assistant.utils.AudioUtils
 import com.maya.assistant.utils.Logger
 
 /**
- * Simple energy-based Voice Activity Detector
+ * Simple energy-based ভয়েস Activity Detector
  */
-class VoiceActivityDetector(
-    private val onSpeechStart: () -> Unit,
+class ভয়েসActivityDetector(
+    private val onSpeechশুরু করো: () -> Unit,
     private val onSpeechEnd: () -> Unit
 ) {
     private val TAG = "VAD"
@@ -16,30 +16,30 @@ class VoiceActivityDetector(
     private val SILENCE_FRAMES = 25          // ~500ms silence to detect end of speech
     private val SPEECH_FRAMES = 3            // Consecutive frames to confirm speech start
 
-    private var silenceCount = 0
-    private var speechCount = 0
-    private var isSpeechActive = false
+    private var silenceগণনা = 0
+    private var speechগণনা = 0
+    private var isSpeechসক্রিয় = false
 
     fun processChunk(pcm: ByteArray) {
         val rms = AudioUtils.calculateRms(pcm)
-        VoiceStateManager.updateAmplitude(rms)
+        ভয়েসStateManager.updateAmplitude(rms)
 
         if (rms > SPEECH_THRESHOLD) {
-            silenceCount = 0
-            speechCount++
+            silenceগণনা = 0
+            speechগণনা++
 
-            if (!isSpeechActive && speechCount >= SPEECH_FRAMES) {
-                isSpeechActive = true
+            if (!isSpeechসক্রিয় && speechগণনা >= SPEECH_FRAMES) {
+                isSpeechসক্রিয় = true
                 Logger.d(TAG, "Speech detected (rms=$rms)")
-                onSpeechStart()
+                onSpeechশুরু করো()
             }
         } else {
-            speechCount = 0
-            if (isSpeechActive) {
-                silenceCount++
-                if (silenceCount >= SILENCE_FRAMES) {
-                    isSpeechActive = false
-                    silenceCount = 0
+            speechগণনা = 0
+            if (isSpeechসক্রিয়) {
+                silenceগণনা++
+                if (silenceগণনা >= SILENCE_FRAMES) {
+                    isSpeechসক্রিয় = false
+                    silenceগণনা = 0
                     Logger.d(TAG, "Silence detected")
                     onSpeechEnd()
                 }
@@ -48,8 +48,8 @@ class VoiceActivityDetector(
     }
 
     fun reset() {
-        silenceCount = 0
-        speechCount = 0
-        isSpeechActive = false
+        silenceগণনা = 0
+        speechগণনা = 0
+        isSpeechসক্রিয় = false
     }
 }

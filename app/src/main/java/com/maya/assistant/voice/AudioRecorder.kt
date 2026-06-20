@@ -30,7 +30,7 @@ class AudioRecorder(
             return
         }
 
-        val bufferSize = AudioUtils.getMinBufferSize(SAMPLE_RATE)
+        val bufferআকার = AudioUtils.getMinBufferআকার(SAMPLE_RATE)
 
         try {
             audioRecord = AudioRecord(
@@ -38,10 +38,10 @@ class AudioRecorder(
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
-                bufferSize
+                bufferআকার
             )
 
-            EchoCancellationManager.attach(audioRecord!!.audioSessionId)
+            EchoবাতিলlationManager.attach(audioRecord!!.audioSessionId)
             audioRecord!!.startRecording()
             isRecording = true
 
@@ -49,7 +49,7 @@ class AudioRecorder(
                 val buffer = ByteArray(CHUNK_SIZE)
                 while (isRecording && !Thread.interrupted()) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: -1
-                    if (read > 0 && !VoiceStateManager.isAiSpeaking()) {
+                    if (read > 0 && !ভয়েসStateManager.isAiবলছে…()) {
                         onChunk(buffer.copyOf(read))
                     }
                 }
@@ -61,7 +61,7 @@ class AudioRecorder(
 
             Logger.d(TAG, "Recording started")
         } catch (e: Exception) {
-            Logger.e(TAG, "Failed to start recording: ${e.message}")
+            Logger.e(TAG, "ব্যর্থ to start recording: ${e.message}")
         }
     }
 
@@ -74,12 +74,12 @@ class AudioRecorder(
             audioRecord?.stop()
             audioRecord?.release()
             audioRecord = null
-            EchoCancellationManager.release()
+            EchoবাতিলlationManager.release()
         } catch (e: Exception) {
-            Logger.e(TAG, "Stop error: ${e.message}")
+            Logger.e(TAG, "বন্ধ করো error: ${e.message}")
         }
         Logger.d(TAG, "Recording stopped")
     }
 
-    fun isActive() = isRecording
+    fun isসক্রিয়() = isRecording
 }

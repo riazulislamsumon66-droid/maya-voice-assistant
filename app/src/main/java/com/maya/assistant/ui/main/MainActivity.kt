@@ -3,7 +3,7 @@ package com.maya.assistant.ui.main
 import android.app.ActivityManager
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.graphics.রঙ
 import android.os.*
 import android.view.WindowManager
 import android.widget.*
@@ -13,17 +13,17 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.maya.assistant.R
-import com.maya.assistant.security.BiometricManager
-import com.maya.assistant.service.AccessibilityHelperService
-import com.maya.assistant.services.ForegroundVoiceService
-import com.maya.assistant.ui.settings.SettingsActivity
+import com.maya.assistant.security.বায়োমেট্রিকManager
+import com.maya.assistant.service.অ্যাক্সেসিবিলিটিসাহায্যerService
+import com.maya.assistant.services.Foregroundভয়েসService
+import com.maya.assistant.ui.settings.সেটিংসActivity
 import com.maya.assistant.utils.Constants
 import com.maya.assistant.utils.Logger
 import com.maya.assistant.utils.PermissionUtils
 import com.maya.assistant.utils.prefs
 import com.maya.assistant.viewmodel.MainViewModel
-import com.maya.assistant.voice.VoiceStateManager
-import java.text.SimpleDateFormat
+import com.maya.assistant.voice.ভয়েসStateManager
+import java.text.SimpleতারিখFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private val timeHandler = Handler(Looper.getMainLooper())
     private val timeRunnable = object : Runnable {
         override fun run() {
-            updateSystemInfo()
+            updateসিস্টেমতথ্য()
             timeHandler.postDelayed(this, 1000)
         }
     }
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     private val responseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val text = intent?.getStringExtra("text") ?: return
-            addBotMessage(text)
+            addBotমেসেজ(text)
         }
     }
 
@@ -63,27 +63,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.statusBarColor = Color.TRANSPARENT
+        window.statusBarরঙ = রঙ.TRANSPARENT
         setContentView(R.layout.activity_main)
 
         initViews()
-        updateSystemInfo()
+        updateসিস্টেমতথ্য()
         timeHandler.post(timeRunnable)
 
-        BiometricManager.authenticate(
+        বায়োমেট্রিকManager.authenticate(
             this,
-            onSuccess = { setupAssistant() },
-            onError = { setupAssistant() },
-            onFallback = { setupAssistant() }
+            onসফল = { setupঅ্যাসিস্ট্যান্ট() },
+            onসমস্যা = { setupঅ্যাসিস্ট্যান্ট() },
+            onFallback = { setupঅ্যাসিস্ট্যান্ট() }
         )
     }
 
-    private fun setupAssistant() {
+    private fun setupঅ্যাসিস্ট্যান্ট() {
         PermissionUtils.requestMissing(this, PERM_CODE)
         observeViewModel()
-        observeVoiceState()
-        startVoiceService()
-        checkAccessibility()
+        observeভয়েসState()
+        startভয়েসService()
+        checkঅ্যাক্সেসিবিলিটি()
     }
 
     private fun initViews() {
@@ -100,112 +100,105 @@ class MainActivity : AppCompatActivity() {
         chatRecycler.layoutManager = LinearLayoutManager(this).also { it.stackFromEnd = true }
         chatRecycler.adapter = chatAdapter
 
-        micButton.setOnClickListener {
-            val svc = ForegroundVoiceService.instance
+        micButton.setচালুClickListener {
+            val svc = Foregroundভয়েসService.instance
             if (svc != null) {
                 val text = "Hey MAYA"
                 svc.sendTextToGemini(text)
-                addUserMessage(text)
+                addব্যবহারকারীমেসেজ(text)
             } else {
-                startVoiceService()
+                startভয়েসService()
             }
         }
 
-        micButton.setOnLongClickListener {
-            ForegroundVoiceService.instance?.reconnectGemini()
-            addBotMessage("Reconnecting...")
+        micButton.setচালুLongClickListener {
+            Foregroundভয়েসService.instance?.reconnectGemini()
+            addBotমেসেজ("পুনরায় সংযুক্ত হচ্ছে…")
             true
         }
 
-        findViewById<ImageButton>(R.id.settingsBtn).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+        findViewById<ImageButton>(R.id.settingsBtn).setচালুClickListener {
+            startActivity(Intent(this, সেটিংসActivity::class.java))
         }
     }
 
-    private fun observeVoiceState() {
-        VoiceStateManager.state.observe(this) { state ->
+    private fun observeভয়েসState() {
+        ভয়েসStateManager.state.observe(this) { state ->
             when (state) {
                 Constants.STATE_LISTENING -> {
-                    orbView.setListening()
+                    orbView.setশুনছে…()
                     micButton.setImageResource(R.drawable.ic_mic_on)
-                    statusText.setTextColor(0xFF00E5FF.toInt())
+                    statusText.setTextরঙ(0xFF00E5FF.toInt())
                 }
                 Constants.STATE_THINKING -> {
-                    orbView.setThinking()
-                    statusText.setTextColor(0xFFD500F9.toInt())
+                    orbView.setভাবছে…()
+                    statusText.setTextরঙ(0xFFD500F9.toInt())
                 }
                 Constants.STATE_SPEAKING -> {
-                    orbView.setSpeaking()
+                    orbView.setবলছে…()
                     micButton.setImageResource(R.drawable.ic_mic_off)
-                    statusText.setTextColor(0xFFFF1744.toInt())
+                    statusText.setTextরঙ(0xFFFF1744.toInt())
                 }
                 else -> {
                     orbView.setIdle()
                     micButton.setImageResource(R.drawable.ic_mic_off)
-                    statusText.setTextColor(0xFFFF1744.toInt())
+                    statusText.setTextরঙ(0xFFFF1744.toInt())
                 }
             }
         }
-        VoiceStateManager.amplitude.observe(this) { amp ->
+        ভয়েসStateManager.amplitude.observe(this) { amp ->
             waveformView.updateAmplitude(amp)
             orbView.setAmplitude(amp)
         }
-        VoiceStateManager.statusMessage.observe(this) { msg ->
+        ভয়েসStateManager.statusমেসেজ.observe(this) { msg ->
             statusText.text = msg
         }
     }
 
     private fun observeViewModel() {
         viewModel.aiResponse.observe(this) { text ->
-            if (!text.isNullOrBlank()) addBotMessage(text)
+            if (!text.isNullOrBlank()) addBotমেসেজ(text)
         }
     }
 
-    private fun startVoiceService() {
+    private fun startভয়েসService() {
         val apiKey = prefs().getString(Constants.KEY_API_KEY, "") ?: ""
         if (apiKey.isEmpty()) {
-        addBotMessage(getString(R.string.api_key_required))
+            addBotমেসেজ("⚠️ API Key দরকার. অনুগ্রহ করে go to সেটিংস → Gemini API Key দিন.")
             return
         }
-        ContextCompat.startForegroundService(this, Intent(this, ForegroundVoiceService::class.java))
-        Logger.d(TAG, "Voice service started")
+        ContextCompat.startForegroundService(this, Intent(this, Foregroundভয়েসService::class.java))
+        Logger.d(TAG, "ভয়েস service started")
     }
 
-    private fun checkAccessibility() {
-        if (!AccessibilityHelperService.isEnabled(this)) {
-            try {
-                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                addBotMessage("জান, Accessibility Service চালু করো — MAYA-কে allow করতে হবে!")
-            } catch (e: Exception) {
-                addBotMessage("Settings > Accessibility > MAYA চালু করো জান")
-            }
+    private fun checkঅ্যাক্সেসিবিলিটি() {
+        if (!অ্যাক্সেসিবিলিটিসাহায্যerService.isচালু(this)) {
+            addBotমেসেজ("⚠️ চালু করো অ্যাক্সেসিবিলিটি Service for app control. সেটিংস → অ্যাক্সেসিবিলিটি.")
         }
     }
 
-    fun addUserMessage(text: String) = runOnUiThread {
-        chatAdapter.addMessage(ChatMessage(text, true))
-        chatRecycler.scrollToPosition(chatAdapter.itemCount - 1)
+    fun addব্যবহারকারীমেসেজ(text: String) = runচালুUiThread {
+        chatAdapter.addমেসেজ(Chatমেসেজ(text, true))
+        chatRecycler.scrollToPosition(chatAdapter.itemগণনা - 1)
     }
 
-    fun addBotMessage(text: String) = runOnUiThread {
-        chatAdapter.addMessage(ChatMessage(text, false))
-        chatRecycler.scrollToPosition(chatAdapter.itemCount - 1)
+    fun addBotমেসেজ(text: String) = runচালুUiThread {
+        chatAdapter.addমেসেজ(Chatমেসেজ(text, false))
+        chatRecycler.scrollToPosition(chatAdapter.itemগণনা - 1)
     }
 
-    private fun updateSystemInfo() {
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-        timeText.text = sdf.format(Date())
-        val bm = getSystemService(Context.BATTERY_SERVICE) as? android.os.BatteryManager
-        batteryText.text = "${bm?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: 0}%"
-        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val mi = ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
+    private fun updateসিস্টেমতথ্য() {
+        val sdf = SimpleতারিখFormat("HH:mm", Locale.getডিফল্ট())
+        timeText.text = sdf.format(তারিখ())
+        val bm = getসিস্টেমService(Context.BATTERY_SERVICE) as? android.os.ব্যাটারিManager
+        batteryText.text = "${bm?.getIntProperty(android.os.ব্যাটারিManager.BATTERY_PROPERTY_CAPACITY) ?: 0}%"
+        val am = getসিস্টেমService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val mi = ActivityManager.মেমোরিতথ্য().also { am.getমেমোরিতথ্য(it) }
         ramText.text = "${(mi.totalMem - mi.availMem) / 1048576}MB"
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onচালিয়ে যাও() {
+        super.onচালিয়ে যাও()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(responseReceiver, IntentFilter("MAYA_RESPONSE"), Context.RECEIVER_NOT_EXPORTED)
         } else {
@@ -213,13 +206,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onবিরতি() {
+        super.onবিরতি()
         try { unregisterReceiver(responseReceiver) } catch (_: Exception) {}
     }
 
     override fun onDestroy() {
-        timeHandler.removeCallbacks(timeRunnable)
+        timeHandler.removeকলbacks(timeRunnable)
         super.onDestroy()
     }
 
@@ -228,7 +221,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERM_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-            startVoiceService()
+            startভয়েসService()
         }
     }
 }

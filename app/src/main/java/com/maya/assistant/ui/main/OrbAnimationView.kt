@@ -15,9 +15,9 @@ class OrbAnimationView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     // State
-    private var isActive = false
-    private var isSpeaking = false
-    private var isThinking = false
+    private var isসক্রিয় = false
+    private var isবলছে… = false
+    private var isভাবছে… = false
     private var isPulsating = false
     private var speakAmplitude = 0f
 
@@ -25,15 +25,15 @@ class OrbAnimationView @JvmOverloads constructor(
     private var rotationAngle = 0f
     private var pulseScale = 1f
     private var glowAlpha = 180
-    private var waveOffset = 0f
+    private var waveবন্ধset = 0f
     private var thinkingAngle = 0f
 
     // Animators
     private val rotationAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
         duration = 4000
-        repeatCount = ValueAnimator.INFINITE
+        repeatগণনা = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpdateListener {
+        addআপডেটListener {
             rotationAngle = it.animatedValue as Float
             invalidate()
         }
@@ -41,9 +41,9 @@ class OrbAnimationView @JvmOverloads constructor(
 
     private val pulseAnimator = ValueAnimator.ofFloat(1f, 1.15f, 1f).apply {
         duration = 1500
-        repeatCount = ValueAnimator.INFINITE
+        repeatগণনা = ValueAnimator.INFINITE
         interpolator = android.view.animation.AccelerateDecelerateInterpolator()
-        addUpdateListener {
+        addআপডেটListener {
             pulseScale = it.animatedValue as Float
             invalidate()
         }
@@ -51,8 +51,8 @@ class OrbAnimationView @JvmOverloads constructor(
 
     private val glowAnimator = ValueAnimator.ofInt(120, 220, 120).apply {
         duration = 2000
-        repeatCount = ValueAnimator.INFINITE
-        addUpdateListener {
+        repeatগণনা = ValueAnimator.INFINITE
+        addআপডেটListener {
             glowAlpha = it.animatedValue as Int
             invalidate()
         }
@@ -60,19 +60,19 @@ class OrbAnimationView @JvmOverloads constructor(
 
     private val waveAnimator = ValueAnimator.ofFloat(0f, (2 * Math.PI).toFloat()).apply {
         duration = 1200
-        repeatCount = ValueAnimator.INFINITE
+        repeatগণনা = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpdateListener {
-            waveOffset = it.animatedValue as Float
+        addআপডেটListener {
+            waveবন্ধset = it.animatedValue as Float
             invalidate()
         }
     }
 
     private val thinkingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
         duration = 1000
-        repeatCount = ValueAnimator.INFINITE
+        repeatগণনা = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
-        addUpdateListener {
+        addআপডেটListener {
             thinkingAngle = it.animatedValue as Float
             invalidate()
         }
@@ -82,23 +82,23 @@ class OrbAnimationView @JvmOverloads constructor(
     private val orbPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
+        style = Paint.Style.STRঠিক আছেE
         strokeWidth = 3f
     }
     private val wavePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
+        style = Paint.Style.STRঠিক আছেE
         strokeWidth = 2.5f
     }
     private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // Colors
-    private val coreColor1 = Color.parseColor("#FF1744")
-    private val coreColor2 = Color.parseColor("#D500F9")
-    private val glowColor = Color.parseColor("#FF1744")
-    private val ringColor = Color.parseColor("#FF6D6D")
-    private val activeColor = Color.parseColor("#FF1744")
-    private val speakColor = Color.parseColor("#E040FB")
-    private val thinkColor = Color.parseColor("#40C4FF")
+    // রঙs
+    private val coreরঙ1 = রঙ.parseরঙ("#FF1744")
+    private val coreরঙ2 = রঙ.parseরঙ("#D500F9")
+    private val glowরঙ = রঙ.parseরঙ("#FF1744")
+    private val ringরঙ = রঙ.parseরঙ("#FF6D6D")
+    private val activeরঙ = রঙ.parseরঙ("#FF1744")
+    private val speakরঙ = রঙ.parseরঙ("#E040FB")
+    private val thinkরঙ = রঙ.parseরঙ("#40C4FF")
 
     // Particles
     private data class Particle(var angle: Float, var radius: Float, var size: Float, var alpha: Int)
@@ -120,8 +120,8 @@ class OrbAnimationView @JvmOverloads constructor(
         glowAnimator.start()
     }
 
-    fun setActive(active: Boolean) {
-        isActive = active
+    fun setসক্রিয়(active: Boolean) {
+        isসক্রিয় = active
         if (active) {
             rotationAnimator.start()
             waveAnimator.start()
@@ -132,8 +132,8 @@ class OrbAnimationView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setSpeaking(speaking: Boolean) {
-        isSpeaking = speaking
+    fun setবলছে…(speaking: Boolean) {
+        isবলছে… = speaking
         if (speaking) {
             waveAnimator.duration = 600
             waveAnimator.start()
@@ -143,8 +143,8 @@ class OrbAnimationView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setThinking(thinking: Boolean) {
-        isThinking = thinking
+    fun setভাবছে…(thinking: Boolean) {
+        isভাবছে… = thinking
         if (thinking) {
             thinkingAnimator.start()
         } else {
@@ -182,39 +182,39 @@ class OrbAnimationView @JvmOverloads constructor(
         drawRings(canvas, cx, cy, baseRadius)
 
         // Wave effect (when active/speaking)
-        if (isActive || isSpeaking) {
+        if (isসক্রিয় || isবলছে…) {
             drawWaves(canvas, cx, cy, baseRadius)
         }
 
-        // Thinking indicator
-        if (isThinking) {
-            drawThinkingArc(canvas, cx, cy, baseRadius)
+        // ভাবছে… indicator
+        if (isভাবছে…) {
+            drawভাবছে…Arc(canvas, cx, cy, baseRadius)
         }
 
         // Particles
-        if (isActive || isSpeaking) {
+        if (isসক্রিয় || isবলছে…) {
             drawParticles(canvas, cx, cy, baseRadius)
         }
 
         canvas.restore()
 
         // Inner glow pulse
-        drawInnerHighlight(canvas, cx, cy, baseRadius * pulseScale)
+        drawInnerহাইghlight(canvas, cx, cy, baseRadius * pulseScale)
     }
 
     private fun drawGlow(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         val glowRadius = radius * 1.6f
         val color = when {
-            isSpeaking -> speakColor
-            isThinking -> thinkColor
-            isActive -> activeColor
-            else -> glowColor
+            isবলছে… -> speakরঙ
+            isভাবছে… -> thinkরঙ
+            isসক্রিয় -> activeরঙ
+            else -> glowরঙ
         }
         val shader = RadialGradient(
             cx, cy, glowRadius,
             intArrayOf(
-                Color.argb(glowAlpha / 3, Color.red(color), Color.green(color), Color.blue(color)),
-                Color.argb(0, Color.red(color), Color.green(color), Color.blue(color))
+                রঙ.argb(glowAlpha / 3, রঙ.red(color), রঙ.green(color), রঙ.blue(color)),
+                রঙ.argb(0, রঙ.red(color), রঙ.green(color), রঙ.blue(color))
             ),
             floatArrayOf(0.3f, 1f),
             Shader.TileMode.CLAMP
@@ -225,16 +225,16 @@ class OrbAnimationView @JvmOverloads constructor(
 
     private fun drawCoreOrb(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         val color1 = when {
-            isSpeaking -> Color.parseColor("#E040FB")
-            isThinking -> Color.parseColor("#40C4FF")
-            isActive -> Color.parseColor("#FF1744")
-            else -> Color.parseColor("#B71C1C")
+            isবলছে… -> রঙ.parseরঙ("#E040FB")
+            isভাবছে… -> রঙ.parseরঙ("#40C4FF")
+            isসক্রিয় -> রঙ.parseরঙ("#FF1744")
+            else -> রঙ.parseরঙ("#B71C1C")
         }
         val color2 = when {
-            isSpeaking -> Color.parseColor("#FF1744")
-            isThinking -> Color.parseColor("#00B0FF")
-            isActive -> Color.parseColor("#D500F9")
-            else -> Color.parseColor("#880E4F")
+            isবলছে… -> রঙ.parseরঙ("#FF1744")
+            isভাবছে… -> রঙ.parseরঙ("#00B0FF")
+            isসক্রিয় -> রঙ.parseরঙ("#D500F9")
+            else -> রঙ.parseরঙ("#880E4F")
         }
 
         val shader = RadialGradient(
@@ -248,11 +248,11 @@ class OrbAnimationView @JvmOverloads constructor(
     }
 
     private fun drawRings(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        val ringCount = 3
-        for (i in 0 until ringCount) {
+        val ringগণনা = 3
+        for (i in 0 until ringগণনা) {
             val r = radius + (i + 1) * 18f
             val alpha = (255 - i * 60).coerceAtLeast(50)
-            ringPaint.color = Color.argb(alpha, 255, 80, 80)
+            ringPaint.color = রঙ.argb(alpha, 255, 80, 80)
             ringPaint.strokeWidth = (3f - i * 0.8f).coerceAtLeast(1f)
 
             canvas.save()
@@ -264,8 +264,8 @@ class OrbAnimationView @JvmOverloads constructor(
     }
 
     private fun drawWaves(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        val waveCount = if (isSpeaking) 8 else 5
-        val amplitude = if (isSpeaking) radius * 0.3f * (0.5f + speakAmplitude) else radius * 0.15f
+        val waveগণনা = if (isবলছে…) 8 else 5
+        val amplitude = if (isবলছে…) radius * 0.3f * (0.5f + speakAmplitude) else radius * 0.15f
         val waveRadius = radius + 25f
 
         val path = Path()
@@ -275,27 +275,27 @@ class OrbAnimationView @JvmOverloads constructor(
             val r = waveRadius + ring * 20f
             for (j in 0..points) {
                 val angle = (j * 360f / points).toRadians()
-                val wave = amplitude * sin(waveCount * angle + waveOffset + ring * 1.2f)
+                val wave = amplitude * sin(waveগণনা * angle + waveবন্ধset + ring * 1.2f)
                 val x = cx + (r + wave) * cos(angle)
                 val y = cy + (r + wave) * sin(angle)
                 if (j == 0) path.moveTo(x, y) else path.lineTo(x, y)
             }
             path.close()
-            wavePaint.color = Color.argb(
+            wavePaint.color = রঙ.argb(
                 if (ring == 0) 200 else 120,
-                if (isSpeaking) 224 else 255,
-                if (isSpeaking) 64 else 30,
-                if (isSpeaking) 251 else 50
+                if (isবলছে…) 224 else 255,
+                if (isবলছে…) 64 else 30,
+                if (isবলছে…) 251 else 50
             )
             wavePaint.strokeWidth = if (ring == 0) 2.5f else 1.5f
             canvas.drawPath(path, wavePaint)
         }
     }
 
-    private fun drawThinkingArc(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+    private fun drawভাবছে…Arc(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         val arcRadius = radius + 40f
         val oval = RectF(cx - arcRadius, cy - arcRadius, cx + arcRadius, cy + arcRadius)
-        ringPaint.color = Color.parseColor("#40C4FF")
+        ringPaint.color = রঙ.parseরঙ("#40C4FF")
         ringPaint.strokeWidth = 4f
         canvas.save()
         canvas.rotate(thinkingAngle, cx, cy)
@@ -310,16 +310,16 @@ class OrbAnimationView @JvmOverloads constructor(
             val pRadius = radius + 30f + 20f * sin(p.angle.toRadians() * 3)
             val x = cx + pRadius * cos(p.angle.toRadians())
             val y = cy + pRadius * sin(p.angle.toRadians())
-            val color = if (isSpeaking) Color.parseColor("#E040FB") else Color.parseColor("#FF6D6D")
-            particlePaint.color = Color.argb(p.alpha, Color.red(color), Color.green(color), Color.blue(color))
+            val color = if (isবলছে…) রঙ.parseরঙ("#E040FB") else রঙ.parseরঙ("#FF6D6D")
+            particlePaint.color = রঙ.argb(p.alpha, রঙ.red(color), রঙ.green(color), রঙ.blue(color))
             canvas.drawCircle(x, y, p.size, particlePaint)
         }
     }
 
-    private fun drawInnerHighlight(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+    private fun drawInnerহাইghlight(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         val highlightShader = RadialGradient(
             cx - radius * 0.25f, cy - radius * 0.25f, radius * 0.5f,
-            intArrayOf(Color.argb(120, 255, 255, 255), Color.TRANSPARENT),
+            intArrayOf(রঙ.argb(120, 255, 255, 255), রঙ.TRANSPARENT),
             floatArrayOf(0f, 1f),
             Shader.TileMode.CLAMP
         )
@@ -330,17 +330,17 @@ class OrbAnimationView @JvmOverloads constructor(
     private fun Float.toRadians() = this * (Math.PI / 180f).toFloat()
 
     // ── Convenience state methods ──────────────────────────────
-    fun setListening() {
-        setActive(true); setSpeaking(false); setThinking(false); setPulsating(false)
+    fun setশুনছে…() {
+        setসক্রিয়(true); setবলছে…(false); setভাবছে…(false); setPulsating(false)
     }
-    fun setSpeaking() {
-        setActive(true); setSpeaking(true); setThinking(false); setPulsating(false)
+    fun setবলছে…() {
+        setসক্রিয়(true); setবলছে…(true); setভাবছে…(false); setPulsating(false)
     }
-    fun setThinking() {
-        setActive(true); setSpeaking(false); setThinking(true); setPulsating(false)
+    fun setভাবছে…() {
+        setসক্রিয়(true); setবলছে…(false); setভাবছে…(true); setPulsating(false)
     }
     fun setIdle() {
-        setActive(false); setSpeaking(false); setThinking(false); setPulsating(true)
+        setসক্রিয়(false); setবলছে…(false); setভাবছে…(false); setPulsating(true)
     }
 
     override fun onDetachedFromWindow() {

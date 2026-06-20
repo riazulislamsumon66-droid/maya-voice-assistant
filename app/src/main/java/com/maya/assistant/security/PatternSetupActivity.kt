@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.maya.assistant.R
 import java.util.*
 
-class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
+class PatternSetupActivity : AppCompatActivity(), TextToSpeech.চালুInitListener {
 
     private lateinit var patternLockView: PatternLockView
     private lateinit var instructionText: TextView
@@ -20,7 +20,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     
     private var tts: TextToSpeech? = null
     private var firstPattern: List<Int>? = null
-    private var isConfirming = false
+    private var isনিশ্চিত করোing = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,60 +38,64 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         cancelBtn = findViewById(R.id.cancelBtn)
 
         patternLockView.listener = object : PatternLockView.PatternListener {
-            override fun onPatternStarted() {
-                instructionText.text = if (isConfirming) "আবার এঁকো..." else "যোগ করতে থাকো..."
+            override fun onPatternশুরু করোed() {
+                instructionText.text = if (isনিশ্চিত করোing) "আবার এঁকো..." else "কানেক্ট করতে থাকো..."
             }
 
             override fun onPatternComplete(pattern: List<Int>) {
                 handlePattern(pattern)
             }
 
-            override fun onPatternCleared() {}
+            override fun onPatternপরিষ্কার করোed() {}
         }
 
-        retryBtn.setOnClickListener { resetSetup() }
-        cancelBtn.setOnClickListener { finish() }
+        retryBtn.setচালুClickListener { resetSetup() }
+        cancelBtn.setচালুClickListener { finish() }
     }
 
     private fun handlePattern(pattern: List<Int>) {
-        if (!isConfirming) {
+        if (!isনিশ্চিত করোing) {
+            // First time drawing
             if (pattern.size < PatternLockView.MIN_PATTERN_LENGTH) {
-                patternLockView.showError()
-                instructionText.text = "খুব ছোট! কমপক্ষে ৪টা dot যোগ করো"
-                speak("কমপক্ষে ৪টা dot যোগ করো", true)
+                patternLockView.showসমস্যা()
+                instructionText.text = "Bohat chota hai! কমপক্ষে 4টা dots connect করো"
+                speak("কমপক্ষে 4টা dots connect করো", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
                 return
             }
 
             firstPattern = pattern
-            patternLockView.showSuccess()
+            patternLockView.showসফল()
             speak("এখন আবার এঁকে confirm করো", true)
             
             handler.postDelayed({
-                isConfirming = true
-                instructionText.text = "Confirm করতে আবার এঁকো"
+                isনিশ্চিত করোing = true
+                instructionText.text = "নিশ্চিত করো karne ke liye dobara draw karo"
                 patternLockView.clearPattern()
                 retryBtn.visibility = View.VISIBLE
             }, 700)
             
         } else {
+            // নিশ্চিত করোing the pattern
             val first = firstPattern ?: return
             if (pattern.joinToString("-") == first.joinToString("-")) {
+                // সফল!
                 PatternManager.savePattern(this, pattern)
                 PatternManager.enablePatternLock(this)
-                SecurityManager.setAppLockEnabled(this, true)
-                patternLockView.showSuccess()
+                নিরাপত্তাManager.setAppLockচালু(this, true)
+                patternLockView.showসফল()
                 instructionText.text = "Pattern সেট হয়ে গেছে!"
-                speak("Pattern সেট হয়ে গেছে! এখন তোমার app safe।", true)
+                speak("Pattern সেট হয়ে গেছে! Ab aapka app safe hai.", true)
                 
                 handler.postDelayed({
-                    setResult(RESULT_OK)
+                    setResult(RESULT_ঠিক আছে)
                     finish()
                 }, 1500)
             } else {
-                patternLockView.showError()
-                instructionText.text = "Pattern মিলছে না! আবার try করো"
-                speak("Pattern মিলছে না! আবার try করো", true)
+                // Mismatch
+                patternLockView.showসমস্যা()
+                instructionText.text = "Pattern match nahi hua! আবার চেষ্টা করো"
+                speak("Pattern match nahi hua! Dobara try karo", true)
                 handler.postDelayed({ patternLockView.clearPattern() }, 800)
             }
         }
@@ -99,11 +103,11 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun resetSetup() {
         firstPattern = null
-        isConfirming = false
+        isনিশ্চিত করোing = false
         patternLockView.clearPattern()
         retryBtn.visibility = View.INVISIBLE
-        instructionText.text = "নতুন pattern এঁকো"
-        speak("ঠিক আছে, নতুন pattern এঁকো", true)
+        instructionText.text = "Naya pattern draw karo"
+        speak("Thik hai, naya pattern draw karo", true)
     }
 
     override fun onInit(status: Int) {

@@ -10,8 +10,8 @@ import com.maya.assistant.ui.main.MainActivity
 class PowerButtonReceiver : BroadcastReceiver() {
 
     companion object {
-        private var pressCount = 0
-        private var lastPressTime = 0L
+        private var pressগণনা = 0
+        private var lastPressসময় = 0L
         private const val DOUBLE_PRESS_WINDOW = 700L
         private const val TAG = "MAYA_POWER"
     }
@@ -24,21 +24,21 @@ class PowerButtonReceiver : BroadcastReceiver() {
     }
 
     private fun detectDoublePress(context: Context) {
-        val now = System.currentTimeMillis()
+        val now = সিস্টেম.currentসময়Millis()
 
-        if (now - lastPressTime <= DOUBLE_PRESS_WINDOW) {
-            pressCount++
+        if (now - lastPressসময় <= DOUBLE_PRESS_WINDOW) {
+            pressগণনা++
 
-            if (pressCount >= 2) {
-                pressCount = 0
+            if (pressগণনা >= 2) {
+                pressগণনা = 0
                 launchMaya(context)
             }
 
         } else {
-            pressCount = 1
+            pressগণনা = 1
         }
 
-        lastPressTime = now
+        lastPressসময় = now
     }
 
     private fun launchMaya(context: Context) {
@@ -51,7 +51,7 @@ class PowerButtonReceiver : BroadcastReceiver() {
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start activity: ${e.message}")
+            Log.e(TAG, "ব্যর্থ to start activity: ${e.message}")
         }
     }
 }

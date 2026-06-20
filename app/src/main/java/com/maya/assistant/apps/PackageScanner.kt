@@ -4,9 +4,9 @@ import android.content.Context
 import com.maya.assistant.models.AppModel
 
 object PackageScanner {
-    fun scanAll(context: Context): List<AppModel> = InstalledAppsManager.getAllApps(context)
+    fun scanসব(context: Context): List<AppModel> = ইনস্টল করোedAppsManager.getসবApps(context)
     fun refresh(context: Context): List<AppModel> {
-        InstalledAppsManager.invalidateCache()
-        return InstalledAppsManager.getAllApps(context)
+        ইনস্টল করোedAppsManager.invalidateCache()
+        return ইনস্টল করোedAppsManager.getসবApps(context)
     }
 }

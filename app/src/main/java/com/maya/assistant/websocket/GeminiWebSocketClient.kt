@@ -7,25 +7,25 @@ import okhttp3.*
 import okio.ByteString
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.সময়Unit
 
 class GeminiWebSocketClient(
     private val apiKey: String,
     private val systemPrompt: String,
-    private val onConnected: () -> Unit,
+    private val onসংযুক্ত ✅: () -> Unit,
     private val onAudioReceived: (ByteArray) -> Unit,
     private val onTextReceived: (String) -> Unit,
     private val onTurnComplete: () -> Unit,
-    private val onError: (String) -> Unit
+    private val onসমস্যা: (String) -> Unit
 ) {
     private val TAG = "GEMINI_WS"
     private var webSocket: WebSocket? = null
     private var isSetupComplete = false
 
     private val client = OkHttpClient.Builder()
-        .readTimeout(0, TimeUnit.MILLISECONDS)
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .pingInterval(25, TimeUnit.SECONDS)
+        .readটাইমআউট(0, সময়Unit.MILLISECONDS)
+        .connectটাইমআউট(20, সময়Unit.SECONDS)
+        .pingInterval(25, সময়Unit.SECONDS)
         .build()
 
     private val url = "${Constants.GEMINI_WS_BASE}?key=$apiKey"
@@ -38,28 +38,28 @@ class GeminiWebSocketClient(
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(ws: WebSocket, response: Response) {
-                Log.d(TAG, "Connected ✅")
+            override fun onখোলো(ws: WebSocket, response: Response) {
+                Log.d(TAG, "সংযুক্ত ✅ ✅")
                 sendSetup(ws)
             }
 
-            override fun onMessage(ws: WebSocket, text: String) {
+            override fun onমেসেজ(ws: WebSocket, text: String) {
                 handleResponse(text)
             }
 
-            override fun onMessage(ws: WebSocket, bytes: ByteString) {
+            override fun onমেসেজ(ws: WebSocket, bytes: ByteString) {
                 try { handleResponse(bytes.utf8()) } catch (e: Exception) { Log.e(TAG, "Binary parse error") }
             }
 
             override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
                 isSetupComplete = false
                 Log.e(TAG, "WS Failure: ${t.message}")
-                onError("Connection failed: ${t.message}")
+                onসমস্যা("Connection failed: ${t.message}")
             }
 
-            override fun onClosed(ws: WebSocket, code: Int, reason: String) {
+            override fun onবন্ধ করোd(ws: WebSocket, code: Int, reason: String) {
                 isSetupComplete = false
-                Log.d(TAG, "WS Closed: $reason")
+                Log.d(TAG, "WS বন্ধ করোd: $reason")
             }
         })
     }
@@ -72,8 +72,8 @@ class GeminiWebSocketClient(
                     put("responseModalities", JSONArray().put("AUDIO"))
                     put("speechConfig", JSONObject().apply {
                         put("voiceConfig", JSONObject().apply {
-                            put("prebuiltVoiceConfig", JSONObject().apply {
-                                put("voiceName", Constants.GEMINI_VOICE)
+                            put("prebuiltভয়েসConfig", JSONObject().apply {
+                                put("voiceনাম", Constants.GEMINI_VOICE)
                             })
                         })
                     })
@@ -105,7 +105,7 @@ class GeminiWebSocketClient(
         }
     }
 
-    fun sendTextMessage(text: String) {
+    fun sendTextমেসেজ(text: String) {
         if (!isSetupComplete) return
         try {
             val msg = JSONObject().apply {
@@ -131,7 +131,7 @@ class GeminiWebSocketClient(
             if (obj.has("setupComplete") || obj.optJSONObject("setupComplete") != null) {
                 isSetupComplete = true
                 Log.d(TAG, "Gemini Ready ✅")
-                onConnected()
+                onসংযুক্ত ✅()
                 return
             }
 
@@ -164,10 +164,10 @@ class GeminiWebSocketClient(
     }
 
     fun disconnect() {
-        webSocket?.close(1000, "Bye")
+        webSocket?.close(1000, "বাই")
         webSocket = null
         isSetupComplete = false
     }
 
-    fun isConnected() = isSetupComplete
+    fun isসংযুক্ত ✅() = isSetupComplete
 }

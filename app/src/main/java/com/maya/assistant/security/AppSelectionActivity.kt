@@ -1,6 +1,6 @@
 package com.maya.assistant.security
 
-import android.content.pm.ApplicationInfo
+import android.content.pm.Applicationতথ্য
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.maya.assistant.R
 import kotlinx.coroutines.*
 
-class AppSelectionActivity : AppCompatActivity() {
+class Appসিলেক্ট করোionActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -27,7 +27,7 @@ class AppSelectionActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.appsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.setHasFixedSize(true)
+        recyclerView.setHasFixedআকার(true)
 
         loadApps()
     }
@@ -37,19 +37,19 @@ class AppSelectionActivity : AppCompatActivity() {
             val apps = withContext(Dispatchers.IO) {
                 val pm = packageManager
                 val lockedApps =
-                    SecurityManager.getLockedPackages(this@AppSelectionActivity)
+                    নিরাপত্তাManager.getলক আছেPackages(this@Appসিলেক্ট করোionActivity)
 
-                pm.getInstalledApplications(PackageManager.GET_META_DATA)
+                pm.getইনস্টল করোedApplications(PackageManager.GET_META_DATA)
                     .filter {
-                        (it.flags and ApplicationInfo.FLAG_SYSTEM) == 0 &&
-                                it.packageName != packageName
+                        (it.flags and Applicationতথ্য.FLAG_SYSTEM) == 0 &&
+                                it.packageনাম != packageনাম
                     }
                     .map {
-                        AppInfo(
+                        Appতথ্য(
                             name = it.loadLabel(pm).toString(),
-                            packageName = it.packageName,
+                            packageনাম = it.packageনাম,
                             icon = it.loadIcon(pm),
-                            isLocked = lockedApps.contains(it.packageName)
+                            isলক আছে = lockedApps.contains(it.packageনাম)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -64,22 +64,22 @@ class AppSelectionActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    data class AppInfo(
+    data class Appতথ্য(
         val name: String,
-        val packageName: String,
+        val packageনাম: String,
         val icon: Drawable,
-        var isLocked: Boolean
+        var isলক আছে: Boolean
     )
 
     inner class AppAdapter(
-        private val apps: List<AppInfo>
+        private val apps: List<Appতথ্য>
     ) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
         inner class AppViewHolder(view: View)
             : RecyclerView.ViewHolder(view) {
 
             val icon: ImageView = view.findViewById(R.id.appIcon)
-            val name: TextView = view.findViewById(R.id.appName)
+            val name: TextView = view.findViewById(R.id.appনাম)
             val checkbox: CheckBox = view.findViewById(R.id.appCheckbox)
         }
 
@@ -105,37 +105,37 @@ class AppSelectionActivity : AppCompatActivity() {
             holder.icon.setImageDrawable(app.icon)
             holder.name.text = app.name
 
-            holder.checkbox.setOnCheckedChangeListener(null)
-            holder.checkbox.isChecked = app.isLocked
+            holder.checkbox.setচালুCheckedChangeListener(null)
+            holder.checkbox.isChecked = app.isলক আছে
 
-            holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
+            holder.checkbox.setচালুCheckedChangeListener { _, isChecked ->
                 updateLock(app, isChecked)
             }
 
-            holder.itemView.setOnClickListener {
+            holder.itemView.setচালুClickListener {
                 holder.checkbox.isChecked = !holder.checkbox.isChecked
             }
         }
 
         private fun updateLock(
-            app: AppInfo,
+            app: Appতথ্য,
             locked: Boolean
         ) {
-            app.isLocked = locked
+            app.isলক আছে = locked
 
             if (locked) {
-                SecurityManager.addLockedPackage(
-                    this@AppSelectionActivity,
-                    app.packageName
+                নিরাপত্তাManager.addলক আছেPackage(
+                    this@Appসিলেক্ট করোionActivity,
+                    app.packageনাম
                 )
             } else {
-                SecurityManager.removeLockedPackage(
-                    this@AppSelectionActivity,
-                    app.packageName
+                নিরাপত্তাManager.removeলক আছেPackage(
+                    this@Appসিলেক্ট করোionActivity,
+                    app.packageনাম
                 )
             }
         }
 
-        override fun getItemCount() = apps.size
+        override fun getItemগণনা() = apps.size
     }
 }

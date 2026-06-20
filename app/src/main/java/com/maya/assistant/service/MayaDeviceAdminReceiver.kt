@@ -1,14 +1,14 @@
 package com.maya.assistant.service
 
-import android.app.admin.DeviceAdminReceiver
+import android.app.admin.Deviceঅ্যাডমিনReceiver
 import android.content.Context
 import android.content.Intent
 
-class MayaDeviceAdminReceiver : DeviceAdminReceiver() {
-    override fun onEnabled(context: Context, intent: Intent) {
-        super.onEnabled(context, intent)
+class MayaDeviceঅ্যাডমিনReceiver : Deviceঅ্যাডমিনReceiver() {
+    override fun onচালু(context: Context, intent: Intent) {
+        super.onচালু(context, intent)
     }
-    override fun onDisabled(context: Context, intent: Intent) {
-        super.onDisabled(context, intent)
+    override fun onবন্ধ(context: Context, intent: Intent) {
+        super.onবন্ধ(context, intent)
     }
 }

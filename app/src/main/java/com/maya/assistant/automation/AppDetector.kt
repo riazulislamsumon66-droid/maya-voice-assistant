@@ -1,8 +1,8 @@
 package com.maya.assistant.automation
 
-import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.অ্যাক্সেসিবিলিটিService
 import android.content.Intent
-import android.content.pm.ApplicationInfo
+import android.content.pm.Applicationতথ্য
 import android.content.pm.PackageManager
 import android.util.Log
 
@@ -10,13 +10,13 @@ object AppDetector {
 
     private const val TAG = "MAYA_APP_DETECTOR"
 
-    data class InstalledApp(
-        val packageName: String,
+    data class ইনস্টল করোedApp(
+        val packageনাম: String,
         val label: String,
-        val isSystemApp: Boolean
+        val isসিস্টেমApp: Boolean
     )
 
-    private fun normalizeName(value: String): String {
+    private fun normalizeনাম(value: String): String {
         return value
             .lowercase()
             .replace("_", " ")
@@ -27,12 +27,12 @@ object AppDetector {
     }
 
     private fun getLaunchableApps(
-        service: AccessibilityService,
-        includeSystem: Boolean = true
-    ): List<InstalledApp> {
+        service: অ্যাক্সেসিবিলিটিService,
+        includeসিস্টেম: Boolean = true
+    ): List<ইনস্টল করোedApp> {
 
         val pm = service.packageManager
-        val apps = mutableListOf<InstalledApp>()
+        val apps = mutableListOf<ইনস্টল করোedApp>()
         val seen = mutableSetOf<String>()
 
         try {
@@ -40,25 +40,25 @@ object AppDetector {
                 addCategory(Intent.CATEGORY_LAUNCHER)
             }
 
-            val resolveInfos = pm.queryIntentActivities(
+            val resolveতথ্যs = pm.queryIntentActivities(
                 intent,
                 PackageManager.MATCH_ALL
             )
 
-            for (resolveInfo in resolveInfos) {
-                val appInfo = resolveInfo.activityInfo.applicationInfo
-                val packageName = appInfo.packageName
-                if (!seen.add(packageName)) continue
+            for (resolveতথ্য in resolveতথ্যs) {
+                val appতথ্য = resolveতথ্য.activityতথ্য.applicationতথ্য
+                val packageনাম = appতথ্য.packageনাম
+                if (!seen.add(packageনাম)) continue
 
-                val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                if (!includeSystem && isSystem) continue
+                val isসিস্টেম = (appতথ্য.flags and Applicationতথ্য.FLAG_SYSTEM) != 0
+                if (!includeসিস্টেম && isসিস্টেম) continue
 
-                val label = pm.getApplicationLabel(appInfo).toString()
+                val label = pm.getApplicationLabel(appতথ্য).toString()
                 apps.add(
-                    InstalledApp(
-                        packageName = packageName,
+                    ইনস্টল করোedApp(
+                        packageনাম = packageনাম,
                         label = label,
-                        isSystemApp = isSystem
+                        isসিস্টেমApp = isসিস্টেম
                     )
                 )
             }
@@ -66,7 +66,7 @@ object AppDetector {
             Log.d(TAG, "Found ${apps.size} launchable apps")
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting launchable apps: ${e.message}")
+            Log.e(TAG, "সমস্যা getting launchable apps: ${e.message}")
         }
 
         return apps
@@ -75,27 +75,27 @@ object AppDetector {
     /**
      * Get all installed applications.
      */
-    private fun getAllInstalledApps(
-        service: AccessibilityService,
-        includeSystem: Boolean = true
-    ): List<InstalledApp> {
+    private fun getসবইনস্টল করোedApps(
+        service: অ্যাক্সেসিবিলিটিService,
+        includeসিস্টেম: Boolean = true
+    ): List<ইনস্টল করোedApp> {
 
         val pm = service.packageManager
-        val apps = mutableListOf<InstalledApp>()
+        val apps = mutableListOf<ইনস্টল করোedApp>()
 
         try {
-            val packages = pm.getInstalledApplications(0)
+            val packages = pm.getইনস্টল করোedApplications(0)
 
-            for (appInfo in packages) {
-                val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                if (!includeSystem && isSystem) continue
+            for (appতথ্য in packages) {
+                val isসিস্টেম = (appতথ্য.flags and Applicationতথ্য.FLAG_SYSTEM) != 0
+                if (!includeসিস্টেম && isসিস্টেম) continue
 
-                val label = pm.getApplicationLabel(appInfo).toString()
+                val label = pm.getApplicationLabel(appতথ্য).toString()
                 apps.add(
-                    InstalledApp(
-                        packageName = appInfo.packageName,
+                    ইনস্টল করোedApp(
+                        packageনাম = appতথ্য.packageনাম,
                         label = label,
-                        isSystemApp = isSystem
+                        isসিস্টেমApp = isসিস্টেম
                     )
                 )
             }
@@ -103,48 +103,48 @@ object AppDetector {
             Log.d(TAG, "Found ${apps.size} installed apps")
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting installed apps: ${e.message}")
+            Log.e(TAG, "সমস্যা getting installed apps: ${e.message}")
         }
 
         return apps
     }
 
-    fun getInstalledApps(
-        service: AccessibilityService
-    ): List<InstalledApp> {
-        return getAllInstalledApps(service, includeSystem = true)
+    fun getইনস্টল করোedApps(
+        service: অ্যাক্সেসিবিলিটিService
+    ): List<ইনস্টল করোedApp> {
+        return getসবইনস্টল করোedApps(service, includeসিস্টেম = true)
     }
 
     /**
      * Find an app by name (fuzzy match)
      */
-    fun findAppByName(
-        service: AccessibilityService,
-        appName: String
-    ): InstalledApp? {
+    fun findAppByনাম(
+        service: অ্যাক্সেসিবিলিটিService,
+        appনাম: String
+    ): ইনস্টল করোedApp? {
 
-        val query = normalizeName(appName)
+        val query = normalizeনাম(appনাম)
         if (query.isBlank()) return null
 
-        val apps = getLaunchableApps(service, includeSystem = true)
+        val apps = getLaunchableApps(service, includeসিস্টেম = true)
 
         val exact = apps.find {
-            normalizeName(it.label) == query ||
-                normalizeName(it.packageName) == query
+            normalizeনাম(it.label) == query ||
+                normalizeনাম(it.packageনাম) == query
         }
         if (exact != null) return exact
 
         val starts = apps.find {
-            val label = normalizeName(it.label)
-            val pkg = normalizeName(it.packageName)
+            val label = normalizeনাম(it.label)
+            val pkg = normalizeনাম(it.packageনাম)
             label.startsWith(query) || pkg.startsWith(query)
         }
         if (starts != null) return starts
 
         return apps
             .map { app ->
-                val label = normalizeName(app.label)
-                val pkg = normalizeName(app.packageName)
+                val label = normalizeনাম(app.label)
+                val pkg = normalizeনাম(app.packageনাম)
                 var score = 0
 
                 if (label == query || pkg == query) score += 100
@@ -161,24 +161,23 @@ object AppDetector {
     }
 
     fun findAppByKeywords(
-        service: AccessibilityService,
+        service: অ্যাক্সেসিবিলিটিService,
         keywords: List<String>
-    ): InstalledApp? {
+    ): ইনস্টল করোedApp? {
 
-        val apps = getLaunchableApps(service, includeSystem = true)
-        val normalizedKeywords = keywords.map { normalizeName(it) }
+        val apps = getLaunchableApps(service, includeসিস্টেম = true)
+        val normalizedKeywords = keywords.map { normalizeনাম(it) }
 
         return apps
             .map { app ->
-                val label = normalizeName(app.label)
-                val pkg = normalizeName(app.packageName)
+                val label = normalizeনাম(app.label)
+                val pkg = normalizeনাম(app.packageনাম)
                 val score = normalizedKeywords.sumOf { keyword ->
-                    val matchScore: Int = when {
+                    when {
                         label.contains(keyword) -> 30
                         pkg.contains(keyword) -> 20
                         else -> 0
                     }
-                    matchScore
                 }
                 app to score
             }
@@ -191,10 +190,10 @@ object AppDetector {
     /**
      * Get all installed apps including system apps
      */
-    fun getAllApps(
-        service: AccessibilityService,
-        includeSystem: Boolean = false
-    ): List<InstalledApp> {
-        return getAllInstalledApps(service, includeSystem)
+    fun getসবApps(
+        service: অ্যাক্সেসিবিলিটিService,
+        includeসিস্টেম: Boolean = false
+    ): List<ইনস্টল করোedApp> {
+        return getসবইনস্টল করোedApps(service, includeসিস্টেম)
     }
 }

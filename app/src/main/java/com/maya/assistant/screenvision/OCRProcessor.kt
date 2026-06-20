@@ -13,12 +13,12 @@ object OCRProcessor {
     fun extractText(bitmap: Bitmap, onResult: (String) -> Unit) {
         val image = InputImage.fromBitmap(bitmap, 0)
         recognizer.process(image)
-            .addOnSuccessListener { result ->
+            .addচালুসফলListener { result ->
                 val text = result.textBlocks.joinToString("\n") { it.text }
                 Log.d(TAG, "OCR result: $text")
                 onResult(text)
             }
-            .addOnFailureListener { e ->
+            .addচালুFailureListener { e ->
                 Log.e(TAG, "OCR failed: ${e.message}")
                 onResult("")
             }

@@ -7,7 +7,7 @@
     android:paddingBottom="4dp">
 
     <TextView
-        android:id="@+id/mayaTag"
+        android:id="@+id/myraTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MAYA"
@@ -27,7 +27,7 @@
         android:textColor="#E8E8FF"
         android:textSize="13sp"
         android:fontFamily="sans-serif"
-        android:background="@drawable/bg_chat_maya"
+        android:background="@drawable/bg_chat_myra"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="8dp"
