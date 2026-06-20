@@ -54,7 +54,7 @@ class PatternLockView @JvmOverloads constructor(
         strokeCap = Paint.Cap.ROUND
     }
 
-    override fun onআকারChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         val size = minOf(w, h).toFloat()
         val cell = size / GRID_SIZE
         val startX = (w - size) / 2f
@@ -149,7 +149,7 @@ class PatternLockView @JvmOverloads constructor(
         if (!selectedDots.contains(dot)) {
             if (selectedDots.isEmpty()) listener?.onPatternStarted()
 
-            addএড়িয়ে যাওpedDot(dot)
+            addSkippedDot(dot)
             selectedDots.add(dot)
             invalidate()
         }
@@ -158,7 +158,7 @@ class PatternLockView @JvmOverloads constructor(
     /**
      * FIX: skipped middle dot auto-select
      */
-    private fun addএড়িয়ে যাওpedDot(newDot: Int) {
+    private fun addSkippedDot(newDot: Int) {
         if (selectedDots.isEmpty()) return
 
         val last = selectedDots.last()

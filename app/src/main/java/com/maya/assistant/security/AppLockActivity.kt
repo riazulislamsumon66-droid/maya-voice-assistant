@@ -297,8 +297,8 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private fun launchBiometric(allowDeviceCredential: Boolean) {
         val executor = ContextCompat.getMainExecutor(this)
-        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.প্রমাণীকরণকলback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
+        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 fingerStatusText.text = "✅ Success!"
                 onSuccess()
@@ -316,7 +316,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
             }
         })
 
-        val promptInfo = BiometricPrompt.Promptতথ্য.Builder()
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("MAYA Unlock")
             .setSubtitle("তোমার identity confirm কRow")
             .apply {
@@ -383,7 +383,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         }
         speak(msg, true)
         handler.postDelayed({ 
-            finishAndRemoveTaskাওটাস্ক()
+            finishAndRemoveTask()
         }, 1300)
     }
 
@@ -494,7 +494,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
         }.start()
     }
 
-    override fun onপিছনেPressed() { 
+    override fun onBackPressed() { 
         speak("আগে unlock কRow!", true)
         // If they try to back out, go to home screen so they can't access the app
         val intent = Intent(Intent.ACTION_MAIN)

@@ -43,7 +43,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var callAnnounceSwitch: Switch
     private lateinit var callAnnounceStatusText: TextView
     private lateinit var grantPermissionsBtn: Button
-    private lateinit var setDefaultAsিস্ট্যান্টBtn: Button
+    private lateinit var setDefaultAssistantBtn: Button
     private lateinit var permissionsStatusText: TextView
 
     private lateinit var devicePolicyManager: DevicePolicyManager
@@ -103,7 +103,7 @@ class SettingsActivity : AppCompatActivity() {
         callAnnounceSwitch = findViewById(R.id.callAnnounceSwitch)
         callAnnounceStatusText = findViewById(R.id.callAnnounceStatusText)
         grantPermissionsBtn = findViewById(R.id.grantPermissionsBtn)
-        setDefaultAsিস্ট্যান্টBtn = findViewById(R.id.setDefaultAsিস্ট্যান্টBtn)
+        setDefaultAssistantBtn = findViewById(R.id.setDefaultAssistantBtn)
         permissionsStatusText = findViewById(R.id.permissionsStatusText)
     }
 
@@ -174,7 +174,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // NEW: Set default assistant button
-        setDefaultAsিস্ট্যান্টBtn.setEnabledClickListener {
+        setDefaultAssistantBtn.setOnClickListener {
             try {
                 startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
                 Toast.makeText(this, "MAYA ko Default Asিস্ট্যান্ট chuno 👆", Toast.LENGTH_LONG).show()

@@ -15,7 +15,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.maya.assistant.R
-import com.maya.assistant.ui.main.কলAsিস্ট্যান্টActivity
+import com.maya.assistant.ui.main.CallAssistantActivity
 import java.util.*
 
 class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
@@ -71,7 +71,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
                         }
                     }
 
-                    TelephonyManager.CALL_STATE_OFFHOঠিক আছে -> {
+                    TelephonyManager.CALL_STATE_OFFHOOK -> {
                         sendBroadcast(Intent(ACTION_CALL_ACTIVE))
                     }
 
@@ -96,7 +96,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
 
         Log.d(TAG, "Incoming: $callerName")
 
-        val intent = Intent(this, কলAsিস্ট্যান্টActivity::class.java).apply {
+        val intent = Intent(this, CallAssistantActivity::class.java).apply {
             putExtra("CALLER_NAME", callerName)
             putExtra("PHONE_NUMBER", number ?: "")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -163,7 +163,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = নাtificationChannel(
+            val channel = NotificationChannel(
                 CHANNEL_ID,
                 "MAYA কল Monitor",
                 NotificationManager.IMPORTANCE_LOW

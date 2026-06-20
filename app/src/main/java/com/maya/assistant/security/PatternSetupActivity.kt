@@ -20,7 +20,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
     
     private var tts: TextToSpeech? = null
     private var firstPattern: List<Int>? = null
-    private var isনিশ্চিত কRowing = false
+    private var isConfirming = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +39,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
 
         patternLockView.listener = object : PatternLockView.PatternListener {
             override fun onPatternStarted() {
-                instructionText.text = if (isনিশ্চিত কRowing) "আবার এঁকো..." else "কানেক্ট করতে থাকো..."
+                instructionText.text = if (isConfirming) "আবার এঁকো..." else "কানেক্ট করতে থাকো..."
             }
 
             override fun onPatternComplete(pattern: List<Int>) {
@@ -54,7 +54,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
     }
 
     private fun handlePattern(pattern: List<Int>) {
-        if (!isনিশ্চিত কRowing) {
+        if (!isConfirming) {
             // First time drawing
             if (pattern.size < PatternLockView.MIN_PATTERN_LENGTH) {
                 patternLockView.showError()
@@ -69,7 +69,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
             speak("এখন আবার এঁকে confirm কRow", true)
             
             handler.postDelayed({
-                isনিশ্চিত কRowing = true
+                isConfirming = true
                 instructionText.text = "নিশ্চিত কRow karne ke liye dobara draw karo"
                 patternLockView.clearPattern()
                 retryBtn.visibility = View.VISIBLE
@@ -103,7 +103,7 @@ class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListen
 
     private fun resetSetup() {
         firstPattern = null
-        isনিশ্চিত কRowing = false
+        isConfirming = false
         patternLockView.clearPattern()
         retryBtn.visibility = View.INVISIBLE
         instructionText.text = "Naya pattern draw karo"

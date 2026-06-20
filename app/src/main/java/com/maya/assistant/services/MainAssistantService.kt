@@ -6,7 +6,7 @@ import android.content.Context
  * Facade for the primary assistant service layer.
  * Routes to ForegroundVoiceService + SmartAccessibilityEngine.
  */
-object MainAsিস্ট্যান্টService {
+object MainAssistantService {
 
     fun initialize(context: Context) {
         RealtimeConversationService.start(context)

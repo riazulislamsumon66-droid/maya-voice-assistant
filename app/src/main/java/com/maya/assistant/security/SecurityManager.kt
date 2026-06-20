@@ -14,7 +14,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * SecurityManager — AES-256 Encryption + PIN + Voice + App Lock per package
  *
- * ADDED: isPackageলক আছে() — AccessibilityHelperService ke liye
+ * ADDED: isPackageLocked() — AccessibilityHelperService ke liye
  */
 object SecurityManager {
 
@@ -50,7 +50,7 @@ object SecurityManager {
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setKeyআকার(256)
+                .setKeySize(256)
                 .build()
         )
         return keyGen.generateKey()
@@ -148,13 +148,13 @@ object SecurityManager {
     fun verifyVoicePassphrase(context: Context, spoken: String): Boolean {
         val stored = getPrefs(context).getString(KEY_VOICE_PHRASE, null) ?: return false
         val storedPhrase = decrypt(stored)
-        val spokenনাrm = normalise(spoken)
+        val spokenNorm = normalise(spoken)
 
-        if (spokenনাrm == storedPhrase) return true
-        if (spokenনাrm.contains(storedPhrase)) return true
+        if (spokenNorm == storedPhrase) return true
+        if (spokenNorm.contains(storedPhrase)) return true
 
         val storedWords = storedPhrase.split(" ").filter { it.isNotEmpty() }
-        val spokenWords  = spokenনাrm.split(" ").filter { it.isNotEmpty() }
+        val spokenWords  = spokenNorm.split(" ").filter { it.isNotEmpty() }
         if (storedWords.isEmpty()) return false
 
         val matchCount = storedWords.count { sw -> spokenWords.any { it.contains(sw) || sw.contains(it) } }
@@ -187,9 +187,9 @@ object SecurityManager {
         return enabled
     }
     
-    fun setবায়োমেট্রিকEnabled(context: Context, enabled: Boolean) {
+    fun setBiometricEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_BIOMETRIC_ON, enabled).apply()
-        Log.d(TAG, "setবায়োমেট্রিকEnabled: $enabled")
+        Log.d(TAG, "setBiometricEnabled: $enabled")
     }
 
     // ── DEVICE LOCK (System Lock) ────────────────────────────────
@@ -204,7 +204,7 @@ object SecurityManager {
     /**
      * ✅ FIXED: Checks if any lock method is active + package is in list
      */
-    fun isPackageলক আছে(context: Context, packageName: String): Boolean {
+    fun isPackageLocked(context: Context, packageName: String): Boolean {
         // Master check: If global app lock is off AND pattern is off, nothing is locked
         if (!isAppLockEnabled(context) && !isBiometricEnabled(context) && !isDeviceLockEnabled(context)) {
             return false
@@ -220,31 +220,31 @@ object SecurityManager {
         if (systemApps.contains(packageName)) return false // Settings should NOT be locked for now to avoid loops
 
         // লক আছে packages list check karo
-        val locked = getলক আছেPackages(context)
-        val isলক আছে = locked.contains(packageName)
-        Log.d(TAG, "Checking lock for $packageName: $isলক আছে")
-        return isলক আছে
+        val locked = getLockedPackages(context)
+        val isLocked = locked.contains(packageName)
+        Log.d(TAG, "Checking lock for $packageName: $isLocked")
+        return isLocked
     }
 
-    fun addলক আছেPackage(context: Context, packageName: String) {
-        val current = getলক আছেPackages(context).toMutableSet()
+    fun addLockedPackage(context: Context, packageName: String) {
+        val current = getLockedPackages(context).toMutableSet()
         current.add(packageName)
-        saveলক আছেPackages(context, current)
+        saveLockedPackages(context, current)
     }
 
-    fun removeলক আছেPackage(context: Context, packageName: String) {
-        val current = getলক আছেPackages(context).toMutableSet()
+    fun removeLockedPackage(context: Context, packageName: String) {
+        val current = getLockedPackages(context).toMutableSet()
         current.remove(packageName)
-        saveলক আছেPackages(context, current)
+        saveLockedPackages(context, current)
     }
 
-    fun getলক আছেPackages(context: Context): Set<String> {
+    fun getLockedPackages(context: Context): Set<String> {
         val stored = getPrefs(context).getString(KEY_LOCKED_PACKAGES, "") ?: ""
         return if (stored.isEmpty()) emptySet()
                else stored.split(",").filter { it.isNotEmpty() }.toSet()
     }
 
-    private fun saveলক আছেPackages(context: Context, packages: Set<String>) {
+    private fun saveLockedPackages(context: Context, packages: Set<String>) {
         getPrefs(context).edit()
             .putString(KEY_LOCKED_PACKAGES, packages.joinToString(","))
             .apply()
@@ -260,7 +260,7 @@ object SecurityManager {
         getPrefs(context).edit().putBoolean(KEY_PRIVATE_MODE, false).apply()
     }
 
-    fun isPrivateModeসক্রিয়(context: Context) = getPrefs(context).getBoolean(KEY_PRIVATE_MODE, false)
+    fun isPrivateModeActive(context: Context) = getPrefs(context).getBoolean(KEY_PRIVATE_MODE, false)
 
     // ── RESULT ───────────────────────────────────────────────────
 

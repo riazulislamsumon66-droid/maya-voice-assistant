@@ -1,6 +1,6 @@
 package com.maya.assistant.security
 
-import android.content.pm.Applicationতথ্য
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.maya.assistant.R
 import kotlinx.coroutines.*
 
-class AppSelect কRowionActivity : AppCompatActivity() {
+class AppSelectionActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -27,7 +27,7 @@ class AppSelect কRowionActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.appsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.setHasFixedআকার(true)
+        recyclerView.setHasFixedSize(true)
 
         loadApps()
     }
@@ -37,19 +37,19 @@ class AppSelect কRowionActivity : AppCompatActivity() {
             val apps = withContext(Dispatchers.IO) {
                 val pm = packageManager
                 val lockedApps =
-                    SecurityManager.getলক আছেPackages(this@AppSelect কRowionActivity)
+                    SecurityManager.getLockedPackages(this@AppSelectionActivity)
 
                 pm.getInstalledApplications(PackageManager.GET_META_DATA)
                     .filter {
-                        (it.flags and Applicationতথ্য.FLAG_SYSTEM) == 0 &&
+                        (it.flags and ApplicationInfo.FLAG_SYSTEM) == 0 &&
                                 it.packageName != packageName
                     }
                     .map {
-                        Appতথ্য(
+                        AppInfo(
                             name = it.loadLabel(pm).toString(),
                             packageName = it.packageName,
                             icon = it.loadIcon(pm),
-                            isলক আছে = lockedApps.contains(it.packageName)
+                            isLocked = lockedApps.contains(it.packageName)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -64,15 +64,15 @@ class AppSelect কRowionActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    data class Appতথ্য(
+    data class AppInfo(
         val name: String,
         val packageName: String,
         val icon: Drawable,
-        var isলক আছে: Boolean
+        var isLocked: Boolean
     )
 
     inner class AppAdapter(
-        private val apps: List<Appতথ্য>
+        private val apps: List<AppInfo>
     ) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
         inner class AppViewHolder(view: View)
@@ -106,7 +106,7 @@ class AppSelect কRowionActivity : AppCompatActivity() {
             holder.name.text = app.name
 
             holder.checkbox.setEnabledCheckedChangeListener(null)
-            holder.checkbox.isChecked = app.isলক আছে
+            holder.checkbox.isChecked = app.isLocked
 
             holder.checkbox.setEnabledCheckedChangeListener { _, isChecked ->
                 updateLock(app, isChecked)
@@ -118,19 +118,19 @@ class AppSelect কRowionActivity : AppCompatActivity() {
         }
 
         private fun updateLock(
-            app: Appতথ্য,
+            app: AppInfo,
             locked: Boolean
         ) {
-            app.isলক আছে = locked
+            app.isLocked = locked
 
             if (locked) {
-                SecurityManager.addলক আছেPackage(
-                    this@AppSelect কRowionActivity,
+                SecurityManager.addLockedPackage(
+                    this@AppSelectionActivity,
                     app.packageName
                 )
             } else {
-                SecurityManager.removeলক আছেPackage(
-                    this@AppSelect কRowionActivity,
+                SecurityManager.removeLockedPackage(
+                    this@AppSelectionActivity,
                     app.packageName
                 )
             }

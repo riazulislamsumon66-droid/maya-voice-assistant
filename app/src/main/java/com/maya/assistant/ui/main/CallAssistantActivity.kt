@@ -28,7 +28,7 @@ import java.util.Locale
 
 
 
-class কলAsিস্ট্যান্টActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
+class CallAssistantActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var callerNameText: TextView
     private lateinit var statusText: TextView
@@ -539,14 +539,14 @@ class কলAsিস্ট্যান্টActivity : AppCompatActivity(), Text
     private fun answerNormalCall(): Boolean {
         var success = false
 
-        // Method 1: TelecomManager acceptRingingকল
+        // Method 1: TelecomManager acceptRingingCall
         try {
             if (checkSelfPermission(Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
                 val telecom = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     @Suppress("DEPRECATION")
-                    telecom.acceptRingingকল()
-                    Log.d(TAG, "✅ কল accepted via TelecomManager.acceptRingingকল()")
+                    telecom.acceptRingingCall()
+                    Log.d(TAG, "✅ কল accepted via TelecomManager.acceptRingingCall()")
                     success = true
                 }
             }

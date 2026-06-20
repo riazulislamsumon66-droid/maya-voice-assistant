@@ -28,13 +28,13 @@ object BiometricManager {
     private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
     private const val KEY_PIN_SET = "pin_set"
 
-    private var isভেরিফাই কRowd = false
-    private var lastAuthসময় = 0L
+    private var isVerified = false
+    private var lastAuthTime = 0L
 
     /**
      * Check if biometric is available on device
      */
-    fun isবায়োমেট্রিকপাওয়া যাচ্ছে(context: Context): Boolean {
+    fun isBiometricAvailable(context: Context): Boolean {
         val biometricManager = BiometricManager.from(context)
         return biometricManager.canVerify() == BiometricManager.BIOMETRIC_SUCCESS
     }
@@ -50,7 +50,7 @@ object BiometricManager {
     /**
      * Enabled কRow/disable biometric
      */
-    fun setবায়োমেট্রিকEnabled(context: Context, enabled: Boolean) {
+    fun setBiometricEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putBoolean(KEY_BIOMETRIC_ENABLED, enabled)
@@ -67,7 +67,7 @@ object BiometricManager {
         onFallback: () -> Unit
     ) {
         // Check session timeout
-        if (isSessionবৈধ(context)) {
+        if (isSessionValid(context)) {
             Log.d(TAG, "Session এখনো valid, skip করছি")
             onSuccess()
             return
@@ -79,7 +79,7 @@ object BiometricManager {
             return
         }
 
-        if (!isবায়োমেট্রিকপাওয়া যাচ্ছে(context)) {
+        if (!isBiometricAvailable(context)) {
             Log.w(TAG, "বায়োমেট্রিক not available, using fallback")
             onFallback()
             return
@@ -100,8 +100,8 @@ object BiometricManager {
     ) {
         val executor = ContextCompat.getMainExecutor(context)
 
-        // Create Promptতথ্য using the builder
-        val promptInfo = BiometricPrompt.Promptতথ্য.Builder()
+        // Create PromptInfo using the builder
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("MAYA নিরাপত্তা")
             .setSubtitle("যাচাই কRow your identity")
             .setDescription("আঙুল sensor এ রাখো")
@@ -114,13 +114,13 @@ object BiometricManager {
         val biometricPrompt = BiometricPrompt(
             activity,
             executor,
-            object : BiometricPrompt.প্রমাণীকরণকলback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.প্রমাণীকরণResult) {
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     Log.d(TAG, "✅ বায়োমেট্রিক authentication succeeded")
-                    isভেরিফাই কRowd = true
-                    lastAuthসময় = System.currentTimeMillis()
-                    saveAuthসময়(context)
+                    isVerified = true
+                    lastAuthTime = System.currentTimeMillis()
+                    saveAuthTime(context)
                     onSuccess()
                 }
 
@@ -149,8 +149,8 @@ object BiometricManager {
     /**
      * Check if current session is valid (not timed out)
      */
-    fun isSessionবৈধ(context: Context): Boolean {
-        if (!isভেরিফাই কRowd) return false
+    fun isSessionValid(context: Context): Boolean {
+        if (!isVerified) return false
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val lastAuth = prefs.getLong(KEY_LAST_AUTH, 0)
@@ -163,14 +163,14 @@ object BiometricManager {
      * Reset কRow authentication state
      */
     fun resetAuth() {
-        isভেরিফাই কRowd = false
-        lastAuthসময় = 0
+        isVerified = false
+        lastAuthTime = 0
     }
 
     /**
      * Save কRow authentication time
      */
-    private fun saveAuthসময়(context: Context) {
+    private fun saveAuthTime(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putLong(KEY_LAST_AUTH, System.currentTimeMillis())

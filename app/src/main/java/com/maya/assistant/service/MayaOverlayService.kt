@@ -137,7 +137,7 @@ class MayaOverlayService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = নাtificationChannel(
+            val channel = NotificationChannel(
                 CHANNEL_ID,
                 "MAYA Asিস্ট্যান্ট",
                 NotificationManager.IMPORTANCE_LOW
@@ -150,7 +150,7 @@ class MayaOverlayService : Service() {
         }
     }
 
-    private fun buildNotification(): নাtification {
+    private fun buildNotification(): Notification {
         val intent = Intent(this, MainActivity::class.java)
         val pi = PendingIntent.getActivity(this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

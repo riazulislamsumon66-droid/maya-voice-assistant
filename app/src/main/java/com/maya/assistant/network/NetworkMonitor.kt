@@ -14,7 +14,7 @@ class NetworkMonitor(context: Context) {
         private set
     var onConnectionChange: ((Boolean) -> Unit)? = null
 
-    private val callback = object : ConnectivityManager.Networkকলback() {
+    private val callback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             isConnected = true
             Logger.d(TAG, "Network available")
@@ -31,11 +31,11 @@ class NetworkMonitor(context: Context) {
         val req = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
-        cm.registerNetworkকলback(req, callback)
+        cm.registerNetworkCallback(req, callback)
         isConnected = cm.activeNetwork != null
     }
 
     fun stop() {
-        try { cm.unregisterNetworkকলback(callback) } catch (_: Exception) {}
+        try { cm.unregisterNetworkCallback(callback) } catch (_: Exception) {}
     }
 }

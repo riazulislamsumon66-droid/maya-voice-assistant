@@ -115,12 +115,12 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
             fingerprintSwitch.isChecked = SecurityManager.isBiometricEnabled(this)
         } else {
             fingerprintSwitch.visibility = View.GONE
-            SecurityManager.setবায়োমেট্রিকEnabled(this, false)
+            SecurityManager.setBiometricEnabled(this, false)
         }
 
         deviceLockSwitch.isChecked = SecurityManager.isDeviceLockEnabled(this)
 
-        val pm = SecurityManager.isPrivateModeসক্রিয়(this)
+        val pm = SecurityManager.isPrivateModeActive(this)
         privateModeSwitch.isChecked = pm
         privateModeStatusText.text = if (pm) "🙈 Private Mode ON" else "👁️ Private Mode OFF"
         privateModeStatusText.setTextColor(if (pm) 0xFFFFAB40.toInt() else 0xFF888888.toInt())
@@ -157,7 +157,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
         setVoiceBtn.setEnabledClickListener { showVoiceSetupDialog() }
 
         fingerprintSwitch.setEnabledCheckedChangeListener { _, checked ->
-            SecurityManager.setবায়োমেট্রিকEnabled(this, checked)
+            SecurityManager.setBiometricEnabled(this, checked)
             speak(if (checked) "Fingerprint unlock enable ho gaya" else "Fingerprint unlock band kar diya", true)
         }
 
@@ -167,7 +167,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
         }
 
         selectAppsBtn.setEnabledClickListener {
-            startActivity(Intent(this, AppSelect কRowionActivity::class.java))
+            startActivity(Intent(this, AppSelectionActivity::class.java))
         }
         usageStatsBtn.setEnabledClickListener {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
@@ -204,7 +204,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
             .setNegativeButton("বাতিল", null)
             .create()
 
-        dialog.setEnabledVisibleওListener {
+        dialog.setVisibleListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabledClickListener {
                 val pin  = newPinInput.text.toString().trim()
                 val conf = confPinInput.text.toString().trim()
@@ -271,9 +271,9 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.EnabledInitLi
     }
 
     private fun checkPermissions() {
-        val usageStatsমঞ্জুর ✅ = isUsageStatsEnabled()
-        usageStatsBtn.text = if (usageStatsমঞ্জুর ✅) "✅ Usage Stats সবowed" else "সবow Usage Stats"
-        usageStatsBtn.isEnabled = !usageStatsমঞ্জুর ✅
+        val usageStatsGranted = isUsageStatsEnabled()
+        usageStatsBtn.text = if (usageStatsGranted) "✅ Usage Stats সবowed" else "Allow Usage Stats"
+        usageStatsBtn.isEnabled = !usageStatsGranted
 
         val overlayGranted = Settings.canDrawOverlays(this)
         overlayPermissionBtn.text = if (overlayGranted) "✅ ওভারলে সবowed" else "সবow ডিসপ্লে Over Apps"
