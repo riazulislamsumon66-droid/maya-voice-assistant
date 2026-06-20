@@ -3,33 +3,55 @@ package com.maya.assistant.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import com.maya.assistant.ui.main.MainActivity
 
 class PowerButtonReceiver : BroadcastReceiver() {
 
     companion object {
-        private const val TAG = "PowerButtonReceiver"
+        private var pressCount = 0
         private var lastPressTime = 0L
-        private const val DOUBLE_PRESS_INTERVAL = 600L // ms
+        private const val DOUBLE_PRESS_WINDOW = 700L
+        private const val TAG = "MAYA_POWER"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action ?: return
-        if (action == Intent.ACTION_SCREEN_OFF || action == Intent.ACTION_SCREEN_ON) {
-            val now = System.currentTimeMillis()
-            if (now - lastPressTime < DOUBLE_PRESS_INTERVAL) {
-                // Double press detected — show overlay
-                Log.d(TAG, "Double power press detected!")
-                lastPressTime = 0L
-                try {
-                    val overlayIntent = Intent(context, MayaOverlayService::class.java)
-                    context.startService(overlayIntent)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error starting overlay: ${e.message}")
-                }
-            } else {
-                lastPressTime = now
+        when (intent.action) {
+            Intent.ACTION_SCREEN_OFF,
+            Intent.ACTION_SCREEN_ON -> detectDoublePress(context)
+        }
+    }
+
+    private fun detectDoublePress(context: Context) {
+        val now = System.currentTimeMillis()
+
+        if (now - lastPressTime <= DOUBLE_PRESS_WINDOW) {
+            pressCount++
+
+            if (pressCount >= 2) {
+                pressCount = 0
+                launchMaya(context)
             }
+
+        } else {
+            pressCount = 1
+        }
+
+        lastPressTime = now
+    }
+
+    private fun launchMaya(context: Context) {
+        Log.d(TAG, "Double power press detected")
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start activity: ${e.message}")
         }
     }
 }

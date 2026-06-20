@@ -1,4 +1,4 @@
-name: Build Maya APK
+name: Build MAYA APK
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
     - name: Build debug APK
       run: |
         export ANDROID_HOME=$HOME/android-sdk
-        export ANDROID_SDK_ROOT=$HOME/android-sdk
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
         ./gradlew assembleDebug --no-daemon 2>&1 | tee /tmp/build.log
 
     - name: Upload build log

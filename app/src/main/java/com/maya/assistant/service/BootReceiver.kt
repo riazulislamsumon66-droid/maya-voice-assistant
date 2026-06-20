@@ -3,22 +3,17 @@ package com.maya.assistant.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import androidx.core.content.ContextCompat
+import com.maya.assistant.services.ForegroundVoiceService
+import com.maya.assistant.utils.Constants
 
 class BootReceiver : BroadcastReceiver() {
-
-    companion object {
-        private const val TAG = "BootReceiver"
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.d(TAG, "Boot completed — starting CallMonitorService")
-            try {
-                val serviceIntent = Intent(context, CallMonitorService::class.java)
-                context.startService(serviceIntent)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error starting CallMonitorService on boot: ${e.message}")
+            val prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
+            val apiKey = prefs.getString(Constants.KEY_API_KEY, "") ?: ""
+            if (apiKey.isNotEmpty()) {
+                ContextCompat.startForegroundService(context, Intent(context, ForegroundVoiceService::class.java))
             }
         }
     }

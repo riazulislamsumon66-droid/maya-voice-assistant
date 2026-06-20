@@ -8,232 +8,347 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import kotlin.math.*
 
-enum class OrbState { IDLE, LISTENING, SPEAKING, THINKING }
-
 class OrbAnimationView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var orbState = OrbState.IDLE
+    // State
+    private var isActive = false
+    private var isSpeaking = false
+    private var isThinking = false
+    private var isPulsating = false
+    private var speakAmplitude = 0f
+
+    // Animation
     private var rotationAngle = 0f
-    private var waveOffset = 0f
     private var pulseScale = 1f
-    private var glowAlpha = 120
+    private var glowAlpha = 180
+    private var waveOffset = 0f
     private var thinkingAngle = 0f
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val rectF = RectF()
+    // Animators
+    private val rotationAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+        duration = 4000
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = LinearInterpolator()
+        addUpdateListener {
+            rotationAngle = it.animatedValue as Float
+            invalidate()
+        }
+    }
+
+    private val pulseAnimator = ValueAnimator.ofFloat(1f, 1.15f, 1f).apply {
+        duration = 1500
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+        addUpdateListener {
+            pulseScale = it.animatedValue as Float
+            invalidate()
+        }
+    }
+
+    private val glowAnimator = ValueAnimator.ofInt(120, 220, 120).apply {
+        duration = 2000
+        repeatCount = ValueAnimator.INFINITE
+        addUpdateListener {
+            glowAlpha = it.animatedValue as Int
+            invalidate()
+        }
+    }
+
+    private val waveAnimator = ValueAnimator.ofFloat(0f, (2 * Math.PI).toFloat()).apply {
+        duration = 1200
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = LinearInterpolator()
+        addUpdateListener {
+            waveOffset = it.animatedValue as Float
+            invalidate()
+        }
+    }
+
+    private val thinkingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+        duration = 1000
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = LinearInterpolator()
+        addUpdateListener {
+            thinkingAngle = it.animatedValue as Float
+            invalidate()
+        }
+    }
+
+    // Paints
+    private val orbPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 3f
+    }
+    private val wavePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 2.5f
+    }
+    private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     // Colors
-    private val idleColor1 = Color.parseColor("#B71C1C")
-    private val idleColor2 = Color.parseColor("#880E4F")
-    private val activeColor1 = Color.parseColor("#FF1744")
-    private val activeColor2 = Color.parseColor("#D500F9")
-    private val speakingColor1 = Color.parseColor("#E040FB")
-    private val speakingColor2 = Color.parseColor("#FF1744")
-    private val thinkingColor1 = Color.parseColor("#40C4FF")
-    private val thinkingColor2 = Color.parseColor("#00B0FF")
+    private val coreColor1 = Color.parseColor("#FF1744")
+    private val coreColor2 = Color.parseColor("#D500F9")
+    private val glowColor = Color.parseColor("#FF1744")
+    private val ringColor = Color.parseColor("#FF6D6D")
+    private val activeColor = Color.parseColor("#FF1744")
+    private val speakColor = Color.parseColor("#E040FB")
+    private val thinkColor = Color.parseColor("#40C4FF")
 
-    private var rotationAnimator: ValueAnimator? = null
-    private var waveAnimator: ValueAnimator? = null
-    private var pulseAnimator: ValueAnimator? = null
-    private var glowAnimator: ValueAnimator? = null
-    private var thinkingAnimator: ValueAnimator? = null
+    // Particles
+    private data class Particle(var angle: Float, var radius: Float, var size: Float, var alpha: Int)
+    private val particles = (0..12).map {
+        Particle(
+            angle = (it * 360f / 12f),
+            radius = 0f,
+            size = (4..8).random().toFloat(),
+            alpha = (100..255).random()
+        )
+    }
 
     init {
         startIdleAnimation()
     }
 
-    fun setState(state: OrbState) {
-        orbState = state
-        stopAllAnimators()
-        when (state) {
-            OrbState.IDLE -> startIdleAnimation()
-            OrbState.LISTENING -> startListeningAnimation()
-            OrbState.SPEAKING -> startSpeakingAnimation()
-            OrbState.THINKING -> startThinkingAnimation()
-        }
-    }
-
-    private fun stopAllAnimators() {
-        rotationAnimator?.cancel()
-        waveAnimator?.cancel()
-        pulseAnimator?.cancel()
-        glowAnimator?.cancel()
-        thinkingAnimator?.cancel()
-    }
-
     private fun startIdleAnimation() {
-        pulseAnimator = ValueAnimator.ofFloat(1f, 1.15f, 1f).apply {
-            duration = 1500
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { pulseScale = it.animatedValue as Float; invalidate() }
-            start()
-        }
-        glowAnimator = ValueAnimator.ofInt(120, 220, 120).apply {
-            duration = 1500
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { glowAlpha = it.animatedValue as Int; invalidate() }
-            start()
-        }
+        pulseAnimator.start()
+        glowAnimator.start()
     }
 
-    private fun startListeningAnimation() {
-        startRotation()
-        startWaves()
-    }
-
-    private fun startSpeakingAnimation() {
-        startRotation()
-        startWaves()
-    }
-
-    private fun startThinkingAnimation() {
-        thinkingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 1000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            addUpdateListener { thinkingAngle = it.animatedValue as Float; invalidate() }
-            start()
+    fun setActive(active: Boolean) {
+        isActive = active
+        if (active) {
+            rotationAnimator.start()
+            waveAnimator.start()
+        } else {
+            rotationAnimator.cancel()
+            waveAnimator.cancel()
         }
+        invalidate()
     }
 
-    private fun startRotation() {
-        rotationAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 3000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            addUpdateListener { rotationAngle = it.animatedValue as Float; invalidate() }
-            start()
+    fun setSpeaking(speaking: Boolean) {
+        isSpeaking = speaking
+        if (speaking) {
+            waveAnimator.duration = 600
+            waveAnimator.start()
+        } else {
+            waveAnimator.duration = 1200
         }
+        invalidate()
     }
 
-    private fun startWaves() {
-        waveAnimator = ValueAnimator.ofFloat(0f, 2f * PI.toFloat()).apply {
-            duration = 2000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            addUpdateListener { waveOffset = it.animatedValue as Float; invalidate() }
-            start()
+    fun setThinking(thinking: Boolean) {
+        isThinking = thinking
+        if (thinking) {
+            thinkingAnimator.start()
+        } else {
+            thinkingAnimator.cancel()
         }
+        invalidate()
+    }
+
+    fun setPulsating(pulsating: Boolean) {
+        isPulsating = pulsating
+        invalidate()
+    }
+
+    fun setAmplitude(amplitude: Float) {
+        speakAmplitude = amplitude.coerceIn(0f, 1f)
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val cx = width / 2f
         val cy = height / 2f
-        val baseRadius = minOf(cx, cy) * 0.7f
-        val radius = baseRadius * pulseScale
+        val baseRadius = minOf(cx, cy) * 0.55f
 
-        // 1. Radial glow
-        paint.shader = RadialGradient(cx, cy, radius * 1.6f, intArrayOf(
-            getGlowColor(), Color.TRANSPARENT
-        ), floatArrayOf(0.3f, 1f), Shader.TileMode.CLAMP)
-        paint.alpha = glowAlpha
-        canvas.drawCircle(cx, cy, radius * 1.6f, paint)
-        paint.alpha = 255
-        paint.shader = null
+        canvas.save()
+        canvas.scale(pulseScale, pulseScale, cx, cy)
 
-        // 2. Core orb
-        val coreColors = getCoreColors()
-        paint.shader = RadialGradient(
+        // Glow layer
+        drawGlow(canvas, cx, cy, baseRadius)
+
+        // Core orb
+        drawCoreOrb(canvas, cx, cy, baseRadius)
+
+        // Rings
+        drawRings(canvas, cx, cy, baseRadius)
+
+        // Wave effect (when active/speaking)
+        if (isActive || isSpeaking) {
+            drawWaves(canvas, cx, cy, baseRadius)
+        }
+
+        // Thinking indicator
+        if (isThinking) {
+            drawThinkingArc(canvas, cx, cy, baseRadius)
+        }
+
+        // Particles
+        if (isActive || isSpeaking) {
+            drawParticles(canvas, cx, cy, baseRadius)
+        }
+
+        canvas.restore()
+
+        // Inner glow pulse
+        drawInnerHighlight(canvas, cx, cy, baseRadius * pulseScale)
+    }
+
+    private fun drawGlow(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val glowRadius = radius * 1.6f
+        val color = when {
+            isSpeaking -> speakColor
+            isThinking -> thinkColor
+            isActive -> activeColor
+            else -> glowColor
+        }
+        val shader = RadialGradient(
+            cx, cy, glowRadius,
+            intArrayOf(
+                Color.argb(glowAlpha / 3, Color.red(color), Color.green(color), Color.blue(color)),
+                Color.argb(0, Color.red(color), Color.green(color), Color.blue(color))
+            ),
+            floatArrayOf(0.3f, 1f),
+            Shader.TileMode.CLAMP
+        )
+        glowPaint.shader = shader
+        canvas.drawCircle(cx, cy, glowRadius, glowPaint)
+    }
+
+    private fun drawCoreOrb(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val color1 = when {
+            isSpeaking -> Color.parseColor("#E040FB")
+            isThinking -> Color.parseColor("#40C4FF")
+            isActive -> Color.parseColor("#FF1744")
+            else -> Color.parseColor("#B71C1C")
+        }
+        val color2 = when {
+            isSpeaking -> Color.parseColor("#FF1744")
+            isThinking -> Color.parseColor("#00B0FF")
+            isActive -> Color.parseColor("#D500F9")
+            else -> Color.parseColor("#880E4F")
+        }
+
+        val shader = RadialGradient(
             cx - radius * 0.3f, cy - radius * 0.3f, radius,
-            coreColors, floatArrayOf(0f, 0.7f, 1f), Shader.TileMode.CLAMP
+            intArrayOf(color1, color2),
+            floatArrayOf(0f, 1f),
+            Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(cx, cy, radius, paint)
-        paint.shader = null
-
-        // 3. Rotating rings
-        if (orbState == OrbState.LISTENING || orbState == OrbState.SPEAKING) {
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = 2f
-            for (i in 1..3) {
-                val ringRadius = radius * (1.1f + i * 0.15f)
-                paint.color = if (i % 2 == 0) activeColor1 else activeColor2
-                paint.alpha = 80 + i * 30
-                rectF.set(cx - ringRadius, cy - ringRadius, cx + ringRadius, cy + ringRadius)
-                canvas.drawArc(rectF, rotationAngle + i * 60, 120f, false, paint)
-            }
-            paint.alpha = 255
-            paint.style = Paint.Style.FILL
-        }
-
-        // 4. Wave rings
-        if (orbState == OrbState.LISTENING || orbState == OrbState.SPEAKING) {
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = 1.5f
-            paint.color = activeColor1
-            paint.alpha = 60
-            for (i in 0 until 3) {
-                val waveRadius = radius * (1.3f + i * 0.2f)
-                val path = Path()
-                for (angle in 0..360 step 5) {
-                    val rad = Math.toRadians(angle.toDouble())
-                    val wave = sin(rad * 3 + waveOffset + i) * 5
-                    val r = (waveRadius + wave).toFloat()
-                    val x = cx + r * cos(rad).toFloat()
-                    val y = cy + r * sin(rad).toFloat()
-                    if (angle == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                }
-                path.close()
-                canvas.drawPath(path, paint)
-            }
-            paint.alpha = 255
-            paint.style = Paint.Style.FILL
-        }
-
-        // 5. Thinking arc
-        if (orbState == OrbState.THINKING) {
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = 4f
-            paint.color = thinkingColor1
-            rectF.set(cx - radius * 1.2f, cy - radius * 1.2f, cx + radius * 1.2f, cy + radius * 1.2f)
-            canvas.drawArc(rectF, thinkingAngle, 120f, false, paint)
-            canvas.drawArc(rectF, thinkingAngle + 180, 120f, false, paint)
-            paint.style = Paint.Style.FILL
-        }
-
-        // 6. Particles
-        if (orbState == OrbState.SPEAKING || orbState == OrbState.LISTENING) {
-            paint.color = activeColor2
-            for (i in 0 until 12) {
-                val angle = (rotationAngle + i * 30) * PI.toFloat() / 180f
-                val dist = radius * 1.4f
-                val px = cx + cos(angle) * dist
-                val py = cy + sin(angle) * dist
-                paint.alpha = 100 + (i * 10)
-                canvas.drawCircle(px, py, 3f, paint)
-            }
-            paint.alpha = 255
-        }
-
-        // 7. Inner highlight
-        paint.shader = RadialGradient(
-            cx - radius * 0.3f, cy - radius * 0.3f, radius * 0.5f,
-            intArrayOf(Color.argb(60, 255, 255, 255), Color.TRANSPARENT),
-            floatArrayOf(0f, 1f), Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(cx, cy, radius, paint)
-        paint.shader = null
+        orbPaint.shader = shader
+        canvas.drawCircle(cx, cy, radius, orbPaint)
     }
 
-    private fun getGlowColor(): Int {
-        return when (orbState) {
-            OrbState.IDLE -> idleColor1
-            OrbState.LISTENING -> activeColor1
-            OrbState.SPEAKING -> speakingColor1
-            OrbState.THINKING -> thinkingColor1
+    private fun drawRings(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val ringCount = 3
+        for (i in 0 until ringCount) {
+            val r = radius + (i + 1) * 18f
+            val alpha = (255 - i * 60).coerceAtLeast(50)
+            ringPaint.color = Color.argb(alpha, 255, 80, 80)
+            ringPaint.strokeWidth = (3f - i * 0.8f).coerceAtLeast(1f)
+
+            canvas.save()
+            canvas.rotate(rotationAngle + i * 30f, cx, cy)
+            val oval = RectF(cx - r, cy - r, cx + r, cy + r)
+            canvas.drawArc(oval, 0f, 280f, false, ringPaint)
+            canvas.restore()
         }
     }
 
-    private fun getCoreColors(): IntArray {
-        return when (orbState) {
-            OrbState.IDLE -> intArrayOf(idleColor1, idleColor2, Color.parseColor("#1A0000"))
-            OrbState.LISTENING -> intArrayOf(activeColor1, activeColor2, Color.parseColor("#1A0000"))
-            OrbState.SPEAKING -> intArrayOf(speakingColor1, speakingColor2, Color.parseColor("#1A0000"))
-            OrbState.THINKING -> intArrayOf(thinkingColor1, thinkingColor2, Color.parseColor("#001A1A"))
+    private fun drawWaves(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val waveCount = if (isSpeaking) 8 else 5
+        val amplitude = if (isSpeaking) radius * 0.3f * (0.5f + speakAmplitude) else radius * 0.15f
+        val waveRadius = radius + 25f
+
+        val path = Path()
+        val points = 180
+        for (ring in 0..1) {
+            path.reset()
+            val r = waveRadius + ring * 20f
+            for (j in 0..points) {
+                val angle = (j * 360f / points).toRadians()
+                val wave = amplitude * sin(waveCount * angle + waveOffset + ring * 1.2f)
+                val x = cx + (r + wave) * cos(angle)
+                val y = cy + (r + wave) * sin(angle)
+                if (j == 0) path.moveTo(x, y) else path.lineTo(x, y)
+            }
+            path.close()
+            wavePaint.color = Color.argb(
+                if (ring == 0) 200 else 120,
+                if (isSpeaking) 224 else 255,
+                if (isSpeaking) 64 else 30,
+                if (isSpeaking) 251 else 50
+            )
+            wavePaint.strokeWidth = if (ring == 0) 2.5f else 1.5f
+            canvas.drawPath(path, wavePaint)
         }
+    }
+
+    private fun drawThinkingArc(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val arcRadius = radius + 40f
+        val oval = RectF(cx - arcRadius, cy - arcRadius, cx + arcRadius, cy + arcRadius)
+        ringPaint.color = Color.parseColor("#40C4FF")
+        ringPaint.strokeWidth = 4f
+        canvas.save()
+        canvas.rotate(thinkingAngle, cx, cy)
+        canvas.drawArc(oval, 0f, 120f, false, ringPaint)
+        canvas.drawArc(oval, 180f, 120f, false, ringPaint)
+        canvas.restore()
+    }
+
+    private fun drawParticles(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        particles.forEach { p ->
+            p.angle = (p.angle + 0.8f) % 360f
+            val pRadius = radius + 30f + 20f * sin(p.angle.toRadians() * 3)
+            val x = cx + pRadius * cos(p.angle.toRadians())
+            val y = cy + pRadius * sin(p.angle.toRadians())
+            val color = if (isSpeaking) Color.parseColor("#E040FB") else Color.parseColor("#FF6D6D")
+            particlePaint.color = Color.argb(p.alpha, Color.red(color), Color.green(color), Color.blue(color))
+            canvas.drawCircle(x, y, p.size, particlePaint)
+        }
+    }
+
+    private fun drawInnerHighlight(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val highlightShader = RadialGradient(
+            cx - radius * 0.25f, cy - radius * 0.25f, radius * 0.5f,
+            intArrayOf(Color.argb(120, 255, 255, 255), Color.TRANSPARENT),
+            floatArrayOf(0f, 1f),
+            Shader.TileMode.CLAMP
+        )
+        val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { shader = highlightShader }
+        canvas.drawCircle(cx - radius * 0.15f, cy - radius * 0.15f, radius * 0.45f, highlightPaint)
+    }
+
+    private fun Float.toRadians() = this * (Math.PI / 180f).toFloat()
+
+    // ── Convenience state methods ──────────────────────────────
+    fun setListening() {
+        setActive(true); setSpeaking(false); setThinking(false); setPulsating(false)
+    }
+    fun setSpeaking() {
+        setActive(true); setSpeaking(true); setThinking(false); setPulsating(false)
+    }
+    fun setThinking() {
+        setActive(true); setSpeaking(false); setThinking(true); setPulsating(false)
+    }
+    fun setIdle() {
+        setActive(false); setSpeaking(false); setThinking(false); setPulsating(true)
+    }
+
+    override fun onDetachedFromWindow() {
+        rotationAnimator.cancel()
+        pulseAnimator.cancel()
+        glowAnimator.cancel()
+        waveAnimator.cancel()
+        thinkingAnimator.cancel()
+        super.onDetachedFromWindow()
     }
 }
