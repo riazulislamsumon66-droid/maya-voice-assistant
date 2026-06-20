@@ -1,0 +1,20 @@
+# APK files
+*.apk
+app/build/
+build-log/
+maya-debug-apk/
+
+# Local config
+local.properties
+
+# Gradle
+.gradle/
+build/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
