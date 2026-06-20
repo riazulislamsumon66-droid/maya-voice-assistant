@@ -198,7 +198,11 @@ class FaceDetector(private val context: Context) {
     /**
      * Capture a face photo for enrollment
      */
-    private suspend fun captureFacePhoto(lifecycleOwner: LifecycleOwner): Bitmap? = suspendCoroutine { cont ->
+    private suspend fun captureFacePhoto(lifecycleOwner: LifecycleOwner?): Bitmap? = suspendCoroutine { cont ->
+        if (lifecycleOwner == null) {
+            cont.resume(null)
+            return@suspendCoroutine
+        }
         try {
             val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
             cameraProviderFuture.addListener({
