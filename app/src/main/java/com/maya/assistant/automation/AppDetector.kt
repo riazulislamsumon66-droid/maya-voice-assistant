@@ -173,11 +173,12 @@ object AppDetector {
                 val label = normalizeName(app.label)
                 val pkg = normalizeName(app.packageName)
                 val score = normalizedKeywords.sumOf { keyword ->
-                    when {
+                    val matchScore: Int = when {
                         label.contains(keyword) -> 30
                         pkg.contains(keyword) -> 20
                         else -> 0
                     }
+                    matchScore
                 }
                 app to score
             }
