@@ -11,6 +11,7 @@ import com.maya.assistant.ai.AIResponseManager
 import com.maya.assistant.ai.ConversationMemory
 import com.maya.assistant.ai.DynamicDecisionEngine
 import com.maya.assistant.ai.IntentAnalyzer
+import com.maya.assistant.apps.AppLauncher
 import com.maya.assistant.models.CommandType
 import com.maya.assistant.ui.main.MainActivity
 import com.maya.assistant.utils.Constants
@@ -156,7 +157,7 @@ class ForegroundVoiceService : Service() {
                 val appName = lower.substringAfter(pattern).trim()
                 if (appName.isNotEmpty()) {
                     AppLauncher.launch(this@ForegroundVoiceService, appName)
-                    Log.d(TAG, "DIRECT OPEN: $appName")
+                    Logger.d(TAG, "DIRECT OPEN: $appName")
                     return
                 }
             }
@@ -166,14 +167,14 @@ class ForegroundVoiceService : Service() {
         if (lower.contains("volume up") || lower.contains("ভলিউম বাড়াও") || lower.contains("জোরে")) {
             val am = getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
             am?.adjustVolume(android.media.AudioManager.ADJUST_RAISE, android.media.AudioManager.FLAG_SHOW_UI)
-            Log.d(TAG, "DIRECT VOLUME UP")
+            Logger.d(TAG, "DIRECT VOLUME UP")
             return
         }
         
         if (lower.contains("volume down") || lower.contains("ভলিউম কমাও") || lower.contains("কম")) {
             val am = getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
             am?.adjustVolume(android.media.AudioManager.ADJUST_LOWER, android.media.AudioManager.FLAG_SHOW_UI)
-            Log.d(TAG, "DIRECT VOLUME DOWN")
+            Logger.d(TAG, "DIRECT VOLUME DOWN")
             return
         }
         
