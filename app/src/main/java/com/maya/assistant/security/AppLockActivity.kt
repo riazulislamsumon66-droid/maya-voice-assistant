@@ -25,7 +25,7 @@ import java.util.Locale
 /**
  * AppLockActivity — MAYA Complete Lock স্ক্রিন
  */
-class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
+class AppLockActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var tabPin: TextView
     private lateinit var tabPattern: TextView
@@ -284,7 +284,7 @@ class AppLockActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
 
     private fun setupFinger() {
         val biometricManager = BiometricManager.from(this)
-        val canAuth = biometricManager.canVerify(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+        val canAuth = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
         
         if (canAuth == BiometricManager.BIOMETRIC_SUCCESS || SecurityManager.isBiometricEnabled(this)) {
             fingerBtn.setOnClickListener { launchBiometric(false) }

@@ -105,10 +105,10 @@ class AppSelectionActivity : AppCompatActivity() {
             holder.icon.setImageDrawable(app.icon)
             holder.name.text = app.name
 
-            holder.checkbox.setEnabledCheckedChangeListener(null)
+            holder.checkbox.setOnCheckedChangeListener(null)
             holder.checkbox.isChecked = app.isLocked
 
-            holder.checkbox.setEnabledCheckedChangeListener { _, isChecked ->
+            holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
                 updateLock(app, isChecked)
             }
 

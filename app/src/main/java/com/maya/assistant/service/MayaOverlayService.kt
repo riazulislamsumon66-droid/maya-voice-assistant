@@ -102,7 +102,7 @@ class MayaOverlayService : Service() {
             var initialTouchX = 0f; var initialTouchY = 0f
             val overlayParams = layoutParams as WindowManager.LayoutParams
 
-            setEnabledTouchListener { _, event ->
+            setOnTouchListener { _, event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         initialX = overlayParams.x
@@ -160,7 +160,7 @@ class MayaOverlayService : Service() {
             .setContentText("Press power button to activate overlay")
             .setSmallIcon(R.drawable.ic_maya_notif)
             .setContentIntent(pi)
-            .setEnabledgoing(true)
+            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }

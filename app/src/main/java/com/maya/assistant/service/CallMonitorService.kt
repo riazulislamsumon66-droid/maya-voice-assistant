@@ -18,7 +18,7 @@ import com.maya.assistant.R
 import com.maya.assistant.ui.main.CallAssistantActivity
 import java.util.*
 
-class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
+class CallMonitorService : Service(), TextToSpeech.OnInitListener {
 
     private var telephonyManager: TelephonyManager? = null
     private var phoneListener: PhoneStateListener? = null
@@ -147,7 +147,7 @@ class CallMonitorService : Service(), TextToSpeech.EnabledInitListener {
             .setContentTitle("MAYA Running")
             .setContentText("Monitoring calls")
             .setSmallIcon(R.mipmap.img)
-            .setEnabledgoing(true)
+            .setOngoing(true)
             .build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

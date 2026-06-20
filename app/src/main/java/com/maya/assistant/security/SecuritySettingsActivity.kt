@@ -109,8 +109,8 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
 
         // Check বায়োমেট্রিক hardware
         val biometricManager = BiometricManager.from(this)
-        val canVerify = biometricManager.canVerify(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-        if (canVerify == BiometricManager.BIOMETRIC_SUCCESS) {
+        val canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
             fingerprintSwitch.visibility = View.VISIBLE
             fingerprintSwitch.isChecked = SecurityManager.isBiometricEnabled(this)
         } else {
@@ -130,13 +130,13 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
     }
 
     private fun setupListeners() {
-        appLockSwitch.setEnabledCheckedChangeListener { _, checked ->
+        appLockSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
                 if (!SecurityManager.hasPin(this) && !PatternManager.isPatternSet(this)) {
                     appLockSwitch.isChecked = false
                     toast("Pehle PIN ya Pattern set karo")
                     speak("Pehle PIN ya pattern set karo tab lock enable hoga", true)
-                    return@setEnabledCheckedChangeListener
+                    return@setOnCheckedChangeListener
                 }
                 SecurityManager.setAppLockEnabled(this, true)
                 if (PatternManager.isPatternSet(this)) {
@@ -156,12 +156,12 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
         setPatternBtn.setOnClickListener { startPatternSetup() }
         setVoiceBtn.setOnClickListener { showVoiceSetupDialog() }
 
-        fingerprintSwitch.setEnabledCheckedChangeListener { _, checked ->
+        fingerprintSwitch.setOnCheckedChangeListener { _, checked ->
             SecurityManager.setBiometricEnabled(this, checked)
             speak(if (checked) "Fingerprint unlock enable ho gaya" else "Fingerprint unlock band kar diya", true)
         }
 
-        deviceLockSwitch.setEnabledCheckedChangeListener { _, checked ->
+        deviceLockSwitch.setOnCheckedChangeListener { _, checked ->
             SecurityManager.setDeviceLockEnabled(this, checked)
             speak(if (checked) "System screen lock enable ho gaya" else "System lock band kar diya", true)
         }
@@ -176,7 +176,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
             startActivity(intent)
         }
-        privateModeSwitch.setEnabledCheckedChangeListener { _, checked ->
+        privateModeSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
                 SecurityManager.enablePrivateMode(this)
                 privateModeStatusText.text = "🙈 Private Mode ON — Chat history hidden"
@@ -204,7 +204,7 @@ class SecuritySettingsActivity : AppCompatActivity(), TextToSpeech.OnInitListene
             .setNegativeButton("বাতিল", null)
             .create()
 
-        dialog.setVisibleListener {
+        dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val pin  = newPinInput.text.toString().trim()
                 val conf = confPinInput.text.toString().trim()

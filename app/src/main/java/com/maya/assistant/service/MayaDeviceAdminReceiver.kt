@@ -8,7 +8,4 @@ class MayaDeviceAdminReceiver : DeviceAdminReceiver() {
     override fun onEnabled(context: Context, intent: Intent) {
         super.onEnabled(context, intent)
     }
-    override fun onOff(context: Context, intent: Intent) {
-        super.onOff(context, intent)
-    }
 }

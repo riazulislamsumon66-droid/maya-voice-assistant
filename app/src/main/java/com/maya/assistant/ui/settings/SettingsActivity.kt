@@ -148,7 +148,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.deviceAdminCard).setOnClickListener {
-            if (!devicePolicyManager.isActive(componentName)) {
+            if (!devicePolicyManager.isAdminActive(componentName)) {
                 val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                     putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
                     putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "MAYA needs admin to control system.")
@@ -312,7 +312,7 @@ class SettingsActivity : AppCompatActivity() {
         accessibilityStatus.text = if (enabled) "✅ Full Control Enabled" else "❌ অ্যাক্সেসিবিলিটি Off"
         accessibilityStatus.setTextColor(if (enabled) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 
-        val adminActive = devicePolicyManager.isActive(componentName)
+        val adminActive = devicePolicyManager.isAdminActive(componentName)
         adminStatusText.text = if (adminActive) "✅ Admin সক্রিয়" else "❌ Admin নিষ্ক্রিয়"
         adminStatusText.setTextColor(if (adminActive) 0xFF00E676.toInt() else 0xFFFF1744.toInt())
 

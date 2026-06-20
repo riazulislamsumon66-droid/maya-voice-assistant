@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.maya.assistant.R
 import java.util.*
 
-class PatternSetupActivity : AppCompatActivity(), TextToSpeech.EnabledInitListener {
+class PatternSetupActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var patternLockView: PatternLockView
     private lateinit var instructionText: TextView

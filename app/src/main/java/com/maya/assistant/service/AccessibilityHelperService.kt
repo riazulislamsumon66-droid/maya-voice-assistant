@@ -94,7 +94,7 @@ class AccessibilityHelperService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
         currentRoot = rootInActiveWindow
-        AccessibilityEventManager.onEvent(event)
+        // AccessibilityEventManager.onEvent(event) — removed, not needed
         Log.d(TAG, "EVENT -> ${event.packageName} | ${event.className}")
     }
 
