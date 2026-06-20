@@ -172,11 +172,11 @@ object AppDetector {
             .map { app ->
                 val label = normalizeName(app.label)
                 val pkg = normalizeName(app.packageName)
-                val score = normalizedKeywords.sumOf { keyword ->
+                var score = 0
+                for (keyword in normalizedKeywords) {
                     when {
-                        label.contains(keyword) -> 30
-                        pkg.contains(keyword) -> 20
-                        else -> 0
+                        label.contains(keyword) -> score += 30
+                        pkg.contains(keyword) -> score += 20
                     }
                 }
                 app to score
