@@ -48,4 +48,5 @@
     <string name="enable_accessibility">⚠️ एक्सेसिबिलिटी सर्विस चालू करें। सेटिंग्स → एक्सेसिबिलिटी।</string>
     <string name="reconnecting">रीकनेक्ट हो रहा है…</string>
     <string name="hey_maya">Hey MAYA</string>
+    <string name="accessibility_description">MAYA AI अिसिस्टेंट को स्क्रीन पढ़ने, ऑटोमेटिक टैप करने और apps कंट्रोल करने के लिए एक्सेसिबिलिटी अनुमति चाहिए।</string>
 </resources>

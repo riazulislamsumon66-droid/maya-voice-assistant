@@ -173,7 +173,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAccessibility() {
         if (!AccessibilityHelperService.isEnabled(this)) {
-            addBotMessage(getString(R.string.enable_accessibility))
+            try {
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                addBotMessage("জান, Accessibility Service চালু করো — MAYA-কে allow করতে হবে!")
+            } catch (e: Exception) {
+                addBotMessage("Settings > Accessibility > MAYA চালু করো জান")
+            }
         }
     }
 

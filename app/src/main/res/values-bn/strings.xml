@@ -63,4 +63,5 @@
     <string name="caller_name">কলারের নাম</string>
     <string name="incoming_call">কল আসছে…</string>
     <string name="say_answer_reject">বলো \'উঠাও\' বা \'রিজেক্ট\'</string>
+    <string name="accessibility_description">MAYA AI সহচর স্ক্রিন পড়তে, অটোমেটিক ট্যাপ করতে এবং apps নিয়ন্ত্রণ করতে অ্যাক্সেসিবিলিটি অনুমতি দরকার।</string>
 </resources>

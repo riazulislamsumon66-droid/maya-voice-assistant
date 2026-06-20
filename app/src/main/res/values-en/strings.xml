@@ -48,4 +48,5 @@
     <string name="enable_accessibility">⚠️ Enable Accessibility Service for app control. Settings → Accessibility.</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="hey_maya">Hey MAYA</string>
+    <string name="accessibility_description">MAYA AI Assistant needs accessibility permission to read screen content, automate taps, and control apps for you.</string>
 </resources>

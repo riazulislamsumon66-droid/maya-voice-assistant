@@ -155,7 +155,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 startActivity(intent)
             } else {
-                Toast.makeText(this, "Admin is already active ✅", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Admin আগে থেকেই active আছে ✅", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -177,7 +177,7 @@ class SettingsActivity : AppCompatActivity() {
         setDefaultAssistantBtn.setOnClickListener {
             try {
                 startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
-                Toast.makeText(this, "MAYA ko Default Assistant chuno 👆", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "MAYA কে Default Assistant বানাও 👆", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "Settings → Apps → Default Apps → Assistant → MAYA", Toast.LENGTH_LONG).show()
             }
@@ -195,7 +195,7 @@ class SettingsActivity : AppCompatActivity() {
         if (missing.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, missing.toTypedArray(), PERMISSIONS_REQUEST_CODE)
         } else {
-            Toast.makeText(this, "Sab permissions already granted! ✅", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "সব permissions আগে থেকেই granted আছে! ✅", Toast.LENGTH_SHORT).show()
             updatePermissionsStatus()
         }
     }
@@ -207,9 +207,9 @@ class SettingsActivity : AppCompatActivity() {
             val total = permissions.size
 
             if (granted == total) {
-                Toast.makeText(this, "Sab permissions mil gayi! ✅", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "সব permissions পেয়ে গেছে! ✅", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "$granted/$total permissions mili ⚠️", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "$granted/$total permissions পেয়েছি ⚠️", Toast.LENGTH_LONG).show()
 
                 val permanentlyDenied = permissions.filterIndexed { index, _ ->
                     grantResults[index] == PackageManager.PERMISSION_DENIED &&
@@ -218,20 +218,20 @@ class SettingsActivity : AppCompatActivity() {
 
                 if (permanentlyDenied.isNotEmpty()) {
                     AlertDialog.Builder(this)
-                        .setTitle("Permissions Required ⚠️")
-                        .setMessage("Kuch permissions permanently deny ho gayi hain. Settings se manually enable karo.\n\n" +
+                        .setTitle("Permissions দরকার ⚠️")
+                        .setMessage("কিছু permissions permanently deny হয়ে গেছে। Settings থেকে manually enable করো.\n\n" +
                                 permanentlyDenied.joinToString("\n") { "• ${it.split('.').last()}" })
-                        .setPositiveButton("Open Settings") { _, _ ->
+                        .setPositiveButton("Settings খোলো") { _, _ ->
                             try {
                                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                                     data = Uri.fromParts("package", packageName, null)
                                 }
                                 startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(this, "Settings open nahi ho paya", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Settings open হয়নি", Toast.LENGTH_SHORT).show()
                             }
                         }
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton("বাতিল", null)
                         .show()
                 }
             }

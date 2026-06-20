@@ -79,7 +79,9 @@ class AccessibilityHelperService : AccessibilityService() {
             flags =
                 AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
                         AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
-                        AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+                        AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
+                        AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE or
+                        AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS
 
             notificationTimeout = 50
         }
