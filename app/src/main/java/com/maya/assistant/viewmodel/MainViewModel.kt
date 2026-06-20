@@ -356,12 +356,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return prefs.getString("prime_contacts_json", "[]") ?: "[]"
     }
 
-    fun getPrimeContactsJson(): String {
-        val context = getApplication<Application>()
-        val prefs = context.getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
-        return prefs.getString("prime_contacts_json", "[]") ?: "[]"
-    }
-
     fun savePrimeContacts(json: String) {
         val context = getApplication<Application>()
         val prefs = context.getSharedPreferences("maya_prefs", Context.MODE_PRIVATE)
@@ -390,7 +384,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return if (service != null && AccessibilityHelperService.isEnabled()) {
             service.getScreenInfo()
         } else {
-            ScreenInfo("Unknown", "", emptyList())
+            ScreenInfo("Unknown", "", "", emptyList())
         }
     }
 

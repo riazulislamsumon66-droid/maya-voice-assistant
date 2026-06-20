@@ -172,7 +172,7 @@ class OrbAnimationView @JvmOverloads constructor(
                 for (angle in 0..360 step 5) {
                     val rad = Math.toRadians(angle.toDouble())
                     val wave = sin(rad * 3 + waveOffset + i) * 5
-                    val r = waveRadius + wave
+                    val r = (waveRadius + wave).toFloat()
                     val x = cx + r * cos(rad).toFloat()
                     val y = cy + r * sin(rad).toFloat()
                     if (angle == 0) path.moveTo(x, y) else path.lineTo(x, y)

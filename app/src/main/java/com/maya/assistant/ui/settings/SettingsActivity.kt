@@ -14,6 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.maya.assistant.R
 import com.maya.assistant.service.AccessibilityHelperService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.os.Build
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -194,6 +199,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
     private fun showAddPrimeContactDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_prime_contact, null)
